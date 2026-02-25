@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.bigtable.v2.ReadRowsRequest;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
     private final ConcurrentHashMap<String, BigtableDataClient> clients = new ConcurrentHashMap<>();
     private final String defaultProject;
     private final String defaultInstance;
+    private final AtomicLong readRowsCount = new AtomicLong(0);
 
     private static final Pattern TABLE_NAME_PATTERN = Pattern.compile("projects/([^/]+)/instances/([^/]+)/tables/([^/]+)");
 
@@ -66,24 +69,38 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     }
 
     @Override
-    public void readRows(ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
-        String tableName = request.getTableName();
-        int limit = request.getLimit() > 0 ? request.getLimit() : 1;
+    public void getStats(StatsRequest request, StreamObserver<StatsResponse> responseObserver) {
+        StatsResponse response = StatsResponse.newBuilder()
+            .setReadRowsCount(readRowsCount.get())
+            .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 
-        System.err.println("Java Sidecar: Reading rows from " + tableName + " (limit: " + limit + ")");
-
+    @Override
+    public void readRows(com.example.sidecar.ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
         try {
+            readRowsCount.incrementAndGet();
+            System.out.println("Java Sidecar: Received readRows call. Request bytes size: " + request.getRequestBytes().size());
+            
+            // 1. Parse the serialized native ReadRowsRequest bytes
+            ReadRowsRequest nativeRequest = ReadRowsRequest.parseFrom(request.getRequestBytes());
+            String tableName = nativeRequest.getTableName();
+            
+            System.out.println("Java Sidecar: Processing full ReadRowsRequest for [" + tableName + "]");
+
+            // 2. Get the appropriate client for this project/instance (parsed from table name)
             BigtableDataClient dataClient = getClient(tableName);
             
-            // Extract tableId from tableName if it's a full path
-            String tableId = tableName;
-            Matcher matcher = TABLE_NAME_PATTERN.matcher(tableName);
-            if (matcher.matches()) {
-                tableId = matcher.group(3);
-            }
+            // 3. Convert the native proto request into a high-level Veneer Query object
+            System.out.println("Java Sidecar: Converting proto to Query...");
+            Query query = Query.fromProto(nativeRequest);
+            System.out.println("Java Sidecar: Query conversion successful.");
 
-            Query query = Query.create(tableId).limit(limit);
+            // 4. Execute the query and stream results
+            int rowCount = 0;
             for (Row row : dataClient.readRows(query)) {
+                rowCount++;
                 SidecarRow.Builder rowBuilder = SidecarRow.newBuilder()
                         .setKey(row.getKey());
 
@@ -124,9 +141,11 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
                 }
                 responseObserver.onNext(rowBuilder.build());
             }
+            System.out.println("Java Sidecar: Finished streaming " + rowCount + " rows.");
             responseObserver.onCompleted();
         } catch (Exception e) {
-            System.err.println("Java Sidecar: Error reading rows: " + e.getMessage());
+            System.out.println("Java Sidecar ERROR: " + e.getMessage());
+            e.printStackTrace(System.out);
             responseObserver.onError(e);
         }
     }

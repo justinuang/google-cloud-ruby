@@ -899,11 +899,24 @@ module Google
               raise "JAVA SIDECAR ERROR: Sidecar signaled readiness but gRPC Ping failed: #{e.message}"
             end
 
+            # Start a background thread to dump sidecar logs to stdout
+            @sidecar_log_thread = Thread.new do
+              begin
+                while line = @sidecar_io.gets
+                  # Only print lines that look like our sidecar logs or errors
+                  puts "   [SIDECAR] #{line}" if line =~ /Java Sidecar|ERROR|WARNING/
+                end
+              rescue => e
+                # Silence log thread errors on shutdown
+              end
+            end
+
             puts ">>> RUBY CLIENT: Sidecar ready and verified via gRPC."
 
             # Register shutdown hook to clean up sidecar and socket
             at_exit do
               puts ">>> RUBY CLIENT: Shutting down sidecar..."
+              @sidecar_log_thread.kill if @sidecar_log_thread
               if @sidecar_io
                 Process.kill("TERM", @sidecar_io.pid) rescue nil
                 @sidecar_io.close rescue nil
@@ -917,6 +930,18 @@ module Google
 
         def sidecar_stub
           self.class.sidecar_stub project_id
+        end
+
+        ##
+        # Returns usage statistics from the Java sidecar.
+        #
+        # @return [Com::Example::Sidecar::StatsResponse]
+        #
+        def sidecar_stats
+          return nil unless @use_sidecar
+          stub = sidecar_stub
+          return nil unless stub
+          stub.get_stats Com::Example::Sidecar::StatsRequest.new
         end
 
         ##
