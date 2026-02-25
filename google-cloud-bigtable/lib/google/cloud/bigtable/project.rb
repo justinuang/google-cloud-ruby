@@ -66,6 +66,10 @@ module Google
         attr_accessor :service
 
         # @private
+        # The instance ID for sidecar proxying
+        attr_accessor :instance_id
+
+        # @private
         # Creates a new Bigtable Project instance.
         # @param service [Google::Cloud::Bigtable::Service]
         def initialize service
@@ -74,7 +78,7 @@ module Google
 
         @sidecar_mutex = Mutex.new
 
-        def self.sidecar_stub
+        def self.sidecar_stub project_id = nil, instance_id = nil
           return @sidecar_stub if @sidecar_stub
 
           @sidecar_mutex.synchronize do
@@ -115,14 +119,18 @@ module Google
             end
 
             puts ">>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS..."
+            args = [socket_path, "--ready-fifo", fifo_path]
+            args += ["--project", project_id] if project_id
+            args += ["--instance", instance_id] if instance_id
+
             if launcher_path
-              @sidecar_io = IO.popen([launcher_path, socket_path, "--ready-fifo", fifo_path], "r", err: [:child, :out])
+              @sidecar_io = IO.popen([launcher_path] + args, "r", err: [:child, :out])
             else
               # Manual java fallback
               java_bin = "java"
               gem_root = File.expand_path("../../../..", __dir__)
               jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
-              @sidecar_io = IO.popen([java_bin, "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "-jar", jar_path, socket_path, "--ready-fifo", fifo_path], "r", err: [:child, :out])
+              @sidecar_io = IO.popen([java_bin, "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "-jar", jar_path] + args, "r", err: [:child, :out])
             end
 
             # Block on FIFO read for readiness signal (non-polling)
@@ -173,7 +181,7 @@ module Google
 
 
         def sidecar_stub
-          self.class.sidecar_stub
+          self.class.sidecar_stub project_id, instance_id
         end
 
         def sidecar_ping message = "Hello from Ruby!"
@@ -183,6 +191,25 @@ module Google
           req = Com::Example::Sidecar::PingRequest.new(message: message)
           resp = stub.ping(req)
           resp.message
+        end
+
+        def sidecar_read table_id = "test-table", limit = 1
+          stub = sidecar_stub
+          raise "JAVA SIDECAR ERROR: Sidecar stub not available." unless stub
+
+          req = Com::Example::Sidecar::ReadRowsRequest.new(table_id: table_id, limit: limit)
+
+          begin
+            responses = stub.read_rows(req)
+            responses.to_a
+          rescue GRPC::BadStatus => e
+            puts ">>> RUBY CLIENT: gRPC Error during sidecar read: #{e.code} - #{e.details}"
+            puts ">>> RUBY CLIENT: Metadata: #{e.metadata}" if e.metadata
+            raise e
+          rescue => e
+            puts ">>> RUBY CLIENT: Error during sidecar read: #{e.class}: #{e.message}"
+            raise e
+          end
         end
 
 

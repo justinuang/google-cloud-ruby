@@ -37,7 +37,7 @@ namespace :sidecar do
         modules = [
           "java.base", "java.compiler", "java.management", "java.naming",
           "java.security.jgss", "java.sql", "jdk.unsupported", "java.logging",
-          "java.xml", "java.desktop"
+          "java.xml", "java.desktop", "jdk.crypto.ec", "java.instrument"
         ].join(",")
 
         sh "#{jlink_bin} --module-path #{jmods_path} " \
