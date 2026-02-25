@@ -16,7 +16,8 @@ Gem::Specification.new do |gem|
 
   gem.platform      = Gem::Platform::RUBY
 
-  gem.files         = `git ls-files -- lib/*`.split("\n") +
+  gem.files         = Dir.glob("lib/**/*") +
+                      Dir.glob("lib/google/cloud/bigtable/runtime/**/*") +
                       ["OVERVIEW.md", "AUTHENTICATION.md", "EMULATOR.md", "LOGGING.md", "CONTRIBUTING.md",
                        "TROUBLESHOOTING.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "LICENSE", ".yardopts"]
   gem.require_paths = ["lib"]

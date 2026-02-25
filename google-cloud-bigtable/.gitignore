@@ -18,3 +18,16 @@ tmp/*
 .byebug_history
 .DS_Store
 rubocop_yard_examples/*
+
+# Built artifacts
+lib/google/cloud/bigtable/runtime/
+*.gem
+build_trace.log
+sidecar/target/
+sidecar/runtime/
+sidecar/jlink-runtime/
+sidecar/classpath.txt
+sidecar/dependency-reduced-pom.xml
+
+# IDE settings
+test/ruby-prototype.code-workspace

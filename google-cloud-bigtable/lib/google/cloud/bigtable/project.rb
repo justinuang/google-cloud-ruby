@@ -59,6 +59,49 @@ module Google
         # @param service [Google::Cloud::Bigtable::Service]
         def initialize service
           @service = service
+          setup_java_sidecar
+        end
+
+        def setup_java_sidecar
+          # Attempt to find the self-contained jlink launcher within the gem first
+          gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
+          
+          if File.exist? gem_launcher_path
+            puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
+            launcher_bin = gem_launcher_path
+            # When using the launcher, we don't need separate java_bin or jar_path
+            @sidecar_io = IO.popen(launcher_bin, "r+")
+          else
+            # Fallback for development/local execution
+            gem_root = File.expand_path("../../../..", __dir__)
+            dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
+            
+            if File.exist? dev_launcher_path
+              puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
+              @sidecar_io = IO.popen(dev_launcher_path, "r+")
+            else
+              # Absolute fallback to system java and JAR (for legacy dev setups)
+              java_bin = "java"
+              jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
+              puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java and #{jar_path}"
+              @sidecar_io = IO.popen("#{java_bin} -jar #{jar_path}", "r+")
+            end
+          end
+
+          @sidecar_io.puts "Ruby says: Hello Java Sidecar!"
+          response = @sidecar_io.gets
+          puts ">>> RUBY CLIENT RECEIVED FROM JAVA SIDECAR: #{response}"
+        end
+
+        def sidecar_read
+          @sidecar_io.puts "read"
+          # The Java sidecar prints results to stdout/stderr.
+          # Here we just read the confirmation line if any.
+          # Our specific Java sidecar prints row keys to stdout.
+          while (line = @sidecar_io.gets)
+            puts ">>> RUBY SIDECAR READ OUTPUT: #{line}"
+            break if line.start_with?("Java sidecar: Found row: 000004") # Hardcoded for limit 5
+          end
         end
 
         ##
