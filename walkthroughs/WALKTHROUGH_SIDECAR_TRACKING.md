@@ -1,39 +1,40 @@
-# Walkthrough: Java-Side Sidecar Tracking
+# Walkthrough: Sidecar Test Consolidation
 
-I have moved usage tracking to the Java sidecar. The Ruby client now queries the sidecar's statistics to verify that operations are actually processed by the Java code.
+I have consolidated the scattered sidecar tests and scripts into a formal integration test suite within the main `test/` directory.
 
 ## Changes Made
 
-### Java Sidecar
-- [SidecarServiceImpl.java](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/sidecar/src/main/java/com/example/sidecar/SidecarServiceImpl.java): Added an `AtomicLong` to track `readRows` calls and implemented the `getStats` RPC.
+### Test Consolidation
+- **Primary Integration Test:** Renamed and moved `test/verification/install_verification.rb` to [sidecar_integration_test.rb](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/test/google/cloud/bigtable/sidecar_integration_test.rb).
+- **Consolidated Logic:** Merged functional testing logic from standalone scripts into this primary suite.
+- **Cleanup:** Deleted redundant standalone scripts:
+  - `test/sidecar_test.rb` [DELETE]
+  - `test/verify_installed_gem.rb` [DELETE]
 
-### Infrastructure & Protos
-- [Rakefile](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/Rakefile): Added a `proto:generate` task to keep Ruby protos in sync with `sidecar.proto`. Integrated it into the `sidecar:build` task.
-- Regenerated Ruby protos in `lib/google/cloud/bigtable/sidecar_proto/`.
-
-### Ruby Client
-- [service.rb](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/lib/google/cloud/bigtable/service.rb): Added `sidecar_stats` method to access the sidecar's internal counters.
-
-### Verification Tests
-- [install_verification.rb](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/test/verification/install_verification.rb): Added `test_sidecar_statistics` to assert that the sidecar's counter increases after a `read_rows` call.
+### Infrastructure
+- [Rakefile](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable/Rakefile): Updated `verify:install` task to point to the new location of the integration test.
 
 ## Verification Results
 
-### Automated Tests
-Run `bundle exec rake verify:install`.
+### Automated Integration Tests
+Run `bundle exec rake verify:install`. This task builds the Java sidecar, builds the Ruby gem, installs it in a clean environment, and runs the full suite of 7 integration tests.
 
 ```text
-Run options: --seed 59852
+Run options: --seed 49081
 
 # Running:
 
-.   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260225-422058-58vl0t/sidecar.sock
-   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260225-422058-58vl0t/sidecar.sock
-   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260225-422058-58vl0t/ready.fifo
-.   [SIDECAR] Java Sidecar: Finished streaming 5 rows.
-.   [SIDECAR] Java Sidecar: Received readRows call. Request bytes size: 81
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
 ...
-7 runs, 34 assertions, 0 failures, 0 errors, 0 skips
+7 runs, 32 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-All 7 verification tests passed, confirming end-to-end functionality of the statistics tracking.
+All 7 integration tests passed, confirming that:
+1. The Java sidecar builds and launches correctly.
+2. The Ruby client successfully handshakes with the sidecar over UDS.
+3. gRPC communication is working for both data and statistics.
+4. Functional features like filters and row limits are correctly proxied.
+
+## Documentation
+All project walkthroughs are now organized in the git repository:
+- [google-cloud-ruby/walkthroughs/](file:///usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/walkthroughs/)
