@@ -5,8 +5,8 @@ project_id = "autonomous-mote-782"
 instance_id = "autopilot-rm-test"
 table_id = "table-10g"
 
-# Initialize the Bigtable client
-bigtable = Google::Cloud::Bigtable.new(project_id: project_id)
+# Initialize the Bigtable client with sidecar enabled
+bigtable = Google::Cloud::Bigtable.new(project_id: project_id, use_sidecar: true)
 
 # Connect to the specific table
 table = bigtable.table(instance_id, table_id)

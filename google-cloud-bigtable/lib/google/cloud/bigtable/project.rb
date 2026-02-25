@@ -23,17 +23,6 @@ require "google/cloud/bigtable/instance"
 require "google/cloud/bigtable/cluster"
 require "google/cloud/bigtable/table"
 
-# Add the sidecar_proto directory to the load path so that the generated
-# sidecar_services_pb.rb can find sidecar_pb.rb.
-proto_dir = File.expand_path("sidecar_proto", __dir__)
-$LOAD_PATH.unshift(proto_dir) unless $LOAD_PATH.include?(proto_dir)
-require "sidecar_services_pb"
-
-require "tmpdir"
-require "timeout"
-
-
-
 module Google
   module Cloud
     module Bigtable
@@ -66,150 +55,10 @@ module Google
         attr_accessor :service
 
         # @private
-        # The instance ID for sidecar proxying
-        attr_accessor :instance_id
-
-        # @private
         # Creates a new Bigtable Project instance.
         # @param service [Google::Cloud::Bigtable::Service]
         def initialize service
           @service = service
-        end
-
-        @sidecar_mutex = Mutex.new
-
-        def self.sidecar_stub project_id = nil, instance_id = nil
-          return @sidecar_stub if @sidecar_stub
-
-          @sidecar_mutex.synchronize do
-            return @sidecar_stub if @sidecar_stub
-
-            if ENV["BIGTABLE_SIDECAR_DISABLED"] == "true"
-              puts ">>> JAVA SIDECAR: Disabled via environment variable"
-              return nil
-            end
-
-            # Create a temporary directory for the socket file and FIFO
-            @sidecar_tmp_dir = Dir.mktmpdir("bigtable-sidecar")
-            socket_path = File.join(@sidecar_tmp_dir, "sidecar.sock")
-            fifo_path = File.join(@sidecar_tmp_dir, "ready.fifo")
-            
-            # Create FIFO for readiness signaling
-            system("mkfifo", fifo_path)
-
-            # Attempt to find the self-contained jlink launcher within the gem first
-            gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
-            
-            launcher_path = nil
-            if File.exist? gem_launcher_path
-              puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
-              launcher_path = gem_launcher_path
-            else
-              # Fallback for development/local execution
-              gem_root = File.expand_path("../../../..", __dir__)
-              dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
-              
-              if File.exist? dev_launcher_path
-                puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
-                launcher_path = dev_launcher_path
-              else
-                # Absolute fallback to system java and JAR (for legacy dev setups)
-                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
-              end
-            end
-
-            puts ">>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS..."
-            args = [socket_path, "--ready-fifo", fifo_path]
-            args += ["--project", project_id] if project_id
-            args += ["--instance", instance_id] if instance_id
-
-            if launcher_path
-              @sidecar_io = IO.popen([launcher_path] + args, "r", err: [:child, :out])
-            else
-              # Manual java fallback
-              java_bin = "java"
-              gem_root = File.expand_path("../../../..", __dir__)
-              jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
-              @sidecar_io = IO.popen([java_bin, "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "-jar", jar_path] + args, "r", err: [:child, :out])
-            end
-
-            # Block on FIFO read for readiness signal (non-polling)
-            puts ">>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)..."
-            begin
-              Timeout.timeout(30) do
-                File.open(fifo_path, "r") do |fifo|
-                  fifo.read(1) # This blocks until the Java sidecar writes a byte
-                end
-              end
-            rescue Timeout::Error
-              @sidecar_io = nil
-              raise "JAVA SIDECAR ERROR: Sidecar failed to signal readiness via FIFO within 30 seconds."
-            end
-            puts ">>> RUBY CLIENT: Sidecar signaled readiness via FIFO."
-
-            # Establish gRPC connection over UDS
-            @sidecar_stub = Com::Example::Sidecar::SidecarService::Stub.new(
-              "unix:#{socket_path}",
-              :this_channel_is_insecure
-            )
-
-            # Verification: one quick Ping to ensure the gRPC layer is truly up
-            begin
-              req = Com::Example::Sidecar::PingRequest.new(message: "Handshake")
-              @sidecar_stub.ping(req, deadline: Time.now + 2)
-            rescue GRPC::BadStatus, GRPC::Unavailable => e
-              @sidecar_io = nil
-              @sidecar_stub = nil
-              raise "JAVA SIDECAR ERROR: Sidecar signaled readiness but gRPC Ping failed: #{e.message}"
-            end
-
-            puts ">>> RUBY CLIENT: Sidecar ready and verified via gRPC."
-
-            # Register shutdown hook to clean up sidecar and socket
-            at_exit do
-              puts ">>> RUBY CLIENT: Shutting down sidecar..."
-              if @sidecar_io
-                Process.kill("TERM", @sidecar_io.pid) rescue nil
-                @sidecar_io.close rescue nil
-              end
-              FileUtils.remove_entry(@sidecar_tmp_dir) if @sidecar_tmp_dir && Dir.exist?(@sidecar_tmp_dir)
-            end
-
-            @sidecar_stub
-          end
-        end
-
-
-        def sidecar_stub
-          self.class.sidecar_stub project_id, instance_id
-        end
-
-        def sidecar_ping message = "Hello from Ruby!"
-          stub = sidecar_stub
-          raise "JAVA SIDECAR ERROR: Sidecar stub not available." unless stub
-
-          req = Com::Example::Sidecar::PingRequest.new(message: message)
-          resp = stub.ping(req)
-          resp.message
-        end
-
-        def sidecar_read table_id = "test-table", limit = 1
-          stub = sidecar_stub
-          raise "JAVA SIDECAR ERROR: Sidecar stub not available." unless stub
-
-          req = Com::Example::Sidecar::ReadRowsRequest.new(table_id: table_id, limit: limit)
-
-          begin
-            responses = stub.read_rows(req)
-            responses.to_a
-          rescue GRPC::BadStatus => e
-            puts ">>> RUBY CLIENT: gRPC Error during sidecar read: #{e.code} - #{e.details}"
-            puts ">>> RUBY CLIENT: Metadata: #{e.metadata}" if e.metadata
-            raise e
-          rescue => e
-            puts ">>> RUBY CLIENT: Error during sidecar read: #{e.class}: #{e.message}"
-            raise e
-          end
         end
 
 
