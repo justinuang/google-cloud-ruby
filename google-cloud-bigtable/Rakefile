@@ -15,9 +15,20 @@ require "bundler/setup"
 require "bundler/gem_tasks"
 require "tmpdir"
 
+namespace :proto do
+  desc "Regenerate Ruby protos from sidecar.proto"
+  task :generate do
+    proto_file = File.join(__dir__, "sidecar", "src", "main", "proto", "sidecar.proto")
+    output_dir = File.join(__dir__, "lib", "google", "cloud", "bigtable", "sidecar_proto")
+    
+    puts "Regenerating Ruby protos from #{proto_file}..."
+    sh "grpc_tools_ruby_protoc -I #{File.dirname(proto_file)} --ruby_out=#{output_dir} --grpc_out=#{output_dir} #{proto_file}"
+  end
+end
+
 namespace :sidecar do
   desc "Build the Java sidecar jlink runtime (hybrid) and copy it to the gem lib directory"
-  task :build do
+  task :build => "proto:generate" do
     java_dir = File.join(__dir__, "sidecar")
     runtime_source = File.join(java_dir, "jlink-runtime")
     runtime_target = File.join(__dir__, "lib", "google", "cloud", "bigtable", "runtime")

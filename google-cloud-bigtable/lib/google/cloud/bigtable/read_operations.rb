@@ -151,9 +151,22 @@ module Google
 
           if service.use_sidecar
             stub = service.sidecar_stub
-            req = Com::Example::Sidecar::ReadRowsRequest.new(table_name: path, limit: limit || 0)
+            
+            # Construct the full native request
+            row_set = build_row_set keys, ranges
+            native_req = Google::Cloud::Bigtable::V2::ReadRowsRequest.new(
+              table_name: path,
+              app_profile_id: app_profile_id || "",
+              rows: row_set,
+              filter: filter&.to_grpc,
+              rows_limit: limit || 0
+            )
+
+            # Send serialized bytes to sidecar
+            sidecar_req = Com::Example::Sidecar::ReadRowsRequest.new(request_bytes: native_req.to_proto)
+            
             begin
-              stub.read_rows(req).each do |sidecar_row|
+              stub.read_rows(sidecar_req).each do |sidecar_row|
                 yield map_sidecar_row(sidecar_row)
               end
               return

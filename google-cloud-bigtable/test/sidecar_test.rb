@@ -11,16 +11,16 @@ bigtable = Google::Cloud::Bigtable.new(project_id: project_id, use_sidecar: true
 # Connect to the specific table
 table = bigtable.table(instance_id, table_id)
 
-puts "Connected to Bigtable! Scanning first 5 rows from '#{table_id}'..."
-
-# Read rows with a limit of 5
+# Read rows with a filter
 begin
-  rows = table.read_rows(limit: 5)
+  puts ">>> Reading 5 rows with cells_per_column(1) filter via Sidecar..."
+  filter = Google::Cloud::Bigtable::RowFilter.cells_per_column(1)
+  rows = table.read_rows(limit: 5, filter: filter)
   rows.each do |row|
     puts "Row key: #{row.key}"
     row.cells.each do |family, cells|
       cells.each do |cell|
-        puts "  #{family}:#{cell.qualifier} @ #{cell.timestamp} = #{cell.value}"
+        puts "  #{family}:#{cell.qualifier} @ #{cell.timestamp} = #{cell.value} (cells for col: #{cells.select{|c| c.qualifier == cell.qualifier}.size})"
       end
     end
   end

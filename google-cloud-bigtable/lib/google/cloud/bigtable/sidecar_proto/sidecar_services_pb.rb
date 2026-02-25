@@ -18,6 +18,7 @@ module Com
 
           rpc :Ping, ::Com::Example::Sidecar::PingRequest, ::Com::Example::Sidecar::PingResponse
           rpc :ReadRows, ::Com::Example::Sidecar::ReadRowsRequest, stream(::Com::Example::Sidecar::SidecarRow)
+          rpc :GetStats, ::Com::Example::Sidecar::StatsRequest, ::Com::Example::Sidecar::StatsResponse
         end
 
         Stub = Service.rpc_stub_class

@@ -8,6 +8,13 @@ option java_multiple_files = true;
 service SidecarService {
   rpc Ping(PingRequest) returns (PingResponse);
   rpc ReadRows(ReadRowsRequest) returns (stream SidecarRow);
+  rpc GetStats(StatsRequest) returns (StatsResponse);
+}
+
+message StatsRequest {}
+
+message StatsResponse {
+  int64 read_rows_count = 1;
 }
 
 message PingRequest {
@@ -19,8 +26,7 @@ message PingResponse {
 }
 
 message ReadRowsRequest {
-  string table_name = 1;
-  int32 limit = 2;
+  bytes request_bytes = 1; // Serialized com.google.bigtable.v2.ReadRowsRequest
 }
 
 message SidecarRow {
