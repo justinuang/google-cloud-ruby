@@ -1,58 +1,48 @@
 package com.example;
 
-import com.google.api.gax.rpc.ServerStream;
-import com.google.cloud.bigtable.data.v2.BigtableDataClient;
-import com.google.cloud.bigtable.data.v2.BigtableDataSettings;
-import com.google.cloud.bigtable.data.v2.models.Query;
-import com.google.cloud.bigtable.data.v2.models.Row;
-import com.google.cloud.bigtable.data.v2.models.RowCell;
-import java.util.Scanner;
+import com.example.sidecar.SidecarServiceImpl;
+import io.grpc.Server;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
+import io.grpc.netty.shaded.io.netty.channel.EventLoopGroup;
+import io.grpc.netty.shaded.io.netty.channel.epoll.EpollEventLoopGroup;
+import io.grpc.netty.shaded.io.netty.channel.epoll.EpollServerDomainSocketChannel;
+import io.grpc.netty.shaded.io.netty.channel.unix.DomainSocketAddress;
+
+import java.io.IOException;
 
 public class BigtableSidecar {
-    public static void main(String[] args) {
-        System.err.println("Java Sidecar: Started");
-        
-        String projectId = "autonomous-mote-782";
-        String instanceId = "autopilot-rm-test";
-        String tableId = "table-10g";
+    public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length < 1) {
+            System.err.println("Usage: BigtableSidecar <socket_path>");
+            System.exit(1);
+        }
 
-        try {
-            BigtableDataSettings settings = BigtableDataSettings.newBuilder()
-                .setProjectId(projectId)
-                .setInstanceId(instanceId)
+        String socketPath = args[0];
+        System.err.println("Java Sidecar: Starting gRPC server on " + socketPath);
+
+        EventLoopGroup bossGroup = new EpollEventLoopGroup(1);
+        EventLoopGroup workerGroup = new EpollEventLoopGroup();
+
+        Server server = NettyServerBuilder.forAddress(new DomainSocketAddress(socketPath))
+                .channelType(EpollServerDomainSocketChannel.class)
+                .workerEventLoopGroup(workerGroup)
+                .bossEventLoopGroup(bossGroup)
+                .addService(new SidecarServiceImpl())
                 .build();
 
-            try (BigtableDataClient dataClient = BigtableDataClient.create(settings)) {
-                System.err.println("Java Sidecar: Bigtable client initialized for " + projectId + "/" + instanceId);
+        server.start();
+        System.out.println("SIDECAR_READY");
+        System.out.flush();
 
-                Scanner scanner = new Scanner(System.in);
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if ("exit".equalsIgnoreCase(line)) {
-                        break;
-                    }
-                    if ("read".equalsIgnoreCase(line) || "read_real".equalsIgnoreCase(line)) {
-                        System.err.println("Java Sidecar: Reading rows from " + tableId + "...");
-                        try {
-                            Query query = Query.create(tableId).limit(5);
-                            ServerStream<Row> rows = dataClient.readRows(query);
-                            for (Row row : rows) {
-                                System.out.println("Java sidecar: Found row: " + row.getKey().toStringUtf8());
-                            }
-                        } catch (Exception e) {
-                            System.err.println("Java Sidecar Read Error: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.out.println("Java sidecar says: " + line);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Java Sidecar Initialization Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        System.err.println("Java Sidecar: Exiting");
+        System.err.println("Java Sidecar: Server started, listening on " + socketPath);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.err.println("Java Sidecar: Shutting down...");
+            server.shutdown();
+            System.err.println("Java Sidecar: Shut down complete.");
+        }));
+
+        server.awaitTermination();
     }
 }
+

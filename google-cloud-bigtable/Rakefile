@@ -52,7 +52,7 @@ namespace :sidecar do
       File.open(launcher_path, "w") do |f|
         f.puts "#!/bin/sh"
         f.puts "DIR=$(dirname \"$0\")"
-        f.puts "exec \"$DIR/java\" -jar \"$DIR/../app/sidecar.jar\" \"$@\""
+        f.puts "exec \"$DIR/java\" -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar \"$DIR/../app/sidecar.jar\" \"$@\""
       end
       chmod 0755, launcher_path
     end
@@ -74,22 +74,24 @@ namespace :verify do
     # Build the gem
     sh "gem build #{gem_name}.gemspec"
 
-    # Create a temporary directory for installation
-    Dir.mktmpdir("bigtable-verify") do |dir|
-      puts "Verifying installation in #{dir}..."
-      
-      # Install the gem into the temporary directory
-      sh "gem install #{gem_file} --install-dir #{dir} --no-document"
-      
-      # Also install minitest since it's needed for the verification script
-      sh "gem install minitest --install-dir #{dir} --no-document"
+    # Use a persistent directory for installation to speed up iterations
+    # by avoiding rebuilding native extensions every time.
+    dir = File.expand_path("tmp/verify_gems", __dir__)
+    mkdir_p dir
+    
+    puts "Verifying installation in #{dir}..."
+    
+    # Install the gem into the directory
+    sh "gem install #{gem_file} --install-dir #{dir} --no-document"
+    
+    # Also install minitest if not present
+    sh "gem install minitest --install-dir #{dir} --no-document"
 
-      # Run a verification script using the installed gem
-      # We set GEM_HOME to the temporary directory so 'require' finds our installed gem
-      env = { "GEM_HOME" => dir, "GEM_PATH" => dir }
-      Bundler.with_unbundled_env do
-        sh env, "ruby test/verification/install_verification.rb"
-      end
+    # Run a verification script using the installed gem
+    # We set GEM_HOME to the directory so 'require' finds our installed gem
+    env = { "GEM_HOME" => dir, "GEM_PATH" => dir }
+    Bundler.with_unbundled_env do
+      sh env, "ruby test/verification/install_verification.rb"
     end
 
     # Clean up the built gem file

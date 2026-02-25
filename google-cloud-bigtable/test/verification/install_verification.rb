@@ -29,25 +29,29 @@ class InstallVerificationTest < Minitest::Test
     assert File.executable?(launcher_path), "Sidecar launcher at #{launcher_path} is not executable"
   end
 
-  def test_initialization_finds_sidecar
-    # This will trigger setup_java_sidecar in project.rb
-    # We mock IO.popen to avoid actually running the Java process if we just want to verify path logic,
-    # but here we can actually let it run if the environment permits, or just verify it finds the path.
+  def test_sidecar_functionality
+    # This test combines initialization and ping to handle the singleton sidecar behavior
+    service = Google::Cloud::Bigtable::Service.new("project-id", nil)
+    project = nil
     
-    # For now, let's just create a project and see if it fails early.
-    # Note: This might require some credentials or environment settings,
-    # but the constructor itself (setup_java_sidecar) is what we want to test.
+    # 1. Verify initialization (handshake via UDS)
+    stdout, _stderr = capture_io do
+      project = Google::Cloud::Bigtable::Project.new(service)
+      project.sidecar_stub # Trigger lazy init
+    end
     
-    # We'll use a dummy service object
-    service = OpenStruct.new(project_id: "test-project")
-    
-    # Capture stdout to see the "Located jlink launcher" message
-    stdout = capture_io do
-      Google::Cloud::Bigtable::Project.new(service)
-    end.first
-    
-    assert_match(/Located jlink launcher in gem/, stdout)
+    # Check if handshake happened (either in this call or previously)
+    if stdout.include?(">>> RUBY CLIENT: Sidecar ready")
+      assert_match(/Connecting gRPC.../, stdout)
+    end
+
+    # 2. Verify Ping
+    stdout, _stderr = capture_io do
+      response = project.sidecar_ping("Verification Ping")
+      assert_equal "Pong: Verification Ping", response
+    end
   end
+
 
   private
 

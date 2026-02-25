@@ -23,6 +23,15 @@ require "google/cloud/bigtable/instance"
 require "google/cloud/bigtable/cluster"
 require "google/cloud/bigtable/table"
 
+# Add the sidecar_proto directory to the load path so that the generated
+# sidecar_services_pb.rb can find sidecar_pb.rb.
+proto_dir = File.expand_path("sidecar_proto", __dir__)
+$LOAD_PATH.unshift(proto_dir) unless $LOAD_PATH.include?(proto_dir)
+require "sidecar_services_pb"
+
+require "tmpdir"
+
+
 module Google
   module Cloud
     module Bigtable
@@ -59,50 +68,106 @@ module Google
         # @param service [Google::Cloud::Bigtable::Service]
         def initialize service
           @service = service
-          setup_java_sidecar
         end
 
-        def setup_java_sidecar
-          # Attempt to find the self-contained jlink launcher within the gem first
-          gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
-          
-          if File.exist? gem_launcher_path
-            puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
-            launcher_bin = gem_launcher_path
-            # When using the launcher, we don't need separate java_bin or jar_path
-            @sidecar_io = IO.popen(launcher_bin, "r+")
-          else
-            # Fallback for development/local execution
-            gem_root = File.expand_path("../../../..", __dir__)
-            dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
-            
-            if File.exist? dev_launcher_path
-              puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
-              @sidecar_io = IO.popen(dev_launcher_path, "r+")
-            else
-              # Absolute fallback to system java and JAR (for legacy dev setups)
-              java_bin = "java"
-              jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
-              puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java and #{jar_path}"
-              @sidecar_io = IO.popen("#{java_bin} -jar #{jar_path}", "r+")
+        @sidecar_mutex = Mutex.new
+
+        def self.sidecar_stub
+          return @sidecar_stub if @sidecar_stub
+
+          @sidecar_mutex.synchronize do
+            return @sidecar_stub if @sidecar_stub
+
+            if ENV["BIGTABLE_SIDECAR_DISABLED"] == "true"
+              puts ">>> JAVA SIDECAR: Disabled via environment variable"
+              return nil
             end
-          end
 
-          @sidecar_io.puts "Ruby says: Hello Java Sidecar!"
-          response = @sidecar_io.gets
-          puts ">>> RUBY CLIENT RECEIVED FROM JAVA SIDECAR: #{response}"
+            # Create a temporary directory for the socket file
+            @sidecar_tmp_dir = Dir.mktmpdir("bigtable-sidecar")
+            socket_path = File.join(@sidecar_tmp_dir, "sidecar.sock")
+            
+            # Remove the socket file if it somehow exists (it shouldn't in a fresh tmpdir)
+            File.delete(socket_path) if File.exist?(socket_path)
+
+            # Attempt to find the self-contained jlink launcher within the gem first
+            gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
+            
+            if File.exist? gem_launcher_path
+              puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
+              launcher_bin = gem_launcher_path
+              # Launch the sidecar with the socket path
+              @sidecar_io = IO.popen("#{launcher_bin} #{socket_path}", "r", err: [:child, :out])
+            else
+              # Fallback for development/local execution
+              gem_root = File.expand_path("../../../..", __dir__)
+              dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
+              
+              if File.exist? dev_launcher_path
+                puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
+                @sidecar_io = IO.popen("#{dev_launcher_path} #{socket_path}", "r", err: [:child, :out])
+              else
+                # Absolute fallback to system java and JAR (for legacy dev setups)
+                java_bin = "java"
+                jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
+                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java and #{jar_path}"
+                @sidecar_io = IO.popen("#{java_bin} -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar #{jar_path} #{socket_path}", "r", err: [:child, :out])
+              end
+            end
+
+            # Wait for SIDECAR_READY on stdout
+            ready = false
+            while (line = @sidecar_io.gets)
+              puts ">>> JAVA SIDECAR LOG: #{line.strip}"
+              if line.strip == "SIDECAR_READY"
+                ready = true
+                break
+              end
+            end
+
+            unless ready
+              @sidecar_io = nil
+              raise "JAVA SIDECAR ERROR: Failed to receive SIDECAR_READY from sidecar."
+            end
+
+            puts ">>> RUBY CLIENT: Sidecar ready at #{socket_path}. Connecting gRPC..."
+            
+            # Establish gRPC connection over UDS
+            @sidecar_stub = Com::Example::Sidecar::SidecarService::Stub.new(
+              "unix:#{socket_path}",
+              :this_channel_is_insecure
+            )
+
+            # Register shutdown hook to clean up sidecar and socket
+            at_exit do
+              puts ">>> RUBY CLIENT: Shutting down sidecar..."
+              if @sidecar_io
+                Process.kill("TERM", @sidecar_io.pid) rescue nil
+                @sidecar_io.close rescue nil
+              end
+              FileUtils.remove_entry(@sidecar_tmp_dir) if @sidecar_tmp_dir && Dir.exist?(@sidecar_tmp_dir)
+            end
+
+            @sidecar_stub
+          end
+        rescue StandardError => e
+          puts ">>> JAVA SIDECAR INITIALIZATION FAILED: #{e.message}"
+          nil
         end
 
-        def sidecar_read
-          @sidecar_io.puts "read"
-          # The Java sidecar prints results to stdout/stderr.
-          # Here we just read the confirmation line if any.
-          # Our specific Java sidecar prints row keys to stdout.
-          while (line = @sidecar_io.gets)
-            puts ">>> RUBY SIDECAR READ OUTPUT: #{line}"
-            break if line.start_with?("Java sidecar: Found row: 000004") # Hardcoded for limit 5
-          end
+        def sidecar_stub
+          self.class.sidecar_stub
         end
+
+        def sidecar_ping message = "Hello from Ruby!"
+          stub = sidecar_stub
+          raise "JAVA SIDECAR ERROR: Sidecar stub not available." unless stub
+
+          req = Com::Example::Sidecar::PingRequest.new(message: message)
+          resp = stub.ping(req)
+          resp.message
+        end
+
 
         ##
         # Retrieve a client for instance administration. This client should be

@@ -28,4 +28,11 @@ Gem::Specification.new do |gem|
   gem.add_dependency "google-cloud-bigtable-admin-v2", "~> 1.7"
   gem.add_dependency "google-cloud-bigtable-v2", "~> 1.5"
   gem.add_dependency "google-cloud-core", "~> 1.5"
+  gem.add_dependency "grpc", "~> 1.60"
+  gem.add_dependency "google-protobuf", "~> 4.26"
+
+  gem.add_development_dependency "grpc-tools", "~> 1.60"
 end
+
+
+
