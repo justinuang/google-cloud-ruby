@@ -12,12 +12,23 @@ import java.io.IOException;
 
 public class BigtableSidecar {
     public static void main(String[] args) throws IOException, InterruptedException {
-        if (args.length < 1) {
-            System.err.println("Usage: BigtableSidecar <socket_path>");
+        String socketPath = null;
+        String readyFifo = null;
+
+        for (int i = 0; i < args.length; i++) {
+            if ("--ready-fifo".equals(args[i]) && i + 1 < args.length) {
+                readyFifo = args[i + 1];
+                i++;
+            } else if (socketPath == null) {
+                socketPath = args[i];
+            }
+        }
+
+        if (socketPath == null) {
+            System.err.println("Usage: BigtableSidecar <socket_path> [--ready-fifo <fifo_path>]");
             System.exit(1);
         }
 
-        String socketPath = args[0];
         System.err.println("Java Sidecar: Starting gRPC server on " + socketPath);
 
         EventLoopGroup bossGroup = new EpollEventLoopGroup(1);
@@ -33,6 +44,16 @@ public class BigtableSidecar {
         server.start();
 
         System.err.println("Java Sidecar: Server started, listening on " + socketPath);
+
+        if (readyFifo != null) {
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(readyFifo)) {
+                fos.write(1);
+                fos.flush();
+                System.err.println("Java Sidecar: Signaled readiness to FIFO: " + readyFifo);
+            } catch (java.io.IOException e) {
+                System.err.println("Java Sidecar: Failed to signal readiness to FIFO: " + e.getMessage());
+            }
+        }
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

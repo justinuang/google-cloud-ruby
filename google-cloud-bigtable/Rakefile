@@ -26,22 +26,25 @@ namespace :sidecar do
     Dir.chdir(java_dir) do
       sh "mvn clean package"
       
-      puts "Creating jlink runtime (JRE only)..."
-      rm_rf "jlink-runtime"
-      jlink_bin = "/usr/lib/jvm/java-17-openjdk-amd64/bin/jlink"
-      jmods_path = "/usr/lib/jvm/java-17-openjdk-amd64/jmods"
-      
-      # Modules identified by jdeps + some extras for safety
-      modules = [
-        "java.base", "java.compiler", "java.management", "java.naming",
-        "java.security.jgss", "java.sql", "jdk.unsupported", "java.logging",
-        "java.xml", "java.desktop"
-      ].join(",")
+      if Dir.exist? "jlink-runtime"
+        puts "jlink-runtime already exists, skipping jlink creation."
+      else
+        puts "Creating jlink runtime (JRE only)..."
+        jlink_bin = "/usr/lib/jvm/java-17-openjdk-amd64/bin/jlink"
+        jmods_path = "/usr/lib/jvm/java-17-openjdk-amd64/jmods"
+        
+        # Modules identified by jdeps + some extras for safety
+        modules = [
+          "java.base", "java.compiler", "java.management", "java.naming",
+          "java.security.jgss", "java.sql", "jdk.unsupported", "java.logging",
+          "java.xml", "java.desktop"
+        ].join(",")
 
-      sh "#{jlink_bin} --module-path #{jmods_path} " \
-         "--add-modules #{modules} " \
-         "--output jlink-runtime " \
-         "--no-header-files --no-man-pages --compress=2"
+        sh "#{jlink_bin} --module-path #{jmods_path} " \
+           "--add-modules #{modules} " \
+           "--output jlink-runtime " \
+           "--no-header-files --no-man-pages --compress=2"
+      end
 
       puts "Copying fat JAR and creating launcher..."
       jar_name = "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar"

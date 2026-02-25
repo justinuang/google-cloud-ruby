@@ -30,6 +30,8 @@ $LOAD_PATH.unshift(proto_dir) unless $LOAD_PATH.include?(proto_dir)
 require "sidecar_services_pb"
 
 require "tmpdir"
+require "timeout"
+
 
 
 module Google
@@ -83,21 +85,21 @@ module Google
               return nil
             end
 
-            # Create a temporary directory for the socket file
+            # Create a temporary directory for the socket file and FIFO
             @sidecar_tmp_dir = Dir.mktmpdir("bigtable-sidecar")
             socket_path = File.join(@sidecar_tmp_dir, "sidecar.sock")
+            fifo_path = File.join(@sidecar_tmp_dir, "ready.fifo")
             
-            # Remove the socket file if it somehow exists (it shouldn't in a fresh tmpdir)
-            File.delete(socket_path) if File.exist?(socket_path)
+            # Create FIFO for readiness signaling
+            system("mkfifo", fifo_path)
 
             # Attempt to find the self-contained jlink launcher within the gem first
             gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
             
+            launcher_path = nil
             if File.exist? gem_launcher_path
               puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
-              launcher_bin = gem_launcher_path
-              # Launch the sidecar with the socket path
-              @sidecar_io = IO.popen("#{launcher_bin} #{socket_path}", "r", err: [:child, :out])
+              launcher_path = gem_launcher_path
             else
               # Fallback for development/local execution
               gem_root = File.expand_path("../../../..", __dir__)
@@ -105,15 +107,37 @@ module Google
               
               if File.exist? dev_launcher_path
                 puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
-                @sidecar_io = IO.popen("#{dev_launcher_path} #{socket_path}", "r", err: [:child, :out])
+                launcher_path = dev_launcher_path
               else
                 # Absolute fallback to system java and JAR (for legacy dev setups)
-                java_bin = "java"
-                jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
-                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java and #{jar_path}"
-                @sidecar_io = IO.popen("#{java_bin} -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar #{jar_path} #{socket_path}", "r", err: [:child, :out])
+                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
               end
             end
+
+            puts ">>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS..."
+            if launcher_path
+              @sidecar_io = IO.popen([launcher_path, socket_path, "--ready-fifo", fifo_path], "r", err: [:child, :out])
+            else
+              # Manual java fallback
+              java_bin = "java"
+              gem_root = File.expand_path("../../../..", __dir__)
+              jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
+              @sidecar_io = IO.popen([java_bin, "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "-jar", jar_path, socket_path, "--ready-fifo", fifo_path], "r", err: [:child, :out])
+            end
+
+            # Block on FIFO read for readiness signal (non-polling)
+            puts ">>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)..."
+            begin
+              Timeout.timeout(30) do
+                File.open(fifo_path, "r") do |fifo|
+                  fifo.read(1) # This blocks until the Java sidecar writes a byte
+                end
+              end
+            rescue Timeout::Error
+              @sidecar_io = nil
+              raise "JAVA SIDECAR ERROR: Sidecar failed to signal readiness via FIFO within 30 seconds."
+            end
+            puts ">>> RUBY CLIENT: Sidecar signaled readiness via FIFO."
 
             # Establish gRPC connection over UDS
             @sidecar_stub = Com::Example::Sidecar::SidecarService::Stub.new(
@@ -121,27 +145,14 @@ module Google
               :this_channel_is_insecure
             )
 
-            # Verification loop: retry Ping until successful or timeout
-            puts ">>> RUBY CLIENT: Verifying sidecar readiness via gRPC Ping..."
-            ready = false
-            attempts = 0
-            max_attempts = 50
-            while attempts < max_attempts
-              begin
-                req = Com::Example::Sidecar::PingRequest.new(message: "Handshake")
-                @sidecar_stub.ping(req, deadline: Time.now + 0.5)
-                ready = true
-                break
-              rescue GRPC::BadStatus, GRPC::Unavailable, Errno::ENOENT, Errno::ECONNREFUSED
-                attempts += 1
-                sleep 0.1
-              end
-            end
-
-            unless ready
+            # Verification: one quick Ping to ensure the gRPC layer is truly up
+            begin
+              req = Com::Example::Sidecar::PingRequest.new(message: "Handshake")
+              @sidecar_stub.ping(req, deadline: Time.now + 2)
+            rescue GRPC::BadStatus, GRPC::Unavailable => e
               @sidecar_io = nil
               @sidecar_stub = nil
-              raise "JAVA SIDECAR ERROR: Failed to connect to sidecar gRPC via UDS after #{max_attempts} attempts."
+              raise "JAVA SIDECAR ERROR: Sidecar signaled readiness but gRPC Ping failed: #{e.message}"
             end
 
             puts ">>> RUBY CLIENT: Sidecar ready and verified via gRPC."
@@ -158,9 +169,6 @@ module Google
 
             @sidecar_stub
           end
-        rescue StandardError => e
-          puts ">>> JAVA SIDECAR INITIALIZATION FAILED: #{e.message}"
-          nil
         end
 
 
