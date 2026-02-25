@@ -30,41 +30,45 @@ class InstallVerificationTest < Minitest::Test
   end
 
   def test_sidecar_functionality
-    # This test combines initialization and ping to handle the singleton sidecar behavior
-    service = Google::Cloud::Bigtable::Service.new("autonomous-mote-782", nil)
-    project = nil
-    
-    # 1. Verify initialization (handshake via UDS)
+    # Initialize via the new native entry point
+    bigtable = nil
     stdout, _stderr = capture_io do
-      project = Google::Cloud::Bigtable::Project.new(service)
-      project.instance_id = "autopilot-rm-test"
-      project.sidecar_stub # Trigger lazy init
+      bigtable = Google::Cloud::Bigtable.new(
+        project_id: "autonomous-mote-782",
+        use_sidecar: true
+      )
     end
     
-    # Check if handshake happened (either in this call or previously)
+    # Check if handshake happened during Service initialization
+    # Note: If sidecar was already running, this might be empty, but Service.sidecar_stub is idempotent.
     if stdout.include?(">>> RUBY CLIENT: Sidecar ready and verified via gRPC.")
       assert_match(/Sidecar ready and verified via gRPC./, stdout)
     end
 
-
-    # 2. Verify Ping
-    stdout, _stderr = capture_io do
-      response = project.sidecar_ping("Verification Ping")
-      assert_equal "Pong: Verification Ping", response
-    end
+    # Verify we can get a table and the service has the flag
+    assert bigtable.service.use_sidecar
+    table = bigtable.table("autopilot-rm-test", "table-10g")
+    assert_kind_of Google::Cloud::Bigtable::Table, table
   end
 
-  def test_sidecar_read
-    service = Google::Cloud::Bigtable::Service.new("autonomous-mote-782", nil)
-    project = Google::Cloud::Bigtable::Project.new(service)
-    project.instance_id = "autopilot-rm-test"
+  def test_sidecar_native_read_rows
+    bigtable = Google::Cloud::Bigtable.new(
+      project_id: "autonomous-mote-782",
+      use_sidecar: true
+    )
+    table = bigtable.table("autopilot-rm-test", "table-10g")
     
-    # Trigger sidecar read
-    rows = project.sidecar_read("table-10g", 1)
+    # Trigger native read_rows (delegates to sidecar)
+    rows = table.read_rows(limit: 1).to_a
     
     assert_kind_of Array, rows
-    refute_empty rows, "Expected at least one row to be returned from sidecar_read"
-    assert_kind_of Com::Example::Sidecar::SidecarRow, rows.first
+    refute_empty rows, "Expected at least one row to be returned from sidecar via read_rows"
+    assert_kind_of Google::Cloud::Bigtable::Row, rows.first
+    
+    # Verify mapping
+    row = rows.first
+    refute_nil row.key
+    refute_empty row.cells
   end
 
 

@@ -4,24 +4,55 @@ import com.google.cloud.bigtable.data.v2.BigtableDataClient;
 import com.google.cloud.bigtable.data.v2.BigtableDataSettings;
 import com.google.cloud.bigtable.data.v2.models.Query;
 import com.google.cloud.bigtable.data.v2.models.Row;
-import com.google.cloud.bigtable.data.v2.models.RowCell;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
-    private final BigtableDataClient dataClient;
+    private final ConcurrentHashMap<String, BigtableDataClient> clients = new ConcurrentHashMap<>();
+    private final String defaultProject;
+    private final String defaultInstance;
 
-    public SidecarServiceImpl(String project, String instance) throws IOException {
-        if (project != null && instance != null) {
+    private static final Pattern TABLE_NAME_PATTERN = Pattern.compile("projects/([^/]+)/instances/([^/]+)/tables/([^/]+)");
+
+    public SidecarServiceImpl(String project, String instance) {
+        this.defaultProject = project;
+        this.defaultInstance = instance;
+    }
+
+    private BigtableDataClient getClient(String tableName) throws IOException {
+        Matcher matcher = TABLE_NAME_PATTERN.matcher(tableName);
+        String project = defaultProject;
+        String instance = defaultInstance;
+
+        if (matcher.matches()) {
+            project = matcher.group(1);
+            instance = matcher.group(2);
+        }
+
+        if (project == null || instance == null) {
+            throw new RuntimeException("Project and Instance IDs must be provided in table name or during sidecar startup.");
+        }
+
+        String clientKey = project + "/" + instance;
+        BigtableDataClient client = clients.get(clientKey);
+        if (client == null) {
+            System.err.println("Java Sidecar: Initializing new client for " + clientKey);
             BigtableDataSettings settings = BigtableDataSettings.newBuilder()
                     .setProjectId(project)
                     .setInstanceId(instance)
                     .build();
-            this.dataClient = BigtableDataClient.create(settings);
-        } else {
-            this.dataClient = null;
+            client = BigtableDataClient.create(settings);
+            BigtableDataClient existing = clients.putIfAbsent(clientKey, client);
+            if (existing != null) {
+                client.close();
+                client = existing;
+            }
         }
+        return client;
     }
 
     @Override
@@ -36,27 +67,27 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
 
     @Override
     public void readRows(ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
-        if (dataClient == null) {
-            responseObserver.onError(new RuntimeException("BigtableDataClient not initialized. Provide project and instance."));
-            return;
-        }
-
-        String tableId = request.getTableId();
+        String tableName = request.getTableName();
         int limit = request.getLimit() > 0 ? request.getLimit() : 1;
 
-        System.err.println("Java Sidecar: Reading rows from " + tableId + " (limit: " + limit + ")");
+        System.err.println("Java Sidecar: Reading rows from " + tableName + " (limit: " + limit + ")");
 
         try {
+            BigtableDataClient dataClient = getClient(tableName);
+            
+            // Extract tableId from tableName if it's a full path
+            String tableId = tableName;
+            Matcher matcher = TABLE_NAME_PATTERN.matcher(tableName);
+            if (matcher.matches()) {
+                tableId = matcher.group(3);
+            }
+
             Query query = Query.create(tableId).limit(limit);
             for (Row row : dataClient.readRows(query)) {
                 SidecarRow.Builder rowBuilder = SidecarRow.newBuilder()
                         .setKey(row.getKey());
 
                 for (com.google.cloud.bigtable.data.v2.models.RowCell cell : row.getCells()) {
-                    // This is a simplified mapping for now. 
-                    // We need to group by family and qualifier as per SidecarRow structure.
-                    // For the initial "fake" implementation, let's just group them minimally.
-                    
                     String familyName = cell.getFamily();
                     SidecarFamily.Builder familyBuilder = null;
                     
