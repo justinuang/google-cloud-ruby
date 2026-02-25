@@ -41,9 +41,10 @@ class InstallVerificationTest < Minitest::Test
     end
     
     # Check if handshake happened (either in this call or previously)
-    if stdout.include?(">>> RUBY CLIENT: Sidecar ready")
-      assert_match(/Connecting gRPC.../, stdout)
+    if stdout.include?(">>> RUBY CLIENT: Sidecar ready and verified via gRPC.")
+      assert_match(/Sidecar ready and verified via gRPC./, stdout)
     end
+
 
     # 2. Verify Ping
     stdout, _stderr = capture_io do

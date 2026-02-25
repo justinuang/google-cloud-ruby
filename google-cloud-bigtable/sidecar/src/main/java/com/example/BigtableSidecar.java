@@ -31,10 +31,9 @@ public class BigtableSidecar {
                 .build();
 
         server.start();
-        System.out.println("SIDECAR_READY");
-        System.out.flush();
 
         System.err.println("Java Sidecar: Server started, listening on " + socketPath);
+
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("Java Sidecar: Shutting down...");

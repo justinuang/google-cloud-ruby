@@ -115,28 +115,36 @@ module Google
               end
             end
 
-            # Wait for SIDECAR_READY on stdout
-            ready = false
-            while (line = @sidecar_io.gets)
-              puts ">>> JAVA SIDECAR LOG: #{line.strip}"
-              if line.strip == "SIDECAR_READY"
-                ready = true
-                break
-              end
-            end
-
-            unless ready
-              @sidecar_io = nil
-              raise "JAVA SIDECAR ERROR: Failed to receive SIDECAR_READY from sidecar."
-            end
-
-            puts ">>> RUBY CLIENT: Sidecar ready at #{socket_path}. Connecting gRPC..."
-            
             # Establish gRPC connection over UDS
             @sidecar_stub = Com::Example::Sidecar::SidecarService::Stub.new(
               "unix:#{socket_path}",
               :this_channel_is_insecure
             )
+
+            # Verification loop: retry Ping until successful or timeout
+            puts ">>> RUBY CLIENT: Verifying sidecar readiness via gRPC Ping..."
+            ready = false
+            attempts = 0
+            max_attempts = 50
+            while attempts < max_attempts
+              begin
+                req = Com::Example::Sidecar::PingRequest.new(message: "Handshake")
+                @sidecar_stub.ping(req, deadline: Time.now + 0.5)
+                ready = true
+                break
+              rescue GRPC::BadStatus, GRPC::Unavailable, Errno::ENOENT, Errno::ECONNREFUSED
+                attempts += 1
+                sleep 0.1
+              end
+            end
+
+            unless ready
+              @sidecar_io = nil
+              @sidecar_stub = nil
+              raise "JAVA SIDECAR ERROR: Failed to connect to sidecar gRPC via UDS after #{max_attempts} attempts."
+            end
+
+            puts ">>> RUBY CLIENT: Sidecar ready and verified via gRPC."
 
             # Register shutdown hook to clean up sidecar and socket
             at_exit do
@@ -154,6 +162,7 @@ module Google
           puts ">>> JAVA SIDECAR INITIALIZATION FAILED: #{e.message}"
           nil
         end
+
 
         def sidecar_stub
           self.class.sidecar_stub
