@@ -13,7 +13,7 @@ class InstallVerificationTest < Minitest::Test
 
   def test_version_matches
     # Find the version from the source
-    source_version_file = File.expand_path("../../lib/google/cloud/bigtable/version.rb", __dir__)
+    source_version_file = File.expand_path("../../../../lib/google/cloud/bigtable/version.rb", __dir__)
     source_version = File.read(source_version_file).match(/VERSION = "([^"]+)"/)[1]
     
     assert_equal source_version, Google::Cloud::Bigtable::VERSION

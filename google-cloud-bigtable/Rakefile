@@ -105,7 +105,7 @@ namespace :verify do
     # We set GEM_HOME to the directory so 'require' finds our installed gem
     env = { "GEM_HOME" => dir, "GEM_PATH" => dir }
     Bundler.with_unbundled_env do
-      sh env, "ruby test/verification/install_verification.rb"
+      sh env, "ruby test/google/cloud/bigtable/sidecar_integration_test.rb"
     end
 
     # Clean up the built gem file
