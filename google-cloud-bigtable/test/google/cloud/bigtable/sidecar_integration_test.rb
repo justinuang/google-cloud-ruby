@@ -147,6 +147,79 @@ class InstallVerificationTest < Minitest::Test
     assert final_count > initial_count, "Expected sidecar read_rows_count to increase. Initial: #{initial_count}, Final: #{final_count}"
   end
 
+  def test_sidecar_mutate_row
+    project_id = "autonomous-mote-782"
+    instance_id = "autopilot-rm-test"
+    table_id = "test-sidecar-mutate-#{Time.now.to_i}"
+
+    bigtable = Google::Cloud::Bigtable.new(
+      project_id: project_id,
+      use_sidecar: true
+    )
+    instance = bigtable.instance(instance_id)
+    table = instance.create_table(table_id) do |cfm|
+      cfm.add "cf1"
+    end
+
+    begin
+      entry = table.new_mutation_entry "row-1"
+      entry.set_cell "cf1", "col1", "value-1", timestamp: 1000
+
+      # Proxy to sidecar
+      assert table.mutate_row(entry)
+
+      # Verify via sidecar read
+      rows = table.read_rows(keys: ["row-1"]).to_a
+      assert_equal 1, rows.size
+      assert_equal "row-1", rows.first.key
+      assert_equal "value-1", rows.first.cells["cf1"].first.value
+    ensure
+      table.delete if table
+    end
+  end
+
+  def test_sidecar_mutate_rows
+    project_id = "autonomous-mote-782"
+    instance_id = "autopilot-rm-test"
+    table_id = "test-sidecar-mutates-#{Time.now.to_i}"
+
+    bigtable = Google::Cloud::Bigtable.new(
+      project_id: project_id,
+      use_sidecar: true
+    )
+    instance = bigtable.instance(instance_id)
+    table = instance.create_table(table_id) do |cfm|
+      cfm.add "cf1"
+    end
+
+    begin
+      entries = (1..3).map do |i|
+        entry = table.new_mutation_entry "row-#{i}"
+        entry.set_cell "cf1", "col1", "value-#{i}", timestamp: 1000
+        entry
+      end
+
+      # Proxy to sidecar
+      results = table.mutate_rows entries
+      assert_equal 3, results.size
+      results.each { |r| assert r.success? }
+
+      # Verify via sidecar read
+      rows = table.read_rows.to_a
+      assert_equal 3, rows.size
+      rows.each_with_index do |row, idx|
+        # Note: Bigtable order may not be guaranteed if we don't sort, but for small sequential ingest it's usually stable.
+        # We'll search for the expected row to be safe.
+        expected_key = "row-#{idx + 1}"
+        row = rows.find { |r| r.key == expected_key }
+        assert_equal expected_key, row.key
+        assert_equal "value-#{idx + 1}", row.cells["cf1"].first.value
+      end
+    ensure
+      table.delete if table
+    end
+  end
+
 
   private
 

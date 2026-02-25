@@ -11,7 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.bigtable.v2.ReadRowsRequest;
+import com.google.bigtable.v2.MutateRowRequest;
+import com.google.bigtable.v2.MutateRowsRequest;
+import com.google.cloud.bigtable.data.v2.models.RowMutation;
+import com.google.cloud.bigtable.data.v2.models.BulkMutation;
+import com.google.cloud.bigtable.data.v2.models.MutateRowsException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
     private final ConcurrentHashMap<String, BigtableDataClient> clients = new ConcurrentHashMap<>();
@@ -142,6 +149,76 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
                 responseObserver.onNext(rowBuilder.build());
             }
             System.out.println("Java Sidecar: Finished streaming " + rowCount + " rows.");
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            System.out.println("Java Sidecar ERROR: " + e.getMessage());
+            e.printStackTrace(System.out);
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void mutateRow(com.example.sidecar.MutateRowRequest request, StreamObserver<com.example.sidecar.MutateRowResponse> responseObserver) {
+        try {
+            System.out.println("Java Sidecar: Received mutateRow call.");
+            MutateRowRequest nativeRequest = MutateRowRequest.parseFrom(request.getRequestBytes());
+            String tableName = nativeRequest.getTableName();
+            BigtableDataClient dataClient = getClient(tableName);
+
+            RowMutation rowMutation = RowMutation.fromProto(nativeRequest);
+            dataClient.mutateRow(rowMutation);
+
+            responseObserver.onNext(com.example.sidecar.MutateRowResponse.newBuilder().build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            System.out.println("Java Sidecar ERROR: " + e.getMessage());
+            e.printStackTrace(System.out);
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void mutateRows(com.example.sidecar.MutateRowsRequest request, StreamObserver<com.example.sidecar.MutateRowsResponse> responseObserver) {
+        try {
+            System.out.println("Java Sidecar: Received mutateRows call.");
+            MutateRowsRequest nativeRequest = MutateRowsRequest.parseFrom(request.getRequestBytes());
+            String tableName = nativeRequest.getTableName();
+            BigtableDataClient dataClient = getClient(tableName);
+
+            BulkMutation bulkMutation = BulkMutation.fromProto(nativeRequest);
+
+            com.example.sidecar.MutateRowsResponse.Builder responseBuilder = com.example.sidecar.MutateRowsResponse.newBuilder();
+
+            try {
+                dataClient.bulkMutateRows(bulkMutation);
+                // All succeeded or were retried successfully
+                for (int i = 0; i < nativeRequest.getEntriesCount(); i++) {
+                    responseBuilder.addEntries(com.example.sidecar.MutateRowsEntry.newBuilder()
+                            .setIndex(i)
+                            .setStatusCode(0) // OK
+                            .build());
+                }
+            } catch (MutateRowsException e) {
+                System.out.println("Java Sidecar: bulkMutateRows had some failures.");
+                // Initialize all as OK first
+                for (int i = 0; i < nativeRequest.getEntriesCount(); i++) {
+                    responseBuilder.addEntries(com.example.sidecar.MutateRowsEntry.newBuilder()
+                            .setIndex(i)
+                            .setStatusCode(0)
+                            .build());
+                }
+
+                for (MutateRowsException.FailedMutation failed : e.getFailedMutations()) {
+                    int index = (int) failed.getIndex();
+                    responseBuilder.setEntries(index, com.example.sidecar.MutateRowsEntry.newBuilder()
+                            .setIndex(index)
+                            .setStatusCode(failed.getError().getStatusCode().getCode().ordinal())
+                            .setStatusMessage(failed.getError().getMessage())
+                            .build());
+                }
+            }
+
+            responseObserver.onNext(responseBuilder.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             System.out.println("Java Sidecar ERROR: " + e.getMessage());

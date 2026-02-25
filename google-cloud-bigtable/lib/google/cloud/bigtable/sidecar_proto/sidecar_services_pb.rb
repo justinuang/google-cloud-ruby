@@ -18,6 +18,8 @@ module Com
 
           rpc :Ping, ::Com::Example::Sidecar::PingRequest, ::Com::Example::Sidecar::PingResponse
           rpc :ReadRows, ::Com::Example::Sidecar::ReadRowsRequest, stream(::Com::Example::Sidecar::SidecarRow)
+          rpc :MutateRow, ::Com::Example::Sidecar::MutateRowRequest, ::Com::Example::Sidecar::MutateRowResponse
+          rpc :MutateRows, ::Com::Example::Sidecar::MutateRowsRequest, ::Com::Example::Sidecar::MutateRowsResponse
           rpc :GetStats, ::Com::Example::Sidecar::StatsRequest, ::Com::Example::Sidecar::StatsResponse
         end
 
