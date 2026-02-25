@@ -8,7 +8,29 @@ option java_multiple_files = true;
 service SidecarService {
   rpc Ping(PingRequest) returns (PingResponse);
   rpc ReadRows(ReadRowsRequest) returns (stream SidecarRow);
+  rpc MutateRow(MutateRowRequest) returns (MutateRowResponse);
+  rpc MutateRows(MutateRowsRequest) returns (MutateRowsResponse);
   rpc GetStats(StatsRequest) returns (StatsResponse);
+}
+
+message MutateRowRequest {
+  bytes request_bytes = 1; // Serialized com.google.bigtable.v2.MutateRowRequest
+}
+
+message MutateRowResponse {}
+
+message MutateRowsRequest {
+  bytes request_bytes = 1; // Serialized com.google.bigtable.v2.MutateRowsRequest
+}
+
+message MutateRowsResponse {
+  repeated MutateRowsEntry entries = 1;
+}
+
+message MutateRowsEntry {
+  int32 index = 1;
+  int32 status_code = 2;
+  string status_message = 3;
 }
 
 message StatsRequest {}
