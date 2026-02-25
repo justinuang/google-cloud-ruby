@@ -16,6 +16,8 @@
 
 require "simplecov"
 
+ENV["BIGTABLE_SIDECAR_DISABLED"] ||= "true"
+
 require "minitest/autorun"
 require "minitest/spec"
 require "minitest/autorun"
