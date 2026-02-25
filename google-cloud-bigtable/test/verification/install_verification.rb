@@ -31,12 +31,13 @@ class InstallVerificationTest < Minitest::Test
 
   def test_sidecar_functionality
     # This test combines initialization and ping to handle the singleton sidecar behavior
-    service = Google::Cloud::Bigtable::Service.new("project-id", nil)
+    service = Google::Cloud::Bigtable::Service.new("autonomous-mote-782", nil)
     project = nil
     
     # 1. Verify initialization (handshake via UDS)
     stdout, _stderr = capture_io do
       project = Google::Cloud::Bigtable::Project.new(service)
+      project.instance_id = "autopilot-rm-test"
       project.sidecar_stub # Trigger lazy init
     end
     
@@ -51,6 +52,19 @@ class InstallVerificationTest < Minitest::Test
       response = project.sidecar_ping("Verification Ping")
       assert_equal "Pong: Verification Ping", response
     end
+  end
+
+  def test_sidecar_read
+    service = Google::Cloud::Bigtable::Service.new("autonomous-mote-782", nil)
+    project = Google::Cloud::Bigtable::Project.new(service)
+    project.instance_id = "autopilot-rm-test"
+    
+    # Trigger sidecar read
+    rows = project.sidecar_read("table-10g", 1)
+    
+    assert_kind_of Array, rows
+    refute_empty rows, "Expected at least one row to be returned from sidecar_read"
+    assert_kind_of Com::Example::Sidecar::SidecarRow, rows.first
   end
 
 

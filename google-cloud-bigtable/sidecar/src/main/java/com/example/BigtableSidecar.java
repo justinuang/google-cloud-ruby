@@ -14,10 +14,18 @@ public class BigtableSidecar {
     public static void main(String[] args) throws IOException, InterruptedException {
         String socketPath = null;
         String readyFifo = null;
+        String project = null;
+        String instance = null;
 
         for (int i = 0; i < args.length; i++) {
             if ("--ready-fifo".equals(args[i]) && i + 1 < args.length) {
                 readyFifo = args[i + 1];
+                i++;
+            } else if ("--project".equals(args[i]) && i + 1 < args.length) {
+                project = args[i + 1];
+                i++;
+            } else if ("--instance".equals(args[i]) && i + 1 < args.length) {
+                instance = args[i + 1];
                 i++;
             } else if (socketPath == null) {
                 socketPath = args[i];
@@ -25,11 +33,14 @@ public class BigtableSidecar {
         }
 
         if (socketPath == null) {
-            System.err.println("Usage: BigtableSidecar <socket_path> [--ready-fifo <fifo_path>]");
+            System.err.println("Usage: BigtableSidecar <socket_path> [--ready-fifo <fifo_path>] [--project <project>] [--instance <instance>]");
             System.exit(1);
         }
 
         System.err.println("Java Sidecar: Starting gRPC server on " + socketPath);
+        if (project != null && instance != null) {
+            System.err.println("Java Sidecar: Proxying to Project: " + project + ", Instance: " + instance);
+        }
 
         EventLoopGroup bossGroup = new EpollEventLoopGroup(1);
         EventLoopGroup workerGroup = new EpollEventLoopGroup();
@@ -38,7 +49,7 @@ public class BigtableSidecar {
                 .channelType(EpollServerDomainSocketChannel.class)
                 .workerEventLoopGroup(workerGroup)
                 .bossEventLoopGroup(bossGroup)
-                .addService(new SidecarServiceImpl())
+                .addService(new SidecarServiceImpl(project, instance))
                 .build();
 
         server.start();
