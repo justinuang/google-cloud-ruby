@@ -1,0 +1,92 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 6.16
+[[1;34mINFO[m] os.detected.version.major: 6
+[[1;34mINFO[m] os.detected.version.minor: 16
+[[1;34mINFO[m] os.detected.release: debian
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m----------------------< [0;36mcom.example:java-sidecar[0;1m >----------------------[m
+[[1;34mINFO[m] [1mBuilding java-sidecar 1.0-SNAPSHOT[m
+[[1;34mINFO[m]   from pom.xml
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mdependency:3.7.0:tree[m [1m(default-cli)[m @ [36mjava-sidecar[0;1m ---[m
+[[1;34mINFO[m] com.example:java-sidecar:jar:1.0-SNAPSHOT
+[[1;34mINFO[m] +- com.google.cloud:google-cloud-bigtable:jar:2.73.0:compile
+[[1;34mINFO[m] |  +- com.google.api:api-common:jar:2.57.1:compile
+[[1;34mINFO[m] |  +- com.google.errorprone:error_prone_annotations:jar:2.42.0:compile
+[[1;34mINFO[m] |  +- com.google.j2objc:j2objc-annotations:jar:3.1:compile
+[[1;34mINFO[m] |  +- com.google.api:gax-grpc:jar:2.74.1:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-inprocess:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- com.google.api:gax:jar:2.74.1:compile
+[[1;34mINFO[m] |  +- com.google.api.grpc:grpc-google-cloud-bigtable-v2:jar:2.73.0:compile
+[[1;34mINFO[m] |  +- com.google.api.grpc:proto-google-cloud-bigtable-v2:jar:2.73.0:compile
+[[1;34mINFO[m] |  +- com.google.api.grpc:proto-google-cloud-bigtable-admin-v2:jar:2.73.0:compile
+[[1;34mINFO[m] |  +- com.google.api.grpc:proto-google-common-protos:jar:2.65.1:compile
+[[1;34mINFO[m] |  +- com.google.api.grpc:proto-google-iam-v1:jar:1.60.1:compile
+[[1;34mINFO[m] |  +- com.google.auth:google-auth-library-credentials:jar:1.42.1:compile
+[[1;34mINFO[m] |  +- com.google.auth:google-auth-library-oauth2-http:jar:1.42.1:compile
+[[1;34mINFO[m] |  +- com.google.auto.value:auto-value-annotations:jar:1.11.0:compile
+[[1;34mINFO[m] |  +- com.google.cloud:google-cloud-core:jar:2.64.1:compile
+[[1;34mINFO[m] |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+[[1;34mINFO[m] |  +- com.google.guava:guava:jar:33.5.0-jre:compile
+[[1;34mINFO[m] |  +- com.google.guava:failureaccess:jar:1.0.3:compile
+[[1;34mINFO[m] |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[[1;34mINFO[m] |  +- org.jspecify:jspecify:jar:1.0.0:compile
+[[1;34mINFO[m] |  +- com.google.protobuf:protobuf-java:jar:4.33.2:compile
+[[1;34mINFO[m] |  +- com.google.protobuf:protobuf-java-util:jar:4.33.2:compile
+[[1;34mINFO[m] |  +- com.google.code.gson:gson:jar:2.12.1:compile
+[[1;34mINFO[m] |  +- io.opencensus:opencensus-api:jar:0.31.1:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-context:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-grpclb:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- org.conscrypt:conscrypt-openjdk-uber:jar:2.5.2:compile
+[[1;34mINFO[m] |  +- org.checkerframework:checker-qual:jar:3.49.0:compile
+[[1;34mINFO[m] |  +- com.google.http-client:google-http-client:jar:2.1.0:runtime
+[[1;34mINFO[m] |  +- org.apache.httpcomponents:httpclient:jar:4.5.14:runtime
+[[1;34mINFO[m] |  +- org.apache.httpcomponents:httpcore:jar:4.4.16:runtime
+[[1;34mINFO[m] |  +- io.opencensus:opencensus-contrib-http-util:jar:0.31.1:runtime
+[[1;34mINFO[m] |  +- com.google.http-client:google-http-client-gson:jar:2.1.0:runtime
+[[1;34mINFO[m] |  +- org.codehaus.mojo:animal-sniffer-annotations:jar:1.24:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-api:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-auth:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-util:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-core:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- com.google.android:annotations:jar:4.1.1.4:runtime
+[[1;34mINFO[m] |  +- io.perfmark:perfmark-api:jar:0.27.0:runtime
+[[1;34mINFO[m] |  +- io.grpc:grpc-googleapis:jar:1.76.2:runtime
+[[1;34mINFO[m] |  +- io.grpc:grpc-xds:jar:1.76.2:runtime
+[[1;34mINFO[m] |  +- io.grpc:grpc-rls:jar:1.76.2:runtime
+[[1;34mINFO[m] |  +- io.grpc:grpc-protobuf-lite:jar:1.76.2:runtime
+[[1;34mINFO[m] |  +- io.grpc:grpc-opentelemetry:jar:1.76.2:compile
+[[1;34mINFO[m] |  +- org.threeten:threetenbp:jar:1.7.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-api:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-context:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-sdk:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-sdk-trace:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-sdk-logs:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-sdk-metrics:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- io.opentelemetry:opentelemetry-sdk-common:jar:1.51.0:compile
+[[1;34mINFO[m] |  +- com.google.cloud.opentelemetry:detector-resources-support:jar:0.33.0:compile
+[[1;34mINFO[m] |  +- com.google.cloud:google-cloud-monitoring:jar:3.86.0:compile
+[[1;34mINFO[m] |  +- io.grpc:grpc-services:jar:1.76.2:runtime
+[[1;34mINFO[m] |  +- com.google.re2j:re2j:jar:1.8:runtime
+[[1;34mINFO[m] |  +- commons-codec:commons-codec:jar:1.18.0:runtime
+[[1;34mINFO[m] |  \- com.google.api.grpc:proto-google-cloud-monitoring-v3:jar:3.86.0:compile
+[[1;34mINFO[m] +- io.grpc:grpc-netty-shaded:jar:1.76.2:compile
+[[1;34mINFO[m] +- io.grpc:grpc-protobuf:jar:1.76.2:compile
+[[1;34mINFO[m] +- io.grpc:grpc-stub:jar:1.76.2:compile
+[[1;34mINFO[m] +- io.grpc:grpc-alts:jar:1.76.2:compile
+[[1;34mINFO[m] \- javax.annotation:javax.annotation-api:jar:1.3.2:compile
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  3.170 s
+[[1;34mINFO[m] Finished at: 2026-02-26T17:30:26-08:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m

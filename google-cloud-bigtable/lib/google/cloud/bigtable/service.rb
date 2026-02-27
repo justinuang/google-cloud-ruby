@@ -837,36 +837,48 @@ module Google
             gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
             
             launcher_path = nil
-            if File.exist? gem_launcher_path
-              puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
-              launcher_path = gem_launcher_path
-            else
-              # Fallback for development/local execution
-              gem_root = File.expand_path("../../../..", __dir__)
-              dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
+            # FORCE FALLBACK TO SYSTEM JAVA
+            # if File.exist? gem_launcher_path
+            #   puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
+            #   launcher_path = gem_launcher_path
+            # else
+            #   # Fallback for development/local execution
+            #   gem_root = File.expand_path("../../../..", __dir__)
+            #   dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
               
-              if File.exist? dev_launcher_path
-                puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
-                launcher_path = dev_launcher_path
-              else
-                # Absolute fallback to system java and JAR (for legacy dev setups)
-                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
-              end
-            end
+            #   if File.exist? dev_launcher_path
+            #     puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
+            #     launcher_path = dev_launcher_path
+            #   else
+            #     # Absolute fallback to system java and JAR (for legacy dev setups)
+            #     puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
+            #   end
+            # end
 
             puts ">>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS..."
             args = [socket_path, "--ready-fifo", fifo_path]
             args += ["--project", project_id] if project_id
             args += ["--instance", instance_id] if instance_id
 
+            env_vars = { "CBT_ENABLE_DIRECTPATH" => "true" }
+
             if launcher_path
-              @sidecar_io = IO.popen([launcher_path] + args, "r", err: [:child, :out])
+              @sidecar_io = IO.popen(env_vars, [launcher_path] + args, "r", err: [:child, :out])
             else
               # Manual java fallback
               java_bin = "java"
-              gem_root = File.expand_path("../../../..", __dir__)
-              jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar")
-              @sidecar_io = IO.popen([java_bin, "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "-jar", jar_path] + args, "r", err: [:child, :out])
+              
+              # Try to find the JAR in gem production path first
+              jar_path = File.expand_path("runtime/app/sidecar.jar", __dir__)
+              unless File.exist? jar_path
+                # Fallback for development structure
+                gem_root = File.expand_path("../../../..", __dir__)
+                jar_path = File.join(gem_root, "sidecar", "target", "java-sidecar-1.0-SNAPSHOT.jar")
+              end
+
+              classpath = "#{jar_path}:#{File.join(File.dirname(jar_path), 'dependency', '*')}"
+              puts ">>> JAVA SIDECAR: Using system java with Classpath: #{classpath}"
+              @sidecar_io = IO.popen(env_vars, [java_bin, "-cp", classpath, "com.example.BigtableSidecar"] + args, "r", err: [:child, :out])
             end
 
             # Block on FIFO read for readiness signal (non-polling)
@@ -903,8 +915,8 @@ module Google
             @sidecar_log_thread = Thread.new do
               begin
                 while line = @sidecar_io.gets
-                  # Only print lines that look like our sidecar logs or errors
-                  puts "   [SIDECAR] #{line}" if line =~ /Java Sidecar|ERROR|WARNING/
+                  # Print all sidecar output for debugging
+                  puts "   [SIDECAR] #{line}"
                 end
               rescue => e
                 # Silence log thread errors on shutdown

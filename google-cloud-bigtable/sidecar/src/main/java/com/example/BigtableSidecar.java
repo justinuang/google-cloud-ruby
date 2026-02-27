@@ -38,6 +38,19 @@ public class BigtableSidecar {
         }
 
         System.err.println("Java Sidecar: Starting gRPC server on " + socketPath);
+        System.err.println("Java Sidecar JRE Home: " + System.getProperty("java.home"));
+        System.err.println("Java Sidecar JRE Version: " + System.getProperty("java.version"));
+        System.err.println("Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: " + System.getenv("CBT_ENABLE_DIRECTPATH"));
+        
+        // Configure JUL for io.grpc
+        java.util.logging.Logger grpcLogger = java.util.logging.Logger.getLogger("io.grpc");
+        grpcLogger.setLevel(java.util.logging.Level.ALL);
+        java.util.logging.ConsoleHandler handler = new java.util.logging.ConsoleHandler();
+        handler.setLevel(java.util.logging.Level.ALL);
+        grpcLogger.addHandler(handler);
+        // Ensure parent handlers don't log duplicate messages
+        grpcLogger.setUseParentHandlers(false);
+        
         if (project != null && instance != null) {
             System.err.println("Java Sidecar: Proxying to Project: " + project + ", Instance: " + instance);
         }
