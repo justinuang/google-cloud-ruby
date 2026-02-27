@@ -4,20 +4,11 @@ set -ex
 echo "--- Step 1: Building and Deploying Gem ---"
 cd /usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable
 
-echo "Building Java sidecar..."
-cd sidecar
-mvn clean package -DskipTests
-cd ..
-
 echo "Cleaning up old gems..."
 rm -f google-cloud-bigtable-*.gem
 
 echo "Building gem..."
-mkdir -p lib/google/cloud/bigtable/runtime/app
-cp sidecar/target/java-sidecar-1.0-SNAPSHOT.jar lib/google/cloud/bigtable/runtime/app/sidecar.jar
-rm -rf lib/google/cloud/bigtable/runtime/app/dependency
-cp -r sidecar/target/dependency lib/google/cloud/bigtable/runtime/app/
-chmod -R a+rX lib/google/cloud/bigtable/runtime/app/dependency
+bundle exec rake sidecar:build
 gem build google-cloud-bigtable.gemspec
 GEM_FILE=$(ls -t google-cloud-bigtable-*.gem | head -n1)
 
