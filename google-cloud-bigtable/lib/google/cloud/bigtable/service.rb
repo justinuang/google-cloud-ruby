@@ -837,23 +837,25 @@ module Google
             gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
             
             launcher_path = nil
-            # FORCE FALLBACK TO SYSTEM JAVA
-            # if File.exist? gem_launcher_path
-            #   puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
-            #   launcher_path = gem_launcher_path
-            # else
-            #   # Fallback for development/local execution
-            #   gem_root = File.expand_path("../../../..", __dir__)
-            #   dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
+            # USE BUNDLED LAUNCHER IF AVAILABLE
+            gem_launcher_path = File.expand_path("runtime/bin/sidecar-launcher", __dir__)
+            launcher_path = nil
+            if File.exist? gem_launcher_path
+              puts ">>> JAVA SIDECAR: Located jlink launcher in gem at #{gem_launcher_path}"
+              launcher_path = gem_launcher_path
+            else
+              # Fallback for development/local execution
+              gem_root = File.expand_path("../../../..", __dir__)
+              dev_launcher_path = File.join(gem_root, "sidecar", "jlink-runtime", "bin", "sidecar-launcher")
               
-            #   if File.exist? dev_launcher_path
-            #     puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
-            #     launcher_path = dev_launcher_path
-            #   else
-            #     # Absolute fallback to system java and JAR (for legacy dev setups)
-            #     puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
-            #   end
-            # end
+              if File.exist? dev_launcher_path
+                puts ">>> JAVA SIDECAR: Using development jlink launcher at #{dev_launcher_path}"
+                launcher_path = dev_launcher_path
+              else
+                # Absolute fallback to system java and JAR (for legacy dev setups)
+                puts ">>> JAVA SIDECAR: jlink launcher not found, using fallback system java"
+              end
+            end
 
             puts ">>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS..."
             args = [socket_path, "--ready-fifo", fifo_path]
@@ -866,7 +868,10 @@ module Google
               @sidecar_io = IO.popen(env_vars, [launcher_path] + args, "r", err: [:child, :out])
             else
               # Manual java fallback
-              java_bin = "java"
+              java_bin = File.expand_path("runtime/bin/java", __dir__)
+              unless File.exist? java_bin
+                java_bin = "java"
+              end
               
               # Try to find the JAR in gem production path first
               jar_path = File.expand_path("runtime/app/sidecar.jar", __dir__)
@@ -879,6 +884,18 @@ module Google
               classpath = "#{jar_path}:#{File.join(File.dirname(jar_path), 'dependency', '*')}"
               puts ">>> JAVA SIDECAR: Using system java with Classpath: #{classpath}"
               @sidecar_io = IO.popen(env_vars, [java_bin, "-cp", classpath, "com.example.BigtableSidecar"] + args, "r", err: [:child, :out])
+            end
+
+            # Start a background thread to dump sidecar logs to stdout
+            @sidecar_log_thread = Thread.new do
+              begin
+                while line = @sidecar_io.gets
+                  # Print all sidecar output for debugging
+                  puts "   [SIDECAR] #{line}"
+                end
+              rescue => e
+                # Silence log thread errors on shutdown
+              end
             end
 
             # Block on FIFO read for readiness signal (non-polling)
@@ -906,21 +923,10 @@ module Google
               req = Com::Example::Sidecar::PingRequest.new(message: "Handshake")
               @sidecar_stub.ping(req, deadline: Time.now + 2)
             rescue GRPC::BadStatus, GRPC::Unavailable => e
+              sleep 1 # Give the log thread a moment to flush any startup errors before dying
               @sidecar_io = nil
               @sidecar_stub = nil
               raise "JAVA SIDECAR ERROR: Sidecar signaled readiness but gRPC Ping failed: #{e.message}"
-            end
-
-            # Start a background thread to dump sidecar logs to stdout
-            @sidecar_log_thread = Thread.new do
-              begin
-                while line = @sidecar_io.gets
-                  # Print all sidecar output for debugging
-                  puts "   [SIDECAR] #{line}"
-                end
-              rescue => e
-                # Silence log thread errors on shutdown
-              end
             end
 
             puts ">>> RUBY CLIENT: Sidecar ready and verified via gRPC."

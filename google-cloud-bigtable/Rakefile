@@ -33,7 +33,7 @@ namespace :sidecar do
     runtime_source = File.join(java_dir, "jlink-runtime")
     runtime_target = File.join(__dir__, "lib", "google", "cloud", "bigtable", "runtime")
 
-    puts "Building Java sidecar fat JAR..."
+    puts "Building Java sidecar JAR..."
     Dir.chdir(java_dir) do
       sh "mvn clean package"
       
@@ -57,18 +57,21 @@ namespace :sidecar do
            "--no-header-files --no-man-pages --compress=2"
       end
 
-      puts "Copying fat JAR and creating launcher..."
-      jar_name = "java-sidecar-1.0-SNAPSHOT-jar-with-dependencies.jar"
+      puts "Copying JARs and creating launcher..."
+      jar_name = "java-sidecar-1.0-SNAPSHOT.jar"
       mkdir_p "jlink-runtime/app"
       cp "target/#{jar_name}", "jlink-runtime/app/sidecar.jar"
+      cp_r "target/dependency", "jlink-runtime/app/"
 
       launcher_path = "jlink-runtime/bin/sidecar-launcher"
       File.open(launcher_path, "w") do |f|
         f.puts "#!/bin/sh"
         f.puts "DIR=$(dirname \"$0\")"
-        f.puts "exec \"$DIR/java\" $BIGTABLE_SIDECAR_JVM_FLAGS -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar \"$DIR/../app/sidecar.jar\" \"$@\""
+        f.puts "exec \"$DIR/java\" $BIGTABLE_SIDECAR_JVM_FLAGS -cp \"$DIR/../app/sidecar.jar:$DIR/../app/dependency/*\" com.example.BigtableSidecar \"$@\""
       end
       chmod 0755, launcher_path
+      # Ensure all files packaged in the runtime are readable by any user (prevents missing class errors on VMs)
+      sh "chmod -R a+rX jlink-runtime/app"
     end
 
     puts "Syncing jlink runtime to #{runtime_target}..."
