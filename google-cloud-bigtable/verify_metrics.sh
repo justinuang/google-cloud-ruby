@@ -46,7 +46,7 @@ echo "Sleeping for 120 seconds to allow metrics to propagate to Monarch..."
 sleep 120
 
 echo "--- Step 5: Querying Monarch ---"
-mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['metric:originator'], Sum()))" > mash_results_final.txt
+mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'autopilot-rm-test', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['metric:originator'], Sum()))" > mash_results_final.txt
 
 echo "Verification complete. Results:"
 cat mash_results_final.txt

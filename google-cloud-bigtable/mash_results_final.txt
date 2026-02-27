@@ -4,5 +4,5 @@ Fields with identical values across the entire result set:
 Stream value kind: GAUGE
 -------------------------------------------------------
 0] 
-   2026/02/27-12:55:12   0.036666666666667
-(1 rows, query time: 0.615/0.613/0.000 rpc/server/render, response size: 0.007MB)
+   2026/02/27-13:20:29   0.38333333333333
+(1 rows, query time: 0.777/0.774/0.000 rpc/server/render, response size: 0.008MB)
