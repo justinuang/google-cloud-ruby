@@ -1,0 +1,1 @@
+Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'autopilot-rm-test', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\.|\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('1m')) | GroupBy(['metric:originator'], Sum())
