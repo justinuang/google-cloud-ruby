@@ -1,8 +1,8 @@
 #!/bin/bash
 set -ex
 
-VM_NAME=${1:-justinuang-directpath}
-VM_ZONE=${2:-us-central1-b}
+VM_NAME=${1:-directpath-test-vm}
+VM_ZONE=${2:-us-east1-a}
 
 echo "--- Step 1: Building and Deploying Gem ---"
 cd /usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable
@@ -46,21 +46,22 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "--- Step 3: Fetching Results ---"
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_sidecar.log" > benchmark_sidecar_local.log
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_ruby.log" > benchmark_ruby_local.log
+mkdir -p tmp/benchmark
+gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_sidecar.log" > tmp/benchmark/benchmark_sidecar_local.log
+gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
 
 echo "Sidecar Results:"
-cat benchmark_sidecar_local.log | tail -n 20
+cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 20
 
 echo ""
 echo "No-Sidecar Results:"
-cat benchmark_ruby_local.log | tail -n 20
+cat tmp/benchmark/benchmark_ruby_local.log | tail -n 20
 
 echo "--- Step 4: Routing Verification ---"
 echo "Waiting 120s for metrics to propagate to Monarch..."
 sleep 120
 
-mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'autopilot-rm-test', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > mash_routing_results.txt
+mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > tmp/benchmark/mash_routing_results.txt
 
 echo "Routing Results:"
-cat mash_routing_results.txt
+cat tmp/benchmark/mash_routing_results.txt

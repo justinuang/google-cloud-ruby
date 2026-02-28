@@ -51,6 +51,24 @@ The VM was upgraded to an `e2-standard-16` to provide sufficient CPU headroom fo
 - p99 Latency: 23.94 ms
 - Routing: Verified via `mash` query. Traffic mapped to `app_profile = nosidecar` and successfully showed `metric:originator = cloudpath-cfe-prod` (CloudPath).
 
+## Phase 2 Results (Targeting `ju-ruby-sidecar` in `us-east1-b`)
+
+The benchmark was updated to use `ju-ruby-sidecar` as the instance, resulting in significantly lower latency due to the intra-region proximity.
+
+**Sidecar (`--use-sidecar --app-profile-id=sidecar`)**
+- Throughput: ~990 ops/sec
+- Average Latency: 3.89 ms
+- p50 Latency: 3.35 ms
+- p99 Latency: 6.16 ms
+
+**No Sidecar (`--app-profile-id=nosidecar`)**
+- Throughput: ~995 ops/sec
+- Average Latency: 3.73 ms
+- p50 Latency: 3.49 ms
+- p99 Latency: 7.55 ms
+
+*Note: The concurrency issue causing multiple `BigtableDataClient` instantiations in `SidecarServiceImpl` under sudden load was resolved by applying `ConcurrentHashMap.computeIfAbsent()` to the initialization block. A single client connection pool is now reused properly across all concurrent Ruby YCSB executor threads.*
+
 
 ## Implementation Plan
 

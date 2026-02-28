@@ -12,7 +12,7 @@ options = {
   duration: 300,
   warmup: 30,
   project_id: ENV['BIGTABLE_TEST_PROJECT'] || 'autonomous-mote-782',
-  instance_id: ENV['BIGTABLE_TEST_INSTANCE'] || 'autopilot-rm-test',
+  instance_id: ENV['BIGTABLE_TEST_INSTANCE'] || 'ju-ruby-sidecar',
   table_id: 'table-10g'
 }
 

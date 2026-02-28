@@ -50,40 +50,34 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
         if (project == null || instance == null) {
             throw new RuntimeException("Project and Instance IDs must be provided in table name or during sidecar startup.");
         }
+        
+        final String finalProject = project;
+        final String finalInstance = instance;
 
-        String clientKey = project + "/" + instance + "/" + (appProfileId == null ? "" : appProfileId);
-        BigtableDataClient client = clients.get(clientKey);
-        if (client == null) {
-            logger.info("Java Sidecar: Initializing new client for " + clientKey);
-            logger.info("Java Sidecar: VERIFICATION_RUN_001");
-            BigtableDataSettings.Builder settingsBuilder = BigtableDataSettings.newBuilder()
-                    .setProjectId(project)
-                    .setInstanceId(instance);
-            
-            if (appProfileId != null && !appProfileId.isEmpty()) {
-                settingsBuilder.setAppProfileId(appProfileId);
+        String clientKey = finalProject + "/" + finalInstance + "/" + (appProfileId == null ? "" : appProfileId);
+        return clients.computeIfAbsent(clientKey, key -> {
+            try {
+                logger.info("Java Sidecar: Initializing new client for " + key);
+                logger.info("Java Sidecar: VERIFICATION_RUN_001");
+                BigtableDataSettings.Builder settingsBuilder = BigtableDataSettings.newBuilder()
+                        .setProjectId(finalProject)
+                        .setInstanceId(finalInstance);
+                
+                if (appProfileId != null && !appProfileId.isEmpty()) {
+                    settingsBuilder.setAppProfileId(appProfileId);
+                }
+                
+                // Log the value of CBT_ENABLE_DIRECTPATH to verify it's set in the Java process environment
+                String directPathEnv = System.getenv("CBT_ENABLE_DIRECTPATH");
+                logger.info("Java Sidecar: CBT_ENABLE_DIRECTPATH is currently set to: '" + directPathEnv + "'");
+                
+                BigtableDataSettings settings = settingsBuilder.build();
+                logger.info("Java Sidecar: BigtableDataClient created for " + finalProject + "/" + finalInstance);
+                return BigtableDataClient.create(settings);
+            } catch (IOException e) {
+                throw new RuntimeException("Java Sidecar: Failed to create BigtableDataClient", e);
             }
-            
-            // Log the value of CBT_ENABLE_DIRECTPATH to verify it's set in the Java process environment
-            String directPathEnv = System.getenv("CBT_ENABLE_DIRECTPATH");
-            logger.info("Java Sidecar: CBT_ENABLE_DIRECTPATH is currently set to: '" + directPathEnv + "'");
-            
-            // NOTE: We rely entirely on CBT_ENABLE_DIRECTPATH=true to engage DirectPath.
-            // Avoid explicitly setting the endpoint or TransportChannelProvider so we don't interfere with the library defaults.
-            
-            // NOTE: We don't need to manually configure InstantiatingGrpcChannelProvider here
-            // BigtableDataSettings properly configures DirectPath if CBT_ENABLE_DIRECTPATH=true is set in env
-            
-            BigtableDataSettings settings = settingsBuilder.build();
-            logger.info("Java Sidecar: BigtableDataClient created for " + project + "/" + instance);
-            client = BigtableDataClient.create(settings);
-            BigtableDataClient existing = clients.putIfAbsent(clientKey, client);
-            if (existing != null) {
-                client.close();
-                client = existing;
-            }
-        }
-        return client;
+        });
     }
 
     @Override
