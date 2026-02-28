@@ -51,21 +51,28 @@ The VM was upgraded to an `e2-standard-16` to provide sufficient CPU headroom fo
 - p99 Latency: 23.94 ms
 - Routing: Verified via `mash` query. Traffic mapped to `app_profile = nosidecar` and successfully showed `metric:originator = cloudpath-cfe-prod` (CloudPath).
 
-## Phase 2 Results (Targeting `ju-ruby-sidecar` in `us-east1-b`)
+## Phase 3 Results (Targeting `ju-ruby-sidecar` in `us-east1-b`)
 
-The benchmark was updated to use `ju-ruby-sidecar` as the instance, resulting in significantly lower latency due to the intra-region proximity.
+The benchmark was updated to use a dedicated 16-core Ubuntu VM co-located in the same zone as the Bigtable cluster, resulting in significantly lower latency due to the intra-region proximity.
 
-**Sidecar (`--use-sidecar --app-profile-id=sidecar`)**
-- Throughput: ~990 ops/sec
-- Average Latency: 3.89 ms
-- p50 Latency: 3.35 ms
-- p99 Latency: 6.16 ms
+### Benchmark Configuration
+* **Client VM**: `ju-ruby-sidecar-vm`
+* **Client Zone**: `us-east1-b`
+* **Client OS / Machine Type**: Ubuntu 24.04 LTS, `e2-standard-16` (16 vCPUs)
+* **Bigtable Instance**: `ju-ruby-sidecar` (Cluster located in `us-east1-b`)
+* **Test Duration**: 300 seconds (5 minutes) total per run.
+* **Warmup Period**: 30 seconds. (All metrics, including the p99, are calculated strictly over the remaining 270 seconds to ensure JVM and gRPC cold start artifacts are excluded).
+* **Workload**: 100% Read (`read_rows` with limit 1) at a target of 1000 QPS across 50 concurrent threads.
+* **Data Payload**: The `table-10g` table utilized for this benchmark contains exactly **one row** (`r1`) containing a single column (`cf:c1`) with a 2-byte value (`"v1"`). Because the Ruby script executes `read_rows(limit: 1)`, every query effectively acts as a single-row point lookup retrieving this exact ~15-byte payload. This isolates the latency metrics, creating a pure network transport and sidecar proxying test that strips away Bigtable disk I/O variability.
 
-**No Sidecar (`--app-profile-id=nosidecar`)**
-- Throughput: ~995 ops/sec
-- Average Latency: 3.73 ms
-- p50 Latency: 3.49 ms
-- p99 Latency: 7.55 ms
+| Metric                | Java Sidecar | Native Ruby |
+| :-------------------- | :----------- | :---------- |
+| **Throughput (ops/sec)** | ~993         | ~974        |
+| **Average Latency**   | 4.01 ms      | 9.27 ms     |
+| **p50 Latency**       | 3.68 ms      | 7.42 ms     |
+| **p90 Latency**       | 4.70 ms      | 13.70 ms    |
+| **p99 Latency**       | 6.76 ms      | 49.78 ms    |
+| **p99.9 Latency**     | 59.74 ms     | 68.84 ms    |
 
 *Note: The concurrency issue causing multiple `BigtableDataClient` instantiations in `SidecarServiceImpl` under sudden load was resolved by applying `ConcurrentHashMap.computeIfAbsent()` to the initialization block. A single client connection pool is now reused properly across all concurrent Ruby YCSB executor threads.*
 
