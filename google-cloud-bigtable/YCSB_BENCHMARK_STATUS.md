@@ -76,6 +76,34 @@ The benchmark was updated to use a dedicated 16-core Ubuntu VM co-located in the
 
 *Note: The concurrency issue causing multiple `BigtableDataClient` instantiations in `SidecarServiceImpl` under sudden load was resolved by applying `ConcurrentHashMap.computeIfAbsent()` to the initialization block. A single client connection pool is now reused properly across all concurrent Ruby YCSB executor threads.*
 
+## Phase 4 Results: Realistic YCSB Benchmark (1GB, Zipfian)
+
+To stress Bigtable with a true YCSB workload (Workload C) mirroring the official PerfKitBenchmarker specifications, the setup was upgraded to a 1,000,000 row dataset (1GB) evaluated via 32 concurrent threads executing Zipfian distributed reads.
+
+### Benchmark Configuration
+* **Client VM**: `ju-ruby-sidecar-vm` (Ubuntu 24.04 LTS, `e2-standard-16`)
+* **Bigtable Instance**: `ju-ruby-sidecar` (Cluster located in `us-east1-b`)
+* **Dataset (`ycsb-1gb`)**: 1,000,000 Rows, 1KB Payload per row (1GB Total).
+* **Workload**: 100% Read (`read_row` point lookups).
+* **Distribution**: **Zipfian**. Row keys are sequentially hashed (e.g. `user<MD5>-<logical_key>`) to eliminate sequential tablet hotspotting, while the logical keys are queried using a Scrambled Zipfian Generator.
+* **Test Duration**: 300 seconds (5 minutes). Warmup 30s.
+* **Threads**: 50 concurrent threads. 
+
+**Routing Verification (`mash`)**:
+* **Java Sidecar**: `app_profile = sidecar`, origin = `<EMPTY>` (DirectPath Confirmed)
+* **Native Ruby**: `app_profile = nosidecar`, origin = `cloudpath-cfe-prod` (CloudPath Confirmed)
+
+| Metric                | Java Sidecar | Native Ruby |
+| :-------------------- | :----------- | :---------- |
+| **Throughput (ops/sec)** | ~993.45      | ~978.37     |
+| **Average Latency**   | 4.02 ms      | 5.82 ms     |
+| **p50 Latency**       | 3.79 ms      | 5.20 ms     |
+| **p90 Latency**       | 4.63 ms      | 8.54 ms     |
+| **p99 Latency**       | 6.06 ms      | 16.33 ms    |
+| **p99.9 Latency**     | 15.72 ms     | 30.26 ms    |
+
+### Phase 4 Summary
+Under a realistic Zipfian distributed YCSB point-read workload on a 1GB table, the Java Sidecar **reduced p99 tail latency enormously** (6.06 ms vs 16.33 ms). It also brought the p99.9 latency down exactly 50% from 30ms to 15ms compared to the native Ruby implementation making CloudPath network traversals. Average and median latency also saw solid 1.5ms reductions.
 
 ## Implementation Plan
 

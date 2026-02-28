@@ -3,6 +3,41 @@
 require 'google/cloud/bigtable'
 require 'optparse'
 require 'logger'
+require 'digest'
+
+class ZipfianGenerator
+  def initialize(min, max, zipfian_constant = 0.99)
+    @min = min
+    @max = max
+    @items = max - min + 1
+    @zipfian_constant = zipfian_constant
+    @alpha = 1.0 / (1.0 - zipfian_constant)
+    @zetan = zeta(@items)
+    @eta = (1.0 - (2.0 / @items)**(1.0 - zipfian_constant)) / (1.0 - zeta(2) / @zetan)
+  end
+
+  def next_val
+    u = rand
+    uz = u * @zetan
+    if uz < 1.0
+      return @min
+    end
+    if uz < 1.0 + (0.5**@zipfian_constant)
+      return @min + 1
+    end
+    @min + (@items * (@eta * u - @eta + 1.0)**@alpha).to_i
+  end
+
+  private
+
+  def zeta(n)
+    sum = 0.0
+    (1..n).each do |i|
+      sum += 1.0 / (i**@zipfian_constant)
+    end
+    sum
+  end
+end
 
 options = {
   use_sidecar: false,
@@ -13,7 +48,9 @@ options = {
   warmup: 30,
   project_id: ENV['BIGTABLE_TEST_PROJECT'] || 'autonomous-mote-782',
   instance_id: ENV['BIGTABLE_TEST_INSTANCE'] || 'ju-ruby-sidecar',
-  table_id: 'table-10g'
+  table_id: 'ycsb-1gb',
+  recordcount: 1_000_000,
+  distribution: 'zipfian'
 }
 
 OptionParser.new do |opts|
@@ -38,6 +75,15 @@ OptionParser.new do |opts|
   opts.on("--duration N", Integer, "Benchmark duration in seconds") do |n|
     options[:duration] = n
   end
+  opts.on("--recordcount N", Integer, "Total records in dataset") do |n|
+    options[:recordcount] = n
+  end
+  opts.on("--distribution TYPE", "Data distribution (zipfian or uniform)") do |type|
+    options[:distribution] = type
+  end
+  opts.on("--table-id ID", "Target Table ID") do |id|
+    options[:table_id] = id
+  end
 end.parse!
 
 puts "Starting YCSB Read-Only Benchmark with:"
@@ -53,6 +99,15 @@ bigtable = Google::Cloud::Bigtable.new(
   use_sidecar: options[:use_sidecar]
 )
 table = bigtable.table(options[:instance_id], options[:table_id], app_profile_id: options[:app_profile_id])
+
+puts "Initializing Zipfian generator for #{options[:recordcount]} items..."
+if options[:distribution] == 'zipfian'
+  key_generator = ZipfianGenerator.new(0, options[:recordcount] - 1)
+else
+  # Default fallback if random or uniform
+  key_generator = -> { rand(options[:recordcount]) }
+end
+puts "Generator Ready."
 
 qps_per_thread = options[:qps].to_f / options[:threads]
 sleep_time_per_query = 1.0 / qps_per_thread
@@ -72,9 +127,16 @@ threads = options[:threads].times.map do |i|
       
       req_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       
-      # Workload C: 100% Read, limit 1 (equivalent to point lookup or short scan)
+      # Workload C: 100% Read Point Lookup (Zipfian distributed)
       begin
-        table.read_rows(limit: 1).to_a
+        logical_index = options[:distribution] == 'zipfian' ? key_generator.next_val : key_generator.call
+        logical_key = sprintf("user%09d", logical_index)
+        hash = Digest::MD5.hexdigest(logical_key)[0..7] 
+        row_key = "user#{hash}-#{logical_key}"
+        
+        row = table.read_row(row_key)
+        # Force evaluation to ensure data is fetched
+        row.cells.first if row
       rescue => e
         abort "Fatal error during benchmark: #{e.message}"
       end

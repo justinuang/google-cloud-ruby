@@ -1,8 +1,8 @@
 #!/bin/bash
 set -ex
 
-VM_NAME=${1:-directpath-test-vm}
-VM_ZONE=${2:-us-east1-a}
+VM_NAME=${1:-ju-ruby-sidecar-vm}
+VM_ZONE=${2:-us-east1-b}
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
