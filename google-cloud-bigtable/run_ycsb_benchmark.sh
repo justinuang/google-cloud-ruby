@@ -4,6 +4,10 @@ set -ex
 VM_NAME=${1:-directpath-test-vm}
 VM_ZONE=${2:-us-east1-a}
 
+SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
+SSH_USER="justinuang_google_com"
+SSH_OPTS="-i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no"
+
 echo "--- Step 1: Building and Deploying Gem ---"
 cd /usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable
 
@@ -13,14 +17,14 @@ gem build google-cloud-bigtable.gemspec
 GEM_FILE=$(ls -t google-cloud-bigtable-*.gem | head -n1)
 
 echo "Copying scripts to VM..."
-gcloud compute scp --zone=$VM_ZONE $GEM_FILE ycsb_benchmark.rb $VM_NAME:~/
+scp $SSH_OPTS $GEM_FILE ycsb_benchmark.rb $SSH_USER@$SSH_HOST:~/
 
 echo "Uninstalling old gem and installing new gem on VM..."
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install --local ~/$GEM_FILE"
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install ~/$GEM_FILE"
 
 echo "--- Step 2: Running Benchmarks ---"
 echo "Starting Sidecar and No-Sidecar benchmarks in the background and waiting..."
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="bash -s" << 'EOF'
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
   ruby ~/ycsb_benchmark.rb --use-sidecar --app-profile-id=sidecar > ~/benchmark_sidecar.log 2>&1 &
   PID1=$!
   ruby ~/ycsb_benchmark.rb --app-profile-id=nosidecar > ~/benchmark_ruby.log 2>&1 &
@@ -47,8 +51,8 @@ fi
 
 echo "--- Step 3: Fetching Results ---"
 mkdir -p tmp/benchmark
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_sidecar.log" > tmp/benchmark/benchmark_sidecar_local.log
-gcloud compute ssh --zone=$VM_ZONE $VM_NAME --command="cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar.log" > tmp/benchmark/benchmark_sidecar_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
 
 echo "Sidecar Results:"
 cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 20
