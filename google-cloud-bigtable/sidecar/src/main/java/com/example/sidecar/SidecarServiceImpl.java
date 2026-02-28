@@ -19,8 +19,12 @@ import com.google.cloud.bigtable.data.v2.models.MutateRowsException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
+    private static final Logger logger = Logger.getLogger(SidecarServiceImpl.class.getName());
+
     private final ConcurrentHashMap<String, BigtableDataClient> clients = new ConcurrentHashMap<>();
     private final String defaultProject;
     private final String defaultInstance;
@@ -33,7 +37,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
         this.defaultInstance = instance;
     }
 
-    private BigtableDataClient getClient(String tableName) throws IOException {
+    private BigtableDataClient getClient(String tableName, String appProfileId) throws IOException {
         Matcher matcher = TABLE_NAME_PATTERN.matcher(tableName);
         String project = defaultProject;
         String instance = defaultInstance;
@@ -47,18 +51,22 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
             throw new RuntimeException("Project and Instance IDs must be provided in table name or during sidecar startup.");
         }
 
-        String clientKey = project + "/" + instance;
+        String clientKey = project + "/" + instance + "/" + (appProfileId == null ? "" : appProfileId);
         BigtableDataClient client = clients.get(clientKey);
         if (client == null) {
-            System.err.println("Java Sidecar: Initializing new client for " + clientKey);
-            System.err.println("Java Sidecar: VERIFICATION_RUN_001");
+            logger.info("Java Sidecar: Initializing new client for " + clientKey);
+            logger.info("Java Sidecar: VERIFICATION_RUN_001");
             BigtableDataSettings.Builder settingsBuilder = BigtableDataSettings.newBuilder()
                     .setProjectId(project)
                     .setInstanceId(instance);
             
+            if (appProfileId != null && !appProfileId.isEmpty()) {
+                settingsBuilder.setAppProfileId(appProfileId);
+            }
+            
             // Log the value of CBT_ENABLE_DIRECTPATH to verify it's set in the Java process environment
             String directPathEnv = System.getenv("CBT_ENABLE_DIRECTPATH");
-            System.err.println("Java Sidecar: CBT_ENABLE_DIRECTPATH is currently set to: '" + directPathEnv + "'");
+            logger.info("Java Sidecar: CBT_ENABLE_DIRECTPATH is currently set to: '" + directPathEnv + "'");
             
             // NOTE: We rely entirely on CBT_ENABLE_DIRECTPATH=true to engage DirectPath.
             // Avoid explicitly setting the endpoint or TransportChannelProvider so we don't interfere with the library defaults.
@@ -67,7 +75,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
             // BigtableDataSettings properly configures DirectPath if CBT_ENABLE_DIRECTPATH=true is set in env
             
             BigtableDataSettings settings = settingsBuilder.build();
-            System.err.println("Java Sidecar: BigtableDataClient created for " + project + "/" + instance);
+            logger.info("Java Sidecar: BigtableDataClient created for " + project + "/" + instance);
             client = BigtableDataClient.create(settings);
             BigtableDataClient existing = clients.putIfAbsent(clientKey, client);
             if (existing != null) {
@@ -101,21 +109,22 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     public void readRows(com.example.sidecar.ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
         try {
             readRowsCount.incrementAndGet();
-            System.out.println("Java Sidecar: Received readRows call. Request bytes size: " + request.getRequestBytes().size());
+            logger.fine("Java Sidecar: Received readRows call. Request bytes size: " + request.getRequestBytes().size());
             
             // 1. Parse the serialized native ReadRowsRequest bytes
             ReadRowsRequest nativeRequest = ReadRowsRequest.parseFrom(request.getRequestBytes());
             String tableName = nativeRequest.getTableName();
             
-            System.out.println("Java Sidecar: Processing full ReadRowsRequest for [" + tableName + "]");
+            logger.fine("Java Sidecar: Processing full ReadRowsRequest for [" + tableName + "]");
 
-            // 2. Get the appropriate client for this project/instance (parsed from table name)
-            BigtableDataClient dataClient = getClient(tableName);
+            // 2. Get the appropriate client for this project/instance/appProfile (parsed from request)
+            String appProfileId = nativeRequest.getAppProfileId();
+            BigtableDataClient dataClient = getClient(tableName, appProfileId);
             
             // 3. Convert the native proto request into a high-level Veneer Query object
-            System.out.println("Java Sidecar: Converting proto to Query...");
+            logger.fine("Java Sidecar: Converting proto to Query...");
             Query query = Query.fromProto(nativeRequest);
-            System.out.println("Java Sidecar: Query conversion successful.");
+            logger.fine("Java Sidecar: Query conversion successful.");
 
             // 4. Execute the query and stream results
             int rowCount = 0;
@@ -161,11 +170,10 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
                 }
                 responseObserver.onNext(rowBuilder.build());
             }
-            System.out.println("Java Sidecar: Finished streaming " + rowCount + " rows.");
+            logger.fine("Java Sidecar: Finished streaming " + rowCount + " rows.");
             responseObserver.onCompleted();
         } catch (Exception e) {
-            System.out.println("Java Sidecar ERROR: " + e.getMessage());
-            e.printStackTrace(System.out);
+            logger.log(Level.SEVERE, "Java Sidecar ERROR: " + e.getMessage(), e);
             responseObserver.onError(e);
         }
     }
@@ -173,10 +181,11 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     @Override
     public void mutateRow(com.example.sidecar.MutateRowRequest request, StreamObserver<com.example.sidecar.MutateRowResponse> responseObserver) {
         try {
-            System.out.println("Java Sidecar: Received mutateRow call.");
+            logger.fine("Java Sidecar: Received mutateRow call.");
             MutateRowRequest nativeRequest = MutateRowRequest.parseFrom(request.getRequestBytes());
             String tableName = nativeRequest.getTableName();
-            BigtableDataClient dataClient = getClient(tableName);
+            String appProfileId = nativeRequest.getAppProfileId();
+            BigtableDataClient dataClient = getClient(tableName, appProfileId);
 
             RowMutation rowMutation = RowMutation.fromProto(nativeRequest);
             dataClient.mutateRow(rowMutation);
@@ -184,8 +193,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
             responseObserver.onNext(com.example.sidecar.MutateRowResponse.newBuilder().build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            System.out.println("Java Sidecar ERROR: " + e.getMessage());
-            e.printStackTrace(System.out);
+            logger.log(Level.SEVERE, "Java Sidecar ERROR: " + e.getMessage(), e);
             responseObserver.onError(e);
         }
     }
@@ -193,10 +201,11 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     @Override
     public void mutateRows(com.example.sidecar.MutateRowsRequest request, StreamObserver<com.example.sidecar.MutateRowsResponse> responseObserver) {
         try {
-            System.out.println("Java Sidecar: Received mutateRows call.");
+            logger.fine("Java Sidecar: Received mutateRows call.");
             MutateRowsRequest nativeRequest = MutateRowsRequest.parseFrom(request.getRequestBytes());
             String tableName = nativeRequest.getTableName();
-            BigtableDataClient dataClient = getClient(tableName);
+            String appProfileId = nativeRequest.getAppProfileId();
+            BigtableDataClient dataClient = getClient(tableName, appProfileId);
 
             BulkMutation bulkMutation = BulkMutation.fromProto(nativeRequest);
 
@@ -212,7 +221,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
                             .build());
                 }
             } catch (MutateRowsException e) {
-                System.out.println("Java Sidecar: bulkMutateRows had some failures.");
+                logger.fine("Java Sidecar: bulkMutateRows had some failures.");
                 // Initialize all as OK first
                 for (int i = 0; i < nativeRequest.getEntriesCount(); i++) {
                     responseBuilder.addEntries(com.example.sidecar.MutateRowsEntry.newBuilder()
@@ -234,8 +243,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
             responseObserver.onNext(responseBuilder.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            System.out.println("Java Sidecar ERROR: " + e.getMessage());
-            e.printStackTrace(System.out);
+            logger.log(Level.SEVERE, "Java Sidecar ERROR: " + e.getMessage(), e);
             responseObserver.onError(e);
         }
     }
