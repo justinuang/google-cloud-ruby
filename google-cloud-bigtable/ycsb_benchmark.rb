@@ -48,8 +48,8 @@ options = {
   warmup: 30,
   project_id: ENV['BIGTABLE_TEST_PROJECT'] || 'autonomous-mote-782',
   instance_id: ENV['BIGTABLE_TEST_INSTANCE'] || 'ju-ruby-sidecar',
-  table_id: 'ycsb-1gb',
-  recordcount: 1_000_000,
+  table_id: 'ycsb-100gb',
+  recordcount: 100_000_000,
   distribution: 'zipfian'
 }
 
