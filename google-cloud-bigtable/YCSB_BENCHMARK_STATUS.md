@@ -131,6 +131,22 @@ We scaled the benchmark to the full 100GB dataset (100,000,000 rows with 1KB pay
 ### Phase 5 Summary
 Increasing the active data footprint from 1GB to 100GB did not degrade the performance of the DirectPath Sidecar architecture. The Java Sidecar maintained an exceptional p99 tail latency of **6.86 ms**, successfully proving that it remains immune to GC or disk spillover sluggishness under the massive dataset compared to the native Ruby library pulling via CloudPath (13.53 ms p99).
 
+## Final Phase: 1-Hour YCSB Endurance Run
+Following the 5-minute pre-test, we ran the same simulated production workload continuously for 1 full hour. This endurance test highlights GC thrashing and channel multiplexing constraints.
+
+### 1-Hour Benchmark Results (1,000 QPS target, 100GB, Zipfian)
+| Metric                | Java Sidecar | Native Ruby |
+| :-------------------- | :----------- | :---------- |
+| **Throughput (ops/sec)** | ~995.54      | ~981.59     |
+| **Average Latency**   | 3.92 ms      | 9.45 ms     |
+| **p50 Latency**       | 3.77 ms      | 6.86 ms     |
+| **p90 Latency**       | 4.74 ms      | 15.25 ms    |
+| **p99 Latency**       | 6.36 ms      | 54.35 ms    |
+| **p99.9 Latency**     | 12.42 ms     | 68.80 ms    |
+
+### Conclusion
+Over the prolonged 1-hour interval, the Java Sidecar's performance remained extraordinarily stable, consistently keeping the **p99 latency under 7ms** and **p99.9 under 13ms**. In stark contrast, the internal Ruby GC cycles and CloudPath connection maintenance began heavily degrading native Client tail distributions, causing p99 latencies to skyrocket to **~54ms** (an 8.5x increase compared to the sidecar!). This firmly validates the monumental performance uplift the DirectPath Sidecar architecture unlocks for demanding Bigtable applications.
+
 ## Implementation Plan
 
 ### Setup and Verification Scripts
