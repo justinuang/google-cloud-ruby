@@ -11,7 +11,12 @@ service SidecarService {
   rpc MutateRow(MutateRowRequest) returns (MutateRowResponse);
   rpc MutateRows(MutateRowsRequest) returns (MutateRowsResponse);
   rpc GetStats(StatsRequest) returns (StatsResponse);
+  rpc ClearStats(ClearStatsRequest) returns (ClearStatsResponse);
 }
+
+message ClearStatsRequest {}
+
+message ClearStatsResponse {}
 
 message MutateRowRequest {
   bytes request_bytes = 1; // Serialized com.google.bigtable.v2.MutateRowRequest
@@ -37,6 +42,10 @@ message StatsRequest {}
 
 message StatsResponse {
   int64 read_rows_count = 1;
+  double p50_latency = 2;
+  double p90_latency = 3;
+  double p99_latency = 4;
+  double average_latency = 5;
 }
 
 message PingRequest {

@@ -123,6 +123,21 @@ start_time = Time.now
 end_time = start_time + options[:duration]
 warmup_end = start_time + options[:warmup]
 
+# Monitor thread to clear Sidecar stats after warmup
+if options[:use_sidecar]
+  Thread.new do
+    sleep(options[:warmup])
+    begin
+      Google::Cloud::Bigtable::Service.sidecar_stub.clear_stats(
+        Com::Example::Sidecar::ClearStatsRequest.new
+      )
+      puts "Sidecar stats cleared after warmup."
+    rescue => e
+      puts "Warning: Could not clear Sidecar stats: #{e.message}"
+    end
+  end
+end
+
 threads = options[:threads].times.map do |i|
   Thread.new do
     loop do
@@ -228,4 +243,25 @@ else
   puts "========================================"
   puts "Worst p99 occurred in Minute #{max_p99_minute + 1} at #{max_p99.round(4)} ms"
   puts "========================================"
+  
+  # 4. Print Java Sidecar Telemetry if enabled
+  if options[:use_sidecar]
+    begin
+      sidecar_stats = Google::Cloud::Bigtable::Service.sidecar_stub.get_stats(
+        Com::Example::Sidecar::StatsRequest.new
+      )
+      puts ""
+      puts "========================================"
+      puts "Java Sidecar Base Performance Metrics:"
+      puts "========================================"
+      puts "Sidecar Processed Ops: #{sidecar_stats.read_rows_count}"
+      puts "Average Latency:       #{sidecar_stats.average_latency.round(4)} ms"
+      puts "p50 Latency:           #{sidecar_stats.p50_latency.round(4)} ms"
+      puts "p90 Latency:           #{sidecar_stats.p90_latency.round(4)} ms"
+      puts "p99 Latency:           #{sidecar_stats.p99_latency.round(4)} ms"
+      puts "========================================"
+    rescue => e
+      puts "Warning: Could not fetch Sidecar stats: #{e.message}"
+    end
+  end
 end
