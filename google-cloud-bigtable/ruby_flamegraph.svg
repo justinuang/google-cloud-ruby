@@ -1,0 +1,491 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="458" onload="init(evt)" viewBox="0 0 1200 458" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno"><!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.--><!--NOTES: --><defs><linearGradient id="background" y1="0" y2="1" x1="0" x2="0"><stop stop-color="#eeeeee" offset="5%"/><stop stop-color="#eeeeb0" offset="95%"/></linearGradient></defs><style type="text/css">
+text { font-family:monospace; font-size:12px }
+#title { text-anchor:middle; font-size:17px; }
+#matched { text-anchor:end; }
+#search { text-anchor:end; opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style><script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = true;
+        var searchcolor = 'rgb(230,0,230)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]><![CDATA["use strict";
+var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames, known_font_width;
+function init(evt) {
+    details = document.getElementById("details").firstChild;
+    searchbtn = document.getElementById("search");
+    unzoombtn = document.getElementById("unzoom");
+    matchedtxt = document.getElementById("matched");
+    svg = document.getElementsByTagName("svg")[0];
+    frames = document.getElementById("frames");
+    known_font_width = get_monospace_width(frames);
+    total_samples = parseInt(frames.attributes.total_samples.value);
+    searching = 0;
+
+    // Use GET parameters to restore a flamegraph's state.
+    var restore_state = function() {
+        var params = get_params();
+        if (params.x && params.y)
+            zoom(find_group(document.querySelector('[*|x="' + params.x + '"][y="' + params.y + '"]')));
+        if (params.s)
+            search(params.s);
+    };
+
+    if (fluiddrawing) {
+        // Make width dynamic so the SVG fits its parent's width.
+        svg.removeAttribute("width");
+        // Edge requires us to have a viewBox that gets updated with size changes.
+        var isEdge = /Edge\/\d./i.test(navigator.userAgent);
+        if (!isEdge) {
+            svg.removeAttribute("viewBox");
+        }
+        var update_for_width_change = function() {
+            if (isEdge) {
+                svg.attributes.viewBox.value = "0 0 " + svg.width.baseVal.value + " " + svg.height.baseVal.value;
+            }
+
+            // Keep consistent padding on left and right of frames container.
+            frames.attributes.width.value = svg.width.baseVal.value - xpad * 2;
+
+            // Text truncation needs to be adjusted for the current width.
+            update_text_for_elements(frames.children);
+
+            // Keep search elements at a fixed distance from right edge.
+            var svgWidth = svg.width.baseVal.value;
+            searchbtn.attributes.x.value = svgWidth - xpad;
+            matchedtxt.attributes.x.value = svgWidth - xpad;
+        };
+        window.addEventListener('resize', function() {
+            update_for_width_change();
+        });
+        // This needs to be done asynchronously for Safari to work.
+        setTimeout(function() {
+            unzoom();
+            update_for_width_change();
+            restore_state();
+        }, 0);
+    } else {
+        restore_state();
+    }
+}
+// event listeners
+window.addEventListener("click", function(e) {
+    var target = find_group(e.target);
+    if (target) {
+        if (target.nodeName == "a") {
+            if (e.ctrlKey === false) return;
+            e.preventDefault();
+        }
+        if (target.classList.contains("parent")) unzoom();
+        zoom(target);
+
+        // set parameters for zoom state
+        var el = target.querySelector("rect");
+        if (el && el.attributes && el.attributes.y && el.attributes["fg:x"]) {
+            var params = get_params()
+            params.x = el.attributes["fg:x"].value;
+            params.y = el.attributes.y.value;
+            history.replaceState(null, null, parse_params(params));
+        }
+    }
+    else if (e.target.id == "unzoom") {
+        unzoom();
+
+        // remove zoom state
+        var params = get_params();
+        if (params.x) delete params.x;
+        if (params.y) delete params.y;
+        history.replaceState(null, null, parse_params(params));
+    }
+    else if (e.target.id == "search") search_prompt();
+}, false)
+// mouse-over for info
+// show
+window.addEventListener("mouseover", function(e) {
+    var target = find_group(e.target);
+    if (target) details.nodeValue = nametype + " " + g_to_text(target);
+}, false)
+// clear
+window.addEventListener("mouseout", function(e) {
+    var target = find_group(e.target);
+    if (target) details.nodeValue = ' ';
+}, false)
+// ctrl-F for search
+window.addEventListener("keydown",function (e) {
+    if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+        e.preventDefault();
+        search_prompt();
+    }
+}, false)
+// functions
+function get_params() {
+    var params = {};
+    var paramsarr = window.location.search.substr(1).split('&');
+    for (var i = 0; i < paramsarr.length; ++i) {
+        var tmp = paramsarr[i].split("=");
+        if (!tmp[0] || !tmp[1]) continue;
+        params[tmp[0]]  = decodeURIComponent(tmp[1]);
+    }
+    return params;
+}
+function parse_params(params) {
+    var uri = "?";
+    for (var key in params) {
+        uri += key + '=' + encodeURIComponent(params[key]) + '&';
+    }
+    if (uri.slice(-1) == "&")
+        uri = uri.substring(0, uri.length - 1);
+    if (uri == '?')
+        uri = window.location.href.split('?')[0];
+    return uri;
+}
+function find_child(node, selector) {
+    var children = node.querySelectorAll(selector);
+    if (children.length) return children[0];
+    return;
+}
+function find_group(node) {
+    var parent = node.parentElement;
+    if (!parent) return;
+    if (parent.id == "frames") return node;
+    return find_group(parent);
+}
+function orig_save(e, attr, val) {
+    if (e.attributes["fg:orig_" + attr] != undefined) return;
+    if (e.attributes[attr] == undefined) return;
+    if (val == undefined) val = e.attributes[attr].value;
+    e.setAttribute("fg:orig_" + attr, val);
+}
+function orig_load(e, attr) {
+    if (e.attributes["fg:orig_"+attr] == undefined) return;
+    e.attributes[attr].value = e.attributes["fg:orig_" + attr].value;
+    e.removeAttribute("fg:orig_" + attr);
+}
+function g_to_text(e) {
+    var text = find_child(e, "title").firstChild.nodeValue;
+    return (text)
+}
+function g_to_func(e) {
+    var func = g_to_text(e);
+    // if there's any manipulation we want to do to the function
+    // name before it's searched, do it here before returning.
+    return (func);
+}
+function get_monospace_width(frames) {
+    // Given the id="frames" element, return the width of text characters if
+    // this is a monospace font, otherwise return 0.
+    text = find_child(frames.children[0], "text");
+    originalContent = text.textContent;
+    text.textContent = "!";
+    bangWidth = text.getComputedTextLength();
+    text.textContent = "W";
+    wWidth = text.getComputedTextLength();
+    text.textContent = originalContent;
+    if (bangWidth === wWidth) {
+        return bangWidth;
+    } else {
+        return 0;
+    }
+}
+function update_text_for_elements(elements) {
+    // In order to render quickly in the browser, you want to do one pass of
+    // reading attributes, and one pass of mutating attributes. See
+    // https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/ for details.
+
+    // Fall back to inefficient calculation, if we're variable-width font.
+    // TODO This should be optimized somehow too.
+    if (known_font_width === 0) {
+        for (var i = 0; i < elements.length; i++) {
+            update_text(elements[i]);
+        }
+        return;
+    }
+
+    var textElemNewAttributes = [];
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var r = find_child(e, "rect");
+        var t = find_child(e, "text");
+        var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
+        var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+        var newX = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
+        // Smaller than this size won't fit anything
+        if (w < 2 * known_font_width) {
+            textElemNewAttributes.push([newX, ""]);
+            continue;
+        }
+
+        // Fit in full text width
+        if (txt.length * known_font_width < w) {
+            textElemNewAttributes.push([newX, txt]);
+            continue;
+        }
+
+        var substringLength = Math.floor(w / known_font_width) - 2;
+        if (truncate_text_right) {
+            // Truncate the right side of the text.
+            textElemNewAttributes.push([newX, txt.substring(0, substringLength) + ".."]);
+            continue;
+        } else {
+            // Truncate the left side of the text.
+            textElemNewAttributes.push([newX, ".." + txt.substring(txt.length - substringLength, txt.length)]);
+            continue;
+        }
+    }
+
+    console.assert(textElemNewAttributes.length === elements.length, "Resize failed, please file a bug at https://github.com/jonhoo/inferno/");
+
+    // Now that we know new textContent, set it all in one go so we don't refresh a bazillion times.
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var values = textElemNewAttributes[i];
+        var t = find_child(e, "text");
+        t.attributes.x.value = values[0];
+        t.textContent = values[1];
+    }
+}
+
+function update_text(e) {
+    var r = find_child(e, "rect");
+    var t = find_child(e, "text");
+    var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
+    var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+    t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
+    // Smaller than this size won't fit anything
+    if (w < 2 * fontsize * fontwidth) {
+        t.textContent = "";
+        return;
+    }
+    t.textContent = txt;
+    // Fit in full text width
+    if (t.getComputedTextLength() < w)
+        return;
+    if (truncate_text_right) {
+        // Truncate the right side of the text.
+        for (var x = txt.length - 2; x > 0; x--) {
+            if (t.getSubStringLength(0, x + 2) <= w) {
+                t.textContent = txt.substring(0, x) + "..";
+                return;
+            }
+        }
+    } else {
+        // Truncate the left side of the text.
+        for (var x = 2; x < txt.length; x++) {
+            if (t.getSubStringLength(x - 2, txt.length) <= w) {
+                t.textContent = ".." + txt.substring(x, txt.length);
+                return;
+            }
+        }
+    }
+    t.textContent = "";
+}
+// zoom
+function zoom_reset(e) {
+    if (e.tagName == "rect") {
+        e.attributes.x.value = format_percent(100 * parseInt(e.attributes["fg:x"].value) / total_samples);
+        e.attributes.width.value = format_percent(100 * parseInt(e.attributes["fg:w"].value) / total_samples);
+    }
+    if (e.childNodes == undefined) return;
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
+        zoom_reset(c[i]);
+    }
+}
+function zoom_child(e, x, zoomed_width_samples) {
+    if (e.tagName == "text") {
+        var parent_x = parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value);
+        e.attributes.x.value = format_percent(parent_x + (100 * 3 / frames.attributes.width.value));
+    } else if (e.tagName == "rect") {
+        e.attributes.x.value = format_percent(100 * (parseInt(e.attributes["fg:x"].value) - x) / zoomed_width_samples);
+        e.attributes.width.value = format_percent(100 * parseInt(e.attributes["fg:w"].value) / zoomed_width_samples);
+    }
+    if (e.childNodes == undefined) return;
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
+        zoom_child(c[i], x, zoomed_width_samples);
+    }
+}
+function zoom_parent(e) {
+    if (e.attributes) {
+        if (e.attributes.x != undefined) {
+            e.attributes.x.value = "0.0%";
+        }
+        if (e.attributes.width != undefined) {
+            e.attributes.width.value = "100.0%";
+        }
+    }
+    if (e.childNodes == undefined) return;
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
+        zoom_parent(c[i]);
+    }
+}
+function zoom(node) {
+    var attr = find_child(node, "rect").attributes;
+    var width = parseInt(attr["fg:w"].value);
+    var xmin = parseInt(attr["fg:x"].value);
+    var xmax = xmin + width;
+    var ymin = parseFloat(attr.y.value);
+    unzoombtn.classList.remove("hide");
+    var el = frames.children;
+    var to_update_text = [];
+    for (var i = 0; i < el.length; i++) {
+        var e = el[i];
+        var a = find_child(e, "rect").attributes;
+        var ex = parseInt(a["fg:x"].value);
+        var ew = parseInt(a["fg:w"].value);
+        // Is it an ancestor
+        if (!inverted) {
+            var upstack = parseFloat(a.y.value) > ymin;
+        } else {
+            var upstack = parseFloat(a.y.value) < ymin;
+        }
+        if (upstack) {
+            // Direct ancestor
+            if (ex <= xmin && (ex+ew) >= xmax) {
+                e.classList.add("parent");
+                zoom_parent(e);
+                to_update_text.push(e);
+            }
+            // not in current path
+            else
+                e.classList.add("hide");
+        }
+        // Children maybe
+        else {
+            // no common path
+            if (ex < xmin || ex >= xmax) {
+                e.classList.add("hide");
+            }
+            else {
+                zoom_child(e, xmin, width);
+                to_update_text.push(e);
+            }
+        }
+    }
+    update_text_for_elements(to_update_text);
+}
+function unzoom() {
+    unzoombtn.classList.add("hide");
+    var el = frames.children;
+    for(var i = 0; i < el.length; i++) {
+        el[i].classList.remove("parent");
+        el[i].classList.remove("hide");
+        zoom_reset(el[i]);
+    }
+    update_text_for_elements(el);
+}
+// search
+function reset_search() {
+    var el = document.querySelectorAll("#frames rect");
+    for (var i = 0; i < el.length; i++) {
+        orig_load(el[i], "fill")
+    }
+    var params = get_params();
+    delete params.s;
+    history.replaceState(null, null, parse_params(params));
+}
+function search_prompt() {
+    if (!searching) {
+        var term = prompt("Enter a search term (regexp " +
+            "allowed, eg: ^ext4_)", "");
+        if (term != null) {
+            search(term)
+        }
+    } else {
+        reset_search();
+        searching = 0;
+        searchbtn.classList.remove("show");
+        searchbtn.firstChild.nodeValue = "Search"
+        matchedtxt.classList.add("hide");
+        matchedtxt.firstChild.nodeValue = ""
+    }
+}
+function search(term) {
+    var re = new RegExp(term);
+    var el = frames.children;
+    var matches = new Object();
+    var maxwidth = 0;
+    for (var i = 0; i < el.length; i++) {
+        var e = el[i];
+        // Skip over frames which are either not visible, or below the zoomed-to frame
+        if (e.classList.contains("hide") || e.classList.contains("parent")) {
+            continue;
+        }
+        var func = g_to_func(e);
+        var rect = find_child(e, "rect");
+        if (func == null || rect == null)
+            continue;
+        // Save max width. Only works as we have a root frame
+        var w = parseInt(rect.attributes["fg:w"].value);
+        if (w > maxwidth)
+            maxwidth = w;
+        if (func.match(re)) {
+            // highlight
+            var x = parseInt(rect.attributes["fg:x"].value);
+            orig_save(rect, "fill");
+            rect.attributes.fill.value = searchcolor;
+            // remember matches
+            if (matches[x] == undefined) {
+                matches[x] = w;
+            } else {
+                if (w > matches[x]) {
+                    // overwrite with parent
+                    matches[x] = w;
+                }
+            }
+            searching = 1;
+        }
+    }
+    if (!searching)
+        return;
+    var params = get_params();
+    params.s = term;
+    history.replaceState(null, null, parse_params(params));
+
+    searchbtn.classList.add("show");
+    searchbtn.firstChild.nodeValue = "Reset Search";
+    // calculate percent matched, excluding vertical overlap
+    var count = 0;
+    var lastx = -1;
+    var lastw = 0;
+    var keys = Array();
+    for (k in matches) {
+        if (matches.hasOwnProperty(k))
+            keys.push(k);
+    }
+    // sort the matched frames by their x location
+    // ascending, then width descending
+    keys.sort(function(a, b){
+        return a - b;
+    });
+    // Step through frames saving only the biggest bottom-up frames
+    // thanks to the sort order. This relies on the tree property
+    // where children are always smaller than their parents.
+    for (var k in keys) {
+        var x = parseInt(keys[k]);
+        var w = matches[keys[k]];
+        if (x >= lastx + lastw) {
+            count += w;
+            lastx = x;
+            lastw = w;
+        }
+    }
+    // display matched percent
+    matchedtxt.classList.remove("hide");
+    var pct = 100 * count / maxwidth;
+    if (pct != 100) pct = pct.toFixed(1);
+    matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+}
+function format_percent(n) {
+    return n.toFixed(4) + "%";
+}
+]]></script><rect x="0" y="0" width="100%" height="458" fill="url(#background)"/><text id="title" fill="rgb(0,0,0)" x="50.0000%" y="24.00">Flame Graph</text><text id="details" fill="rgb(0,0,0)" x="10" y="40.00"> </text><text id="unzoom" class="hide" fill="rgb(0,0,0)" x="10" y="24.00">Reset Zoom</text><text id="search" fill="rgb(0,0,0)" x="1190" y="24.00">Search</text><text id="matched" fill="rgb(0,0,0)" x="1190" y="447.00"> </text><svg id="frames" x="10" width="1180" total_samples="4105"><g><title>(unknown) [c function] - (unknown) (42 samples, 1.02%)</title><rect x="0.0000%" y="68" width="1.0231%" height="15" fill="rgb(245,188,44)" fg:x="0" fg:w="42"/><text x="0.2500%" y="78.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="0.8283%" y="84" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="34" fg:w="8"/><text x="1.0783%" y="94.50"></text></g><g><title>&lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:230 (1,616 samples, 39.37%)</title><rect x="1.0231%" y="68" width="39.3666%" height="15" fill="rgb(231,176,29)" fg:x="42" fg:w="1616"/><text x="1.2731%" y="78.50">&lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:230</text></g><g><title>(unknown) [c function] - (unknown) (1,616 samples, 39.37%)</title><rect x="1.0231%" y="84" width="39.3666%" height="15" fill="rgb(245,188,44)" fg:x="42" fg:w="1616"/><text x="1.2731%" y="94.50">(unknown) [c function] - (unknown)</text></g><g><title>initialize - /home/justinuang_google_com/ycsb_benchmark.rb:18 (1,616 samples, 39.37%)</title><rect x="1.0231%" y="100" width="39.3666%" height="15" fill="rgb(232,161,29)" fg:x="42" fg:w="1616"/><text x="1.2731%" y="110.50">initialize - /home/justinuang_google_com/ycsb_benchmark.rb:18</text></g><g><title>zeta - /home/justinuang_google_com/ycsb_benchmark.rb:40 (1,616 samples, 39.37%)</title><rect x="1.0231%" y="116" width="39.3666%" height="15" fill="rgb(225,178,22)" fg:x="42" fg:w="1616"/><text x="1.2731%" y="126.50">zeta - /home/justinuang_google_com/ycsb_benchmark.rb:40</text></g><g><title>(unknown) [c function] - (unknown) (1,616 samples, 39.37%)</title><rect x="1.0231%" y="132" width="39.3666%" height="15" fill="rgb(245,188,44)" fg:x="42" fg:w="1616"/><text x="1.2731%" y="142.50">(unknown) [c function] - (unknown)</text></g><g><title>block in zeta - /home/justinuang_google_com/ycsb_benchmark.rb:38 (1,235 samples, 30.09%)</title><rect x="10.3045%" y="148" width="30.0853%" height="15" fill="rgb(229,110,27)" fg:x="423" fg:w="1235"/><text x="10.5545%" y="158.50">block in zeta - /home/justinuang_google_com/ycsb..</text></g><g><title>(unknown) [c function] - (unknown) (446 samples, 10.86%)</title><rect x="29.5250%" y="164" width="10.8648%" height="15" fill="rgb(245,188,44)" fg:x="1212" fg:w="446"/><text x="29.7750%" y="174.50">(unknown) [c fun..</text></g><g><title>(unknown) [c function] - (unknown) (466 samples, 11.35%)</title><rect x="40.7308%" y="116" width="11.3520%" height="15" fill="rgb(245,188,44)" fg:x="1672" fg:w="466"/><text x="40.9808%" y="126.50">(unknown) [c func..</text></g><g><title>(unknown) [c function] - (unknown) (7 samples, 0.17%)</title><rect x="51.9123%" y="132" width="0.1705%" height="15" fill="rgb(245,188,44)" fg:x="2131" fg:w="7"/><text x="52.1623%" y="142.50"></text></g><g><title>(unknown) [c function] - (unknown) (14 samples, 0.34%)</title><rect x="52.3021%" y="180" width="0.3410%" height="15" fill="rgb(245,188,44)" fg:x="2147" fg:w="14"/><text x="52.5521%" y="190.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/rows_reader.rb:57 (14 samples, 0.34%)</title><rect x="52.3021%" y="196" width="0.3410%" height="15" fill="rgb(229,161,26)" fg:x="2147" fg:w="14"/><text x="52.5521%" y="206.50"></text></g><g><title>(unknown) [c function] - (unknown) (13 samples, 0.32%)</title><rect x="52.3264%" y="212" width="0.3167%" height="15" fill="rgb(245,188,44)" fg:x="2148" fg:w="13"/><text x="52.5764%" y="222.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:47 (13 samples, 0.32%)</title><rect x="52.3264%" y="228" width="0.3167%" height="15" fill="rgb(230,161,28)" fg:x="2148" fg:w="13"/><text x="52.5764%" y="238.50"></text></g><g><title>reset_to_new_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:226 (10 samples, 0.24%)</title><rect x="52.3995%" y="244" width="0.2436%" height="15" fill="rgb(240,165,38)" fg:x="2151" fg:w="10"/><text x="52.6495%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="52.4482%" y="260" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="2153" fg:w="8"/><text x="52.6982%" y="270.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/row.rb:112 (6 samples, 0.15%)</title><rect x="52.4970%" y="276" width="0.1462%" height="15" fill="rgb(248,161,48)" fg:x="2155" fg:w="6"/><text x="52.7470%" y="286.50"></text></g><g><title>(unknown) [c function] - (unknown) (5 samples, 0.12%)</title><rect x="52.5213%" y="292" width="0.1218%" height="15" fill="rgb(245,188,44)" fg:x="2156" fg:w="5"/><text x="52.7713%" y="302.50"></text></g><g><title>build_row_set - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/read_operations.rb:359 (21 samples, 0.51%)</title><rect x="52.6431%" y="180" width="0.5116%" height="15" fill="rgb(230,101,28)" fg:x="2161" fg:w="21"/><text x="52.8931%" y="190.50"></text></g><g><title>(unknown) [c function] - (unknown) (19 samples, 0.46%)</title><rect x="52.6918%" y="196" width="0.4629%" height="15" fill="rgb(245,188,44)" fg:x="2163" fg:w="19"/><text x="52.9418%" y="206.50"></text></g><g><title>(unknown) [c function] - (unknown) (18 samples, 0.44%)</title><rect x="52.7162%" y="212" width="0.4385%" height="15" fill="rgb(245,188,44)" fg:x="2164" fg:w="18"/><text x="52.9662%" y="222.50"></text></g><g><title>try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:39 (10 samples, 0.24%)</title><rect x="52.9111%" y="228" width="0.2436%" height="15" fill="rgb(228,158,25)" fg:x="2172" fg:w="10"/><text x="53.1611%" y="238.50"></text></g><g><title>(unknown) [c function] - (unknown) (9 samples, 0.22%)</title><rect x="52.9354%" y="244" width="0.2192%" height="15" fill="rgb(245,188,44)" fg:x="2173" fg:w="9"/><text x="53.1854%" y="254.50"></text></g><g><title>block in try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:38 (5 samples, 0.12%)</title><rect x="53.0329%" y="260" width="0.1218%" height="15" fill="rgb(229,110,27)" fg:x="2177" fg:w="5"/><text x="53.2829%" y="270.50"></text></g><g><title>(unknown) [c function] - (unknown) (13 samples, 0.32%)</title><rect x="53.8611%" y="340" width="0.3167%" height="15" fill="rgb(245,188,44)" fg:x="2211" fg:w="13"/><text x="54.1111%" y="350.50"></text></g><g><title>persist_cell - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:215 (5 samples, 0.12%)</title><rect x="54.2753%" y="356" width="0.1218%" height="15" fill="rgb(242,184,41)" fg:x="2228" fg:w="5"/><text x="54.5253%" y="366.50"></text></g><g><title>next_state! - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:204 (14 samples, 0.34%)</title><rect x="54.1778%" y="340" width="0.3410%" height="15" fill="rgb(245,219,44)" fg:x="2224" fg:w="14"/><text x="54.4278%" y="350.50"></text></g><g><title>reset_to_new_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:226 (5 samples, 0.12%)</title><rect x="54.3971%" y="356" width="0.1218%" height="15" fill="rgb(240,165,38)" fg:x="2233" fg:w="5"/><text x="54.6471%" y="366.50"></text></g><g><title>block (2 levels) in read - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/rows_reader.rb:94 (61 samples, 1.49%)</title><rect x="53.6663%" y="292" width="1.4860%" height="15" fill="rgb(242,110,41)" fg:x="2203" fg:w="61"/><text x="53.9163%" y="302.50"></text></g><g><title>process - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:68 (61 samples, 1.49%)</title><rect x="53.6663%" y="308" width="1.4860%" height="15" fill="rgb(226,184,23)" fg:x="2203" fg:w="61"/><text x="53.9163%" y="318.50"></text></g><g><title>process_new_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:147 (58 samples, 1.41%)</title><rect x="53.7393%" y="324" width="1.4129%" height="15" fill="rgb(236,184,34)" fg:x="2206" fg:w="58"/><text x="53.9893%" y="334.50"></text></g><g><title>validate_new_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/chunk_processor.rb:114 (26 samples, 0.63%)</title><rect x="54.5189%" y="340" width="0.6334%" height="15" fill="rgb(245,120,44)" fg:x="2238" fg:w="26"/><text x="54.7689%" y="350.50"></text></g><g><title>(unknown) [c function] - (unknown) (17 samples, 0.41%)</title><rect x="54.7381%" y="356" width="0.4141%" height="15" fill="rgb(245,188,44)" fg:x="2247" fg:w="17"/><text x="54.9881%" y="366.50"></text></g><g><title>try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:39 (9 samples, 0.22%)</title><rect x="54.9330%" y="372" width="0.2192%" height="15" fill="rgb(228,158,25)" fg:x="2255" fg:w="9"/><text x="55.1830%" y="382.50"></text></g><g><title>(unknown) [c function] - (unknown) (9 samples, 0.22%)</title><rect x="54.9330%" y="388" width="0.2192%" height="15" fill="rgb(245,188,44)" fg:x="2255" fg:w="9"/><text x="55.1830%" y="398.50"></text></g><g><title>block in try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:38 (9 samples, 0.22%)</title><rect x="54.9330%" y="404" width="0.2192%" height="15" fill="rgb(229,110,27)" fg:x="2255" fg:w="9"/><text x="55.1830%" y="414.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="54.9574%" y="420" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="2256" fg:w="8"/><text x="55.2074%" y="430.50"></text></g><g><title>get - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:33 (5 samples, 0.12%)</title><rect x="55.1523%" y="292" width="0.1218%" height="15" fill="rgb(238,170,36)" fg:x="2264" fg:w="5"/><text x="55.4023%" y="302.50"></text></g><g><title>block in read - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/rows_reader.rb:99 (85 samples, 2.07%)</title><rect x="53.3739%" y="260" width="2.0706%" height="15" fill="rgb(233,110,31)" fg:x="2191" fg:w="85"/><text x="53.6239%" y="270.50">b..</text></g><g><title>(unknown) [c function] - (unknown) (81 samples, 1.97%)</title><rect x="53.4714%" y="276" width="1.9732%" height="15" fill="rgb(245,188,44)" fg:x="2195" fg:w="81"/><text x="53.7214%" y="286.50">(..</text></g><g><title>try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:39 (7 samples, 0.17%)</title><rect x="55.2741%" y="292" width="0.1705%" height="15" fill="rgb(228,158,25)" fg:x="2269" fg:w="7"/><text x="55.5241%" y="302.50"></text></g><g><title>(unknown) [c function] - (unknown) (7 samples, 0.17%)</title><rect x="55.2741%" y="308" width="0.1705%" height="15" fill="rgb(245,188,44)" fg:x="2269" fg:w="7"/><text x="55.5241%" y="318.50"></text></g><g><title>block in try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:38 (5 samples, 0.12%)</title><rect x="55.3228%" y="324" width="0.1218%" height="15" fill="rgb(229,110,27)" fg:x="2271" fg:w="5"/><text x="55.5728%" y="334.50"></text></g><g><title>(unknown) [c function] - (unknown) (231 samples, 5.63%)</title><rect x="55.5664%" y="276" width="5.6273%" height="15" fill="rgb(245,188,44)" fg:x="2281" fg:w="231"/><text x="55.8164%" y="286.50">(unknow..</text></g><g><title>(unknown) [c function] - (unknown) (346 samples, 8.43%)</title><rect x="53.2521%" y="228" width="8.4287%" height="15" fill="rgb(245,188,44)" fg:x="2186" fg:w="346"/><text x="53.5021%" y="238.50">(unknown) [c..</text></g><g><title>block in each_remote_read_then_finish - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:342 (344 samples, 8.38%)</title><rect x="53.3009%" y="244" width="8.3800%" height="15" fill="rgb(244,110,43)" fg:x="2188" fg:w="344"/><text x="53.5509%" y="254.50">block in eac..</text></g><g><title>remote_read - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:273 (256 samples, 6.24%)</title><rect x="55.4446%" y="260" width="6.2363%" height="15" fill="rgb(251,184,51)" fg:x="2276" fg:w="256"/><text x="55.6946%" y="270.50">remote_r..</text></g><g><title>get_message_from_batch_result - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:282 (20 samples, 0.49%)</title><rect x="61.1937%" y="276" width="0.4872%" height="15" fill="rgb(252,170,52)" fg:x="2512" fg:w="20"/><text x="61.4437%" y="286.50"></text></g><g><title>block in unmarshal_proc - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/rpc_desc.rb:47 (19 samples, 0.46%)</title><rect x="61.2180%" y="292" width="0.4629%" height="15" fill="rgb(230,110,28)" fg:x="2513" fg:w="19"/><text x="61.4680%" y="302.50"></text></g><g><title>(unknown) [c function] - (unknown) (19 samples, 0.46%)</title><rect x="61.2180%" y="308" width="0.4629%" height="15" fill="rgb(245,188,44)" fg:x="2513" fg:w="19"/><text x="61.4680%" y="318.50"></text></g><g><title>(unknown) [c function] - (unknown) (13 samples, 0.32%)</title><rect x="61.3642%" y="324" width="0.3167%" height="15" fill="rgb(245,188,44)" fg:x="2519" fg:w="13"/><text x="61.6142%" y="334.50"></text></g><g><title>(unknown) [c function] - (unknown) (13 samples, 0.32%)</title><rect x="61.3642%" y="340" width="0.3167%" height="15" fill="rgb(245,188,44)" fg:x="2519" fg:w="13"/><text x="61.6142%" y="350.50"></text></g><g><title>try_add - /var/lib/gems/3.2.0/gems/google-protobuf-4.34.0-x86_64-linux-gnu/lib/google/protobuf/internal/object_cache.rb:39 (10 samples, 0.24%)</title><rect x="61.4373%" y="356" width="0.2436%" height="15" fill="rgb(228,158,25)" fg:x="2522" fg:w="10"/><text x="61.6873%" y="366.50"></text></g><g><title>(unknown) [c function] - (unknown) (10 samples, 0.24%)</title><rect x="61.4373%" y="372" width="0.2436%" height="15" fill="rgb(245,188,44)" fg:x="2522" fg:w="10"/><text x="61.6873%" y="382.50"></text></g><g><title>(unknown) [c function] - (unknown) (29 samples, 0.71%)</title><rect x="61.7052%" y="244" width="0.7065%" height="15" fill="rgb(245,188,44)" fg:x="2533" fg:w="29"/><text x="61.9552%" y="254.50"></text></g><g><title>attach_status_results_and_complete_call - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:190 (5 samples, 0.12%)</title><rect x="62.4117%" y="244" width="0.1218%" height="15" fill="rgb(238,117,36)" fg:x="2562" fg:w="5"/><text x="62.6617%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (18 samples, 0.44%)</title><rect x="62.5335%" y="308" width="0.4385%" height="15" fill="rgb(245,188,44)" fg:x="2567" fg:w="18"/><text x="62.7835%" y="318.50"></text></g><g><title>receive_and_check_status - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:179 (55 samples, 1.34%)</title><rect x="61.6809%" y="228" width="1.3398%" height="15" fill="rgb(242,178,40)" fg:x="2532" fg:w="55"/><text x="61.9309%" y="238.50"></text></g><g><title>set_input_stream_done - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:599 (20 samples, 0.49%)</title><rect x="62.5335%" y="244" width="0.4872%" height="15" fill="rgb(237,154,35)" fg:x="2567" fg:w="20"/><text x="62.7835%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (20 samples, 0.49%)</title><rect x="62.5335%" y="260" width="0.4872%" height="15" fill="rgb(245,188,44)" fg:x="2567" fg:w="20"/><text x="62.7835%" y="270.50"></text></g><g><title>block in set_input_stream_done - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:598 (20 samples, 0.49%)</title><rect x="62.5335%" y="276" width="0.4872%" height="15" fill="rgb(238,110,37)" fg:x="2567" fg:w="20"/><text x="62.7835%" y="286.50"></text></g><g><title>maybe_finish_and_close_call_locked - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:617 (20 samples, 0.49%)</title><rect x="62.5335%" y="292" width="0.4872%" height="15" fill="rgb(236,109,34)" fg:x="2567" fg:w="20"/><text x="62.7835%" y="302.50"></text></g><g><title>(unknown) [c function] - (unknown) (405 samples, 9.87%)</title><rect x="53.2034%" y="196" width="9.8660%" height="15" fill="rgb(245,188,44)" fg:x="2184" fg:w="405"/><text x="53.4534%" y="206.50">(unknown) [c f..</text></g><g><title>each_remote_read_then_finish - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:347 (403 samples, 9.82%)</title><rect x="53.2521%" y="212" width="9.8173%" height="15" fill="rgb(235,166,33)" fg:x="2186" fg:w="403"/><text x="53.5021%" y="222.50">each_remote_re..</text></g><g><title>instance_id - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/table.rb:100 (10 samples, 0.24%)</title><rect x="63.0694%" y="196" width="0.2436%" height="15" fill="rgb(235,167,34)" fg:x="2589" fg:w="10"/><text x="63.3194%" y="206.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="63.1181%" y="212" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="2591" fg:w="8"/><text x="63.3681%" y="222.50"></text></g><g><title>name - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/table.rb:109 (5 samples, 0.12%)</title><rect x="63.3130%" y="196" width="0.1218%" height="15" fill="rgb(237,181,35)" fg:x="2599" fg:w="5"/><text x="63.5630%" y="206.50"></text></g><g><title>(unknown) [c function] - (unknown) (5 samples, 0.12%)</title><rect x="63.3130%" y="212" width="0.1218%" height="15" fill="rgb(245,188,44)" fg:x="2599" fg:w="5"/><text x="63.5630%" y="222.50"></text></g><g><title>(unknown) [c function] - (unknown) (38 samples, 0.93%)</title><rect x="64.1657%" y="228" width="0.9257%" height="15" fill="rgb(245,188,44)" fg:x="2634" fg:w="38"/><text x="64.4157%" y="238.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/call_options.rb:53 (17 samples, 0.41%)</title><rect x="64.6772%" y="244" width="0.4141%" height="15" fill="rgb(236,161,34)" fg:x="2655" fg:w="17"/><text x="64.9272%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (13 samples, 0.32%)</title><rect x="64.7747%" y="260" width="0.3167%" height="15" fill="rgb(245,188,44)" fg:x="2659" fg:w="13"/><text x="65.0247%" y="270.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/call_options/retry_policy.rb:36 (9 samples, 0.22%)</title><rect x="64.8721%" y="276" width="0.2192%" height="15" fill="rgb(233,161,31)" fg:x="2663" fg:w="9"/><text x="65.1221%" y="286.50"></text></g><g><title>block in create_getter - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/config.rb:79 (17 samples, 0.41%)</title><rect x="65.1888%" y="228" width="0.4141%" height="15" fill="rgb(235,110,33)" fg:x="2676" fg:w="17"/><text x="65.4388%" y="238.50"></text></g><g><title>(unknown) [c function] - (unknown) (16 samples, 0.39%)</title><rect x="65.6516%" y="244" width="0.3898%" height="15" fill="rgb(245,188,44)" fg:x="2695" fg:w="16"/><text x="65.9016%" y="254.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/grpc/service_stub/rpc_call.rb:41 (13 samples, 0.32%)</title><rect x="65.7247%" y="260" width="0.3167%" height="15" fill="rgb(223,161,20)" fg:x="2698" fg:w="13"/><text x="65.9747%" y="270.50"></text></g><g><title>random_uuid4 - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/logging_concerns.rb:180 (13 samples, 0.32%)</title><rect x="65.7247%" y="276" width="0.3167%" height="15" fill="rgb(239,146,37)" fg:x="2698" fg:w="13"/><text x="65.9747%" y="286.50"></text></g><g><title>unpack - unknown:21 (7 samples, 0.17%)</title><rect x="65.8709%" y="292" width="0.1705%" height="15" fill="rgb(225,161,22)" fg:x="2704" fg:w="7"/><text x="66.1209%" y="302.50"></text></g><g><title>(unknown) [c function] - (unknown) (7 samples, 0.17%)</title><rect x="66.5773%" y="308" width="0.1705%" height="15" fill="rgb(245,188,44)" fg:x="2733" fg:w="7"/><text x="66.8273%" y="318.50"></text></g><g><title>new_active_call - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/client_stub.rb:501 (33 samples, 0.80%)</title><rect x="66.9428%" y="308" width="0.8039%" height="15" fill="rgb(231,184,29)" fg:x="2748" fg:w="33"/><text x="67.1928%" y="318.50"></text></g><g><title>(unknown) [c function] - (unknown) (33 samples, 0.80%)</title><rect x="66.9428%" y="324" width="0.8039%" height="15" fill="rgb(245,188,44)" fg:x="2748" fg:w="33"/><text x="67.1928%" y="334.50"></text></g><g><title>initialize - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:114 (10 samples, 0.24%)</title><rect x="67.5030%" y="340" width="0.2436%" height="15" fill="rgb(245,161,44)" fg:x="2771" fg:w="10"/><text x="67.7530%" y="350.50"></text></g><g><title>(unknown) [c function] - (unknown) (6 samples, 0.15%)</title><rect x="67.6005%" y="356" width="0.1462%" height="15" fill="rgb(245,188,44)" fg:x="2775" fg:w="6"/><text x="67.8505%" y="366.50"></text></g><g><title>block (3 levels) in rpc_stub_class - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/service.rb:182 (62 samples, 1.51%)</title><rect x="66.3825%" y="276" width="1.5104%" height="15" fill="rgb(253,110,53)" fg:x="2725" fg:w="62"/><text x="66.6325%" y="286.50"></text></g><g><title>server_streamer - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/client_stub.rb:352 (56 samples, 1.36%)</title><rect x="66.5286%" y="292" width="1.3642%" height="15" fill="rgb(243,160,41)" fg:x="2731" fg:w="56"/><text x="66.7786%" y="302.50"></text></g><g><title>operation - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:155 (6 samples, 0.15%)</title><rect x="67.7467%" y="308" width="0.1462%" height="15" fill="rgb(239,195,37)" fg:x="2781" fg:w="6"/><text x="67.9967%" y="318.50"></text></g><g><title>(unknown) [c function] - (unknown) (5 samples, 0.12%)</title><rect x="67.7710%" y="324" width="0.1218%" height="15" fill="rgb(245,188,44)" fg:x="2782" fg:w="5"/><text x="68.0210%" y="334.50"></text></g><g><title>(unknown) [c function] - (unknown) (70 samples, 1.71%)</title><rect x="66.3337%" y="260" width="1.7052%" height="15" fill="rgb(245,188,44)" fg:x="2723" fg:w="70"/><text x="66.5837%" y="270.50"></text></g><g><title>(unknown) [c function] - (unknown) (1,122 samples, 27.33%)</title><rect x="68.3313%" y="324" width="27.3325%" height="15" fill="rgb(245,188,44)" fg:x="2805" fg:w="1122"/><text x="68.5813%" y="334.50">(unknown) [c function] - (unknown)</text></g><g><title>block in marshal_proc - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/rpc_desc.rb:35 (8 samples, 0.19%)</title><rect x="95.6638%" y="324" width="0.1949%" height="15" fill="rgb(235,110,33)" fg:x="3927" fg:w="8"/><text x="95.9138%" y="334.50"></text></g><g><title>(unknown) [c function] - (unknown) (6 samples, 0.15%)</title><rect x="95.7125%" y="340" width="0.1462%" height="15" fill="rgb(245,188,44)" fg:x="3929" fg:w="6"/><text x="95.9625%" y="350.50"></text></g><g><title>block in server_streamer - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/client_stub.rb:345 (1,143 samples, 27.84%)</title><rect x="68.0390%" y="260" width="27.8441%" height="15" fill="rgb(238,110,37)" fg:x="2793" fg:w="1143"/><text x="68.2890%" y="270.50">block in server_streamer - /var/lib/gems/3.2...</text></g><g><title>intercept! - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/interceptors.rb:184 (1,142 samples, 27.82%)</title><rect x="68.0633%" y="276" width="27.8197%" height="15" fill="rgb(249,164,49)" fg:x="2794" fg:w="1142"/><text x="68.3133%" y="286.50">intercept! - /var/lib/gems/3.2.0/gems/grpc-1...</text></g><g><title>block (2 levels) in server_streamer - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/client_stub.rb:344 (1,142 samples, 27.82%)</title><rect x="68.0633%" y="292" width="27.8197%" height="15" fill="rgb(240,110,39)" fg:x="2794" fg:w="1142"/><text x="68.3133%" y="302.50">block (2 levels) in server_streamer - /var/li..</text></g><g><title>server_streamer - /var/lib/gems/3.2.0/gems/grpc-1.78.1-x86_64-linux-gnu/src/ruby/lib/grpc/generic/active_call.rb:471 (1,141 samples, 27.80%)</title><rect x="68.0877%" y="308" width="27.7954%" height="15" fill="rgb(236,160,34)" fg:x="2795" fg:w="1141"/><text x="68.3377%" y="318.50">server_streamer - /var/lib/gems/3.2.0/gems/gr..</text></g><g><title>(unknown) [c function] - (unknown) (6 samples, 0.15%)</title><rect x="95.8831%" y="276" width="0.1462%" height="15" fill="rgb(245,188,44)" fg:x="3936" fg:w="6"/><text x="96.1331%" y="286.50"></text></g><g><title>calculate_deadline - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/grpc/service_stub/rpc_call.rb:160 (9 samples, 0.22%)</title><rect x="95.8831%" y="260" width="0.2192%" height="15" fill="rgb(229,112,26)" fg:x="3936" fg:w="9"/><text x="96.1331%" y="270.50"></text></g><g><title>call_rpc - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/grpc/service_stub.rb:221 (1,254 samples, 30.55%)</title><rect x="65.6029%" y="228" width="30.5481%" height="15" fill="rgb(231,112,28)" fg:x="2693" fg:w="1254"/><text x="65.8529%" y="238.50">call_rpc - /var/lib/gems/3.2.0/gems/gapic-common-..</text></g><g><title>call - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/grpc/service_stub/rpc_call.rb:151 (1,236 samples, 30.11%)</title><rect x="66.0414%" y="244" width="30.1096%" height="15" fill="rgb(228,112,26)" fg:x="2711" fg:w="1236"/><text x="66.2914%" y="254.50">call - /var/lib/gems/3.2.0/gems/gapic-common-1.2...</text></g><g><title>(unknown) [c function] - (unknown) (10 samples, 0.24%)</title><rect x="96.1754%" y="244" width="0.2436%" height="15" fill="rgb(245,188,44)" fg:x="3948" fg:w="10"/><text x="96.4254%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="96.2241%" y="260" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="3950" fg:w="8"/><text x="96.4741%" y="270.50"></text></g><g><title>(unknown) [c function] - (unknown) (8 samples, 0.19%)</title><rect x="96.5895%" y="292" width="0.1949%" height="15" fill="rgb(245,188,44)" fg:x="3965" fg:w="8"/><text x="96.8395%" y="302.50"></text></g><g><title>coerce - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/protobuf.rb:44 (31 samples, 0.76%)</title><rect x="96.1510%" y="228" width="0.7552%" height="15" fill="rgb(235,136,33)" fg:x="3947" fg:w="31"/><text x="96.4010%" y="238.50"></text></g><g><title>coerce_submessages - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/protobuf.rb:73 (20 samples, 0.49%)</title><rect x="96.4190%" y="244" width="0.4872%" height="15" fill="rgb(246,136,45)" fg:x="3958" fg:w="20"/><text x="96.6690%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (18 samples, 0.44%)</title><rect x="96.4677%" y="260" width="0.4385%" height="15" fill="rgb(245,188,44)" fg:x="3960" fg:w="18"/><text x="96.7177%" y="270.50"></text></g><g><title>block in coerce_submessages - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/protobuf.rb:71 (18 samples, 0.44%)</title><rect x="96.4677%" y="276" width="0.4385%" height="15" fill="rgb(232,110,30)" fg:x="3960" fg:w="18"/><text x="96.7177%" y="286.50"></text></g><g><title>coerce_submessage - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/protobuf.rb:102 (5 samples, 0.12%)</title><rect x="96.7844%" y="292" width="0.1218%" height="15" fill="rgb(249,136,49)" fg:x="3973" fg:w="5"/><text x="97.0344%" y="302.50"></text></g><g><title>encode_www_form - /usr/lib/ruby/3.2.0/uri/common.rb:420 (57 samples, 1.39%)</title><rect x="96.9062%" y="228" width="1.3886%" height="15" fill="rgb(231,212,29)" fg:x="3978" fg:w="57"/><text x="97.1562%" y="238.50"></text></g><g><title>(unknown) [c function] - (unknown) (56 samples, 1.36%)</title><rect x="96.9306%" y="244" width="1.3642%" height="15" fill="rgb(245,188,44)" fg:x="3979" fg:w="56"/><text x="97.1806%" y="254.50"></text></g><g><title>(unknown) [c function] - (unknown) (55 samples, 1.34%)</title><rect x="96.9549%" y="260" width="1.3398%" height="15" fill="rgb(245,188,44)" fg:x="3980" fg:w="55"/><text x="97.2049%" y="270.50"></text></g><g><title>(unknown) [c function] - (unknown) (55 samples, 1.34%)</title><rect x="96.9549%" y="276" width="1.3398%" height="15" fill="rgb(245,188,44)" fg:x="3980" fg:w="55"/><text x="97.2049%" y="286.50"></text></g><g><title>block in encode_www_form - /usr/lib/ruby/3.2.0/uri/common.rb:419 (55 samples, 1.34%)</title><rect x="96.9549%" y="292" width="1.3398%" height="15" fill="rgb(234,110,32)" fg:x="3980" fg:w="55"/><text x="97.2049%" y="302.50"></text></g><g><title>encode_www_form_component - /usr/lib/ruby/3.2.0/uri/common.rb:330 (54 samples, 1.32%)</title><rect x="96.9793%" y="308" width="1.3155%" height="15" fill="rgb(231,212,28)" fg:x="3981" fg:w="54"/><text x="97.2293%" y="318.50"></text></g><g><title>_encode_uri_component - /usr/lib/ruby/3.2.0/uri/common.rb:366 (54 samples, 1.32%)</title><rect x="96.9793%" y="324" width="1.3155%" height="15" fill="rgb(234,173,32)" fg:x="3981" fg:w="54"/><text x="97.2293%" y="334.50"></text></g><g><title>(unknown) [c function] - (unknown) (53 samples, 1.29%)</title><rect x="97.0037%" y="340" width="1.2911%" height="15" fill="rgb(245,188,44)" fg:x="3982" fg:w="53"/><text x="97.2537%" y="350.50"></text></g><g><title>read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-v2-1.11.0/lib/google/cloud/bigtable/v2/bigtable/client.rb:356 (1,443 samples, 35.15%)</title><rect x="63.6297%" y="212" width="35.1523%" height="15" fill="rgb(236,184,34)" fg:x="2612" fg:w="1443"/><text x="63.8797%" y="222.50">read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtabl..</text></g><g><title>x_goog_api_client - /var/lib/gems/3.2.0/gems/gapic-common-1.2.0/lib/gapic/headers.rb:55 (19 samples, 0.46%)</title><rect x="98.3191%" y="228" width="0.4629%" height="15" fill="rgb(232,172,30)" fg:x="4036" fg:w="19"/><text x="98.5691%" y="238.50"></text></g><g><title>(unknown) [c function] - (unknown) (1,918 samples, 46.72%)</title><rect x="52.2290%" y="132" width="46.7235%" height="15" fill="rgb(245,188,44)" fg:x="2144" fg:w="1918"/><text x="52.4790%" y="142.50">(unknown) [c function] - (unknown)</text></g><g><title>(unknown) [c function] - (unknown) (1,917 samples, 46.70%)</title><rect x="52.2533%" y="148" width="46.6991%" height="15" fill="rgb(245,188,44)" fg:x="2145" fg:w="1917"/><text x="52.5033%" y="158.50">(unknown) [c function] - (unknown)</text></g><g><title>read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/read_operations.rb:193 (1,916 samples, 46.67%)</title><rect x="52.2777%" y="164" width="46.6748%" height="15" fill="rgb(250,184,49)" fg:x="2146" fg:w="1916"/><text x="52.5277%" y="174.50">read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/..</text></g><g><title>read - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/rows_reader.rb:102 (1,880 samples, 45.80%)</title><rect x="53.1547%" y="180" width="45.7978%" height="15" fill="rgb(249,184,49)" fg:x="2182" fg:w="1880"/><text x="53.4047%" y="190.50">read - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/clo..</text></g><g><title>read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/service.rb:697 (1,458 samples, 35.52%)</title><rect x="63.4348%" y="196" width="35.5177%" height="15" fill="rgb(239,184,38)" fg:x="2604" fg:w="1458"/><text x="63.6848%" y="206.50">read_rows - /var/lib/gems/3.2.0/gems/google-cloud-bigtable..</text></g><g><title>table_path - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/service.rb:1041 (7 samples, 0.17%)</title><rect x="98.7820%" y="212" width="0.1705%" height="15" fill="rgb(230,130,28)" fg:x="4055" fg:w="7"/><text x="99.0320%" y="222.50"></text></g><g><title>table_path - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-admin-v2-1.16.0/lib/google/cloud/bigtable/admin/v2/bigtable_table_admin/paths.rb:188 (6 samples, 0.15%)</title><rect x="98.8063%" y="228" width="0.1462%" height="15" fill="rgb(242,130,41)" fg:x="4056" fg:w="6"/><text x="99.0563%" y="238.50"></text></g><g><title>block (2 levels) in &lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:162 (2,405 samples, 58.59%)</title><rect x="40.3898%" y="68" width="58.5871%" height="15" fill="rgb(243,110,42)" fg:x="1658" fg:w="2405"/><text x="40.6398%" y="78.50">block (2 levels) in &lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:162</text></g><g><title>(unknown) [c function] - (unknown) (2,405 samples, 58.59%)</title><rect x="40.3898%" y="84" width="58.5871%" height="15" fill="rgb(245,188,44)" fg:x="1658" fg:w="2405"/><text x="40.6398%" y="94.50">(unknown) [c function] - (unknown)</text></g><g><title>block (3 levels) in &lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:161 (2,405 samples, 58.59%)</title><rect x="40.3898%" y="100" width="58.5871%" height="15" fill="rgb(227,110,24)" fg:x="1658" fg:w="2405"/><text x="40.6398%" y="110.50">block (3 levels) in &lt;main&gt; - /home/justinuang_google_com/ycsb_benchmark.rb:161</text></g><g><title>read_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/read_operations.rb:225 (1,920 samples, 46.77%)</title><rect x="52.2046%" y="116" width="46.7722%" height="15" fill="rgb(241,184,40)" fg:x="2143" fg:w="1920"/><text x="52.4546%" y="126.50">read_row - /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/c..</text></g><g><title>expires_within? - /var/lib/gems/3.2.0/gems/signet-0.21.0/lib/signet/oauth_2/client.rb:879 (15 samples, 0.37%)</title><rect x="99.4153%" y="132" width="0.3654%" height="15" fill="rgb(237,158,35)" fg:x="4081" fg:w="15"/><text x="99.6653%" y="142.50"></text></g><g><title>now - unknown:225 (8 samples, 0.19%)</title><rect x="99.5859%" y="148" width="0.1949%" height="15" fill="rgb(241,189,40)" fg:x="4088" fg:w="8"/><text x="99.8359%" y="158.50"></text></g><g><title>apply! - /var/lib/gems/3.2.0/gems/googleauth-1.16.2/lib/googleauth/base_client.rb:42 (31 samples, 0.76%)</title><rect x="99.0743%" y="100" width="0.7552%" height="15" fill="rgb(239,150,37)" fg:x="4067" fg:w="31"/><text x="99.3243%" y="110.50"></text></g><g><title>needs_access_token? - /var/lib/gems/3.2.0/gems/googleauth-1.16.2/lib/googleauth/base_client.rb:54 (22 samples, 0.54%)</title><rect x="99.2935%" y="116" width="0.5359%" height="15" fill="rgb(234,203,32)" fg:x="4076" fg:w="22"/><text x="99.5435%" y="126.50"></text></g><g><title>all (4,105 samples, 100%)</title><rect x="0.0000%" y="52" width="100.0000%" height="15" fill="rgb(255,230,55)" fg:x="0" fg:w="4105"/><text x="0.2500%" y="62.50"></text></g><g><title>block in updater_proc - /var/lib/gems/3.2.0/gems/googleauth-1.16.2/lib/googleauth/base_client.rb:59 (42 samples, 1.02%)</title><rect x="98.9769%" y="68" width="1.0231%" height="15" fill="rgb(225,110,23)" fg:x="4063" fg:w="42"/><text x="99.2269%" y="78.50"></text></g><g><title>apply - /var/lib/gems/3.2.0/gems/googleauth-1.16.2/lib/googleauth/base_client.rb:49 (38 samples, 0.93%)</title><rect x="99.0743%" y="84" width="0.9257%" height="15" fill="rgb(227,150,24)" fg:x="4067" fg:w="38"/><text x="99.3243%" y="94.50"></text></g><g><title>clone - unknown:49 (7 samples, 0.17%)</title><rect x="99.8295%" y="100" width="0.1705%" height="15" fill="rgb(227,102,24)" fg:x="4098" fg:w="7"/><text x="100.0795%" y="110.50"></text></g></svg></svg>
