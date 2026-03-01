@@ -219,7 +219,9 @@ module Google
         #   row = table.read_row "user-1", filter: filter
         #
         def read_row key, filter: nil
-          read_rows(keys: [key], filter: filter).first
+          # Using .to_a.first ensures the Ruby client reads the stream to completion
+          # rather than abruptly cancelling midway when yielding 1 element.
+          read_rows(keys: [key], filter: filter, limit: 1).to_a.first
         end
 
         ##
