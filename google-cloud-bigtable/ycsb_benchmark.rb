@@ -75,6 +75,9 @@ OptionParser.new do |opts|
   opts.on("--duration N", Integer, "Benchmark duration in seconds") do |n|
     options[:duration] = n
   end
+  opts.on("--warmup N", Integer, "Benchmark warmup period before collecting latencies") do |n|
+    options[:warmup] = n
+  end
   opts.on("--recordcount N", Integer, "Total records in dataset") do |n|
     options[:recordcount] = n
   end
@@ -112,7 +115,7 @@ puts "Generator Ready."
 qps_per_thread = options[:qps].to_f / options[:threads]
 sleep_time_per_query = 1.0 / qps_per_thread
 
-latencies = []
+latencies_by_minute = Hash.new { |h, k| h[k] = [] }
 latencies_mutex = Mutex.new
 
 start_time = Time.now
@@ -146,7 +149,8 @@ threads = options[:threads].times.map do |i|
       
       # Only record latency if we are past the warmup phase
       if now > warmup_end
-        latencies_mutex.synchronize { latencies << latency_ms }
+        minute_bucket = ((now - warmup_end) / 60.0).floor
+        latencies_mutex.synchronize { latencies_by_minute[minute_bucket] << latency_ms }
       end
       
       # Rate limit
@@ -161,17 +165,66 @@ threads.each(&:join)
 
 puts "========================================"
 puts "Benchmark Finished!"
-puts "Total operations recorded (post-warmup): #{latencies.size}"
 
-if latencies.empty?
+overall_latencies = latencies_by_minute.values.flatten
+
+if overall_latencies.empty?
   puts "No latencies recorded. Was the run duration too short?"
 else
-  sorted = latencies.sort
-  puts "Throughput (ops/sec): #{latencies.size.to_f / (options[:duration] - options[:warmup])}"
-  puts "Average Latency: #{sorted.sum / sorted.size} ms"
-  puts "p50 Latency:     #{sorted[(sorted.size * 0.50).to_i]} ms"
-  puts "p90 Latency:     #{sorted[(sorted.size * 0.90).to_i]} ms"
-  puts "p99 Latency:     #{sorted[(sorted.size * 0.99).to_i]} ms"
-  puts "p99.9 Latency:   #{sorted[(sorted.size * 0.999).to_i]} ms"
+  # 1. Print Per-Minute Metrics
+  puts "========================================"
+  puts "Per-Minute Breakdown:"
+  puts "========================================"
+  max_p99 = 0.0
+  max_p99_minute = 0
+  
+  latencies_by_minute.keys.sort.each do |minute|
+    bucket = latencies_by_minute[minute]
+    next if bucket.empty?
+    
+    sorted_bucket = bucket.sort
+    actual_duration = [60, options[:duration] - (minute * 60)].min
+    throughput = bucket.size.to_f / actual_duration
+    
+    avg = sorted_bucket.sum / sorted_bucket.size
+    p50 = sorted_bucket[(sorted_bucket.size * 0.50).to_i]
+    p90 = sorted_bucket[(sorted_bucket.size * 0.90).to_i]
+    p99 = sorted_bucket[(sorted_bucket.size * 0.99).to_i]
+    p999 = sorted_bucket[(sorted_bucket.size * 0.999).to_i]
+    
+    if p99 > max_p99
+      max_p99 = p99
+      max_p99_minute = minute
+    end
+
+    puts "Minute #{minute + 1} (Sec #{minute * 60}-#{(minute + 1) * 60}):"
+    puts "  Throughput (ops/sec): #{throughput.round(2)}"
+    puts "  Average Latency:      #{avg.round(4)} ms"
+    puts "  p50 Latency:          #{p50.round(4)} ms"
+    puts "  p90 Latency:          #{p90.round(4)} ms"
+    puts "  p99 Latency:          #{p99.round(4)} ms"
+    puts "  p99.9 Latency:        #{p999.round(4)} ms"
+    puts "----------------------------------------"
+  end
+
+  # 2. Print Overall Metrics
+  puts "========================================"
+  puts "Overall Aggregate Metrics:"
+  puts "========================================"
+  puts "Total operations recorded (post-warmup): #{overall_latencies.size}"
+  
+  sorted_overall = overall_latencies.sort
+  puts "Throughput (ops/sec): #{overall_latencies.size.to_f / (options[:duration] - options[:warmup])}"
+  puts "Average Latency: #{sorted_overall.sum / sorted_overall.size} ms"
+  puts "p50 Latency:     #{sorted_overall[(sorted_overall.size * 0.50).to_i]} ms"
+  puts "p90 Latency:     #{sorted_overall[(sorted_overall.size * 0.90).to_i]} ms"
+  puts "p99 Latency:     #{sorted_overall[(sorted_overall.size * 0.99).to_i]} ms"
+  puts "p99.9 Latency:   #{sorted_overall[(sorted_overall.size * 0.999).to_i]} ms"
+  
+  # 3. Print Worst-Minute Callout
+  puts "========================================"
+  puts "Worst-Minute Analysis:"
+  puts "========================================"
+  puts "Worst p99 occurred in Minute #{max_p99_minute + 1} at #{max_p99.round(4)} ms"
+  puts "========================================"
 end
-puts "========================================"
