@@ -4,6 +4,7 @@ require 'google/cloud/bigtable'
 require 'optparse'
 require 'logger'
 require 'digest'
+require 'digest/md5'
 
 class ZipfianGenerator
   def initialize(min, max, zipfian_constant = 0.99)

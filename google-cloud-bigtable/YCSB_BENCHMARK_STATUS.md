@@ -167,10 +167,10 @@ To better isolate whether the performance gains are coming from the robust Java 
 xychart-beta
     title "p99 Tail Latencies Over 5-Minutes"
     x-axis ["Min 1", "Min 2", "Min 3", "Min 4", "Min 5"]
-    y-axis "Latency (ms)" 5 --> 8
-    line [5.85, 5.45, 5.31, 5.48, 5.50]
-    line [6.46, 6.21, 6.16, 5.63, 5.40]
-    line [6.82, 6.66, 7.23, 6.55, 6.75]
+    y-axis "Latency (ms)" 5 --> 70
+    line [6.51, 6.30, 6.10, 6.23, 6.63]
+    line [6.16, 6.20, 6.51, 6.36, 7.38]
+    line [7.40, 22.31, 65.32, 29.01, 51.67]
 ```
 *(Legend: 🔵 Java Sidecar DirectPath | 🟢 Java Sidecar Cloudpath | 🔴 Native Ruby)*
 
@@ -180,10 +180,10 @@ To highlight Garbage Collection turbulence and network stability across the cont
 
 | Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
 | :-------------------- | :------------------------ | :----------------------- | :---------------------- |
-| **Overall p99 Latency** | **5.52 ms**               | **6.04 ms**              | **6.79 ms**             |
-| **Worst-Min p99**     | 5.85 ms (Min 1)           | 6.46 ms (Min 1)          | 7.23 ms (Min 3)         |
-| **Overall p50 Latency** | 3.29 ms                   | 3.61 ms                  | 3.32 ms                 |
-| **Overall Average**   | 3.40 ms                   | 3.75 ms                  | 3.55 ms                 |
+| **Overall p99 Latency** | **6.33 ms**               | **6.37 ms**              | **57.39 ms**            |
+| **Worst-Min p99**     | 6.63 ms (Min 5)           | 7.38 ms (Min 5)          | 65.32 ms (Min 3)        |
+| **Overall p50 Latency** | 3.80 ms                   | 3.88 ms                  | 5.30 ms                 |
+| **Overall Average**   | 3.94 ms                   | 4.03 ms                  | 9.82 ms                 |
 
 ### Phase 7 Conclusion
 The 3-way performance split evaluated across 60-second time buckets emphasizes that **the vast majority of the latency improvement stems from the Java Sidecar's highly optimized gRPC connection multiplexer and threading architecture**.
