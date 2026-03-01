@@ -21,6 +21,7 @@ module Com
           rpc :MutateRow, ::Com::Example::Sidecar::MutateRowRequest, ::Com::Example::Sidecar::MutateRowResponse
           rpc :MutateRows, ::Com::Example::Sidecar::MutateRowsRequest, ::Com::Example::Sidecar::MutateRowsResponse
           rpc :GetStats, ::Com::Example::Sidecar::StatsRequest, ::Com::Example::Sidecar::StatsResponse
+          rpc :ClearStats, ::Com::Example::Sidecar::ClearStatsRequest, ::Com::Example::Sidecar::ClearStatsResponse
         end
 
         Stub = Service.rpc_stub_class

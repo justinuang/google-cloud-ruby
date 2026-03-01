@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Arrays;
+
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
     private static final Logger logger = Logger.getLogger(SidecarServiceImpl.class.getName());
 
@@ -29,6 +32,7 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     private final String defaultProject;
     private final String defaultInstance;
     private final AtomicLong readRowsCount = new AtomicLong(0);
+    private final ConcurrentLinkedQueue<Long> readRowsLatencies = new ConcurrentLinkedQueue<>();
 
     private static final Pattern TABLE_NAME_PATTERN = Pattern.compile("projects/([^/]+)/instances/([^/]+)/tables/([^/]+)");
 
@@ -89,18 +93,54 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+    
+    @Override
+    public void clearStats(com.example.sidecar.ClearStatsRequest request, StreamObserver<com.example.sidecar.ClearStatsResponse> responseObserver) {
+        readRowsCount.set(0);
+        readRowsLatencies.clear();
+        responseObserver.onNext(com.example.sidecar.ClearStatsResponse.newBuilder().build());
+        responseObserver.onCompleted();
+    }
 
     @Override
     public void getStats(StatsRequest request, StreamObserver<StatsResponse> responseObserver) {
+        int size = readRowsLatencies.size();
+        double p50 = 0.0, p90 = 0.0, p99 = 0.0, avg = 0.0;
+        
+        if (size > 0) {
+            double[] latenciesMs = new double[size];
+            int i = 0;
+            for (Long latencyNanos : readRowsLatencies) {
+                if (i < size) {
+                    latenciesMs[i++] = latencyNanos / 1_000_000.0;
+                }
+            }
+            Arrays.sort(latenciesMs);
+            
+            double sumMs = 0;
+            for (double l : latenciesMs) sumMs += l;
+            
+            p50 = latenciesMs[(int) (size * 0.50)];
+            p90 = latenciesMs[(int) (size * 0.90)];
+            p99 = latenciesMs[(int) (size * 0.99)];
+            avg = sumMs / size;
+        }
+
         StatsResponse response = StatsResponse.newBuilder()
             .setReadRowsCount(readRowsCount.get())
+            .setP50Latency(p50)
+            .setP90Latency(p90)
+            .setP99Latency(p99)
+            .setAverageLatency(avg)
             .build();
+            
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
     public void readRows(com.example.sidecar.ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
+        long startTime = System.nanoTime();
         try {
             readRowsCount.incrementAndGet();
             logger.fine("Java Sidecar: Received readRows call. Request bytes size: " + request.getRequestBytes().size());
@@ -169,6 +209,8 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Java Sidecar ERROR: " + e.getMessage(), e);
             responseObserver.onError(e);
+        } finally {
+            readRowsLatencies.add(System.nanoTime() - startTime);
         }
     }
 

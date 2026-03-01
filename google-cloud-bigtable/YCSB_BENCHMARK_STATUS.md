@@ -227,6 +227,24 @@ At 500 QPS, migrating the benchmark to a top-tier CPU cleanly maintained Native 
 Because the throughput target was kept at 500 QPS, all 50 concurrent Ruby threads were able to stagger their event loop cycles gracefully despite the extremely fast `C3` cores processing the application logic instantly. The Native Ruby P99 tail returned an incredibly healthy **8.03 ms**, functionally tying the Java Sidecar's lock-free parallel execution framework (which sat flawlessly at **4.83 ms**).
 
 However, as previously demonstrated, as soon as this ceiling is pushed higher towards 1000 QPS, Native Ruby's single-core execution cycle violently collapses inside `grpc` C-bindings. At scale, the Java Sidecar acts as a crucial local shock absorber!
+
+## Phase 10: Sidecar Proxy Tax (IPC Overhead)
+
+To objectively define the exact time-loss injected by bouncing traffic through the Java Sidecar's Unix domain socket and serialization boundary, we needed to mathematically isolate the time spent exclusively *inside* the Sidecar executing the java `ReadRows` query versus the total end-to-end time measured inherently by the Ruby script. 
+We expanded the gRPC `sidecar.proto` to track Native Java latencies internally without breaking payload limits, and processed the results during the teardown of the 500 QPS C3 Benchmark.
+
+### Total Latency vs Internal Java Execution Time
+| Metric Type | Ruby (DirectPath Config) | Java Internal (DirectPath) | Proxy Tax | Ruby (CloudPath Config) | Java Internal (CloudPath) | Proxy Tax |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **P50 Latency** | 3.08 ms | 2.56 ms | **0.52 ms** | 3.41 ms | 3.04 ms | **0.37 ms** |
+| **P90 Latency** | 3.99 ms | 3.55 ms | **0.44 ms** | 4.54 ms | 4.10 ms | **0.44 ms** |
+| **P99 Latency** | 5.81 ms | 5.10 ms | **0.71 ms** | 8.21 ms | 7.69 ms | **0.52 ms** |
+
+### Phase 10 Conclusion: Negligible Translation Cost
+In every tracked percentile block, packaging and traversing the gRPC bytecode across the Unix socket between the two processes costs less than one millisecond (**~0.30 to ~0.70 ms**).
+
+Given that the Native Ruby `grpc` C-extension locks the GIL during asynchronous network loops—which we proved can incur an **85+ millisecond penalty** under heavy connection thread contention—the 1ms proxy tax is an overwhelmingly worthwhile trade-off to unlock the Sidecar's infinite concurrent connection pooling framework.
+
 ## Implementation Plan
 
 ### Setup and Verification Scripts
