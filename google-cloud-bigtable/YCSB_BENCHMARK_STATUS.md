@@ -149,6 +149,8 @@ Over the prolonged 1-hour interval, the Java Sidecar's performance remained extr
 
 ## Phase 7: 3-Way Context Switch Comparison (Per-Minute Breakdown)
 
+WARNING: This may be because the Ruby VMs are maxing out a single core (GIL).
+
 To better isolate whether the performance gains are coming from the robust Java gRPC channel multiplexer or the underlying DirectPath network routing itself, we introduced a third testing flag (`BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true`). This mode forces the Java Sidecar to use standard CloudPath DNS lookups, establishing a true 3-way comparison evaluating:
 1. Native Ruby (CloudPath)
 2. Java Sidecar (CloudPath)
@@ -165,12 +167,12 @@ To better isolate whether the performance gains are coming from the robust Java 
 
 ```mermaid
 xychart-beta
-    title "p99 Tail Latencies Over 5-Minutes"
+    title "p99 Tail Latencies Over 5-Minutes (E2 Baseline VM)"
     x-axis ["Min 1", "Min 2", "Min 3", "Min 4", "Min 5"]
-    y-axis "Latency (ms)" 5 --> 70
-    line [6.51, 6.30, 6.10, 6.23, 6.63]
-    line [6.16, 6.20, 6.51, 6.36, 7.38]
-    line [7.40, 22.31, 65.32, 29.01, 51.67]
+    y-axis "Latency (ms)" 5 --> 100
+    line [8.38, 7.60, 9.16, 8.82, 9.39]
+    line [8.11, 8.01, 9.64, 9.27, 9.43]
+    line [89.47, 91.49, 81.60, 74.45, 85.29]
 ```
 *(Legend: 🔵 Java Sidecar DirectPath | 🟢 Java Sidecar Cloudpath | 🔴 Native Ruby)*
 
@@ -180,10 +182,10 @@ To highlight Garbage Collection turbulence and network stability across the cont
 
 | Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
 | :-------------------- | :------------------------ | :----------------------- | :---------------------- |
-| **Overall p99 Latency** | **6.33 ms**               | **6.37 ms**              | **57.39 ms**            |
-| **Worst-Min p99**     | 6.63 ms (Min 5)           | 7.38 ms (Min 5)          | 65.32 ms (Min 3)        |
-| **Overall p50 Latency** | 3.80 ms                   | 3.88 ms                  | 5.30 ms                 |
-| **Overall Average**   | 3.94 ms                   | 4.03 ms                  | 9.82 ms                 |
+| **Overall p99 Latency** | **8.63 ms**               | **8.89 ms**              | **87.08 ms**            |
+| **Worst-Min p99**     | 9.39 ms (Min 5)           | 9.64 ms (Min 3)          | 91.49 ms (Min 2)        |
+| **Overall p50 Latency** | 4.31 ms                   | 4.66 ms                  | 31.21 ms                |
+| **Overall Average**   | 4.54 ms                   | 4.91 ms                  | 35.46 ms                |
 
 ### Phase 7 Conclusion
 The 3-way performance split evaluated across 60-second time buckets emphasizes that **the vast majority of the latency improvement stems from the Java Sidecar's highly optimized gRPC connection multiplexer and threading architecture**.
