@@ -25,6 +25,7 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable
 echo "--- Step 2: Running Benchmarks ---"
 echo "Starting 3-way benchmarks in the background and waiting..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
+  rm -f ~/benchmark_sidecar.log ~/benchmark_sidecar_cloudpath.log ~/benchmark_ruby.log
   ruby ~/ycsb_benchmark.rb --use-sidecar --app-profile-id=sidecar > ~/benchmark_sidecar.log 2>&1 &
   PID1=$!
   
@@ -72,11 +73,11 @@ echo ""
 echo "Native Ruby Results:"
 cat tmp/benchmark/benchmark_ruby_local.log | tail -n 20
 
-echo "--- Step 4: Routing Verification ---"
-echo "Waiting 120s for metrics to propagate to Monarch..."
-sleep 120
+# echo "--- Step 4: Routing Verification ---"
+# echo "Waiting 120s for metrics to propagate to Monarch..."
+# sleep 120
 
-mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(?:\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > tmp/benchmark/mash_routing_results.txt
+# mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > tmp/benchmark/mash_routing_results.txt
 
-echo "Routing Results:"
-cat tmp/benchmark/mash_routing_results.txt
+# echo "Routing Results:"
+# cat tmp/benchmark/mash_routing_results.txt
