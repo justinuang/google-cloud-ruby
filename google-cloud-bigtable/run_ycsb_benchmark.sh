@@ -23,25 +23,31 @@ echo "Uninstalling old gem and installing new gem on VM..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install ~/$GEM_FILE"
 
 echo "--- Step 2: Running Benchmarks ---"
-echo "Starting Sidecar and No-Sidecar benchmarks in the background and waiting..."
+echo "Starting 3-way benchmarks in the background and waiting..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
   ruby ~/ycsb_benchmark.rb --use-sidecar --app-profile-id=sidecar > ~/benchmark_sidecar.log 2>&1 &
   PID1=$!
-  ruby ~/ycsb_benchmark.rb --app-profile-id=nosidecar > ~/benchmark_ruby.log 2>&1 &
+  
+  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ~/ycsb_benchmark.rb --use-sidecar --app-profile-id=sidecarcloudpath > ~/benchmark_sidecar_cloudpath.log 2>&1 &
   PID2=$!
   
-  wait -n $PID1 $PID2
+  ruby ~/ycsb_benchmark.rb --app-profile-id=nosidecar > ~/benchmark_ruby.log 2>&1 &
+  PID3=$!
+  
+  wait -n $PID1 $PID2 $PID3
   STATUS=$?
   if [ $STATUS -ne 0 ]; then
     echo "A benchmark process failed with status $STATUS!"
-    kill $PID1 $PID2 2>/dev/null || true
+    kill $PID1 $PID2 $PID3 2>/dev/null || true
     echo "--- Sidecar Logs ---"
     cat ~/benchmark_sidecar.log
+    echo "--- Sidecar CloudPath Logs ---"
+    cat ~/benchmark_sidecar_cloudpath.log
     echo "--- No-Sidecar Logs ---"
     cat ~/benchmark_ruby.log
     exit 1
   fi
-  wait $PID1 $PID2
+  wait $PID1 $PID2 $PID3
 EOF
 
 if [ $? -ne 0 ]; then
@@ -52,13 +58,18 @@ fi
 echo "--- Step 3: Fetching Results ---"
 mkdir -p tmp/benchmark
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar.log" > tmp/benchmark/benchmark_sidecar_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar_cloudpath.log" > tmp/benchmark/benchmark_sidecar_cloudpath_local.log
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
 
-echo "Sidecar Results:"
+echo "Sidecar Results (DirectPath):"
 cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 20
 
 echo ""
-echo "No-Sidecar Results:"
+echo "Sidecar Results (CloudPath):"
+cat tmp/benchmark/benchmark_sidecar_cloudpath_local.log | tail -n 20
+
+echo ""
+echo "Native Ruby Results:"
 cat tmp/benchmark/benchmark_ruby_local.log | tail -n 20
 
 echo "--- Step 4: Routing Verification ---"

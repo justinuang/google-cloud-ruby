@@ -872,7 +872,12 @@ module Google
             args += ["--project", project_id] if project_id
             args += ["--instance", instance_id] if instance_id
 
-            env_vars = { "CBT_ENABLE_DIRECTPATH" => "true" }
+            env_vars = {}
+            if ENV["BIGTABLE_SIDECAR_DISABLE_DIRECTPATH"] != "true"
+              env_vars["CBT_ENABLE_DIRECTPATH"] = "true"
+            else
+              puts ">>> JAVA SIDECAR: DirectPath expressly disabled by BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true. Using CloudPath."
+            end
 
             if launcher_path
               @sidecar_io = IO.popen(env_vars, [launcher_path] + args, "r", err: [:child, :out])
