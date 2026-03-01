@@ -44,7 +44,7 @@ options = {
   app_profile_id: 'default',
   threads: 50,
   qps: 1000,
-  duration: 300,
+  duration: 3600,
   warmup: 30,
   project_id: ENV['BIGTABLE_TEST_PROJECT'] || 'autonomous-mote-782',
   instance_id: ENV['BIGTABLE_TEST_INSTANCE'] || 'ju-ruby-sidecar',
