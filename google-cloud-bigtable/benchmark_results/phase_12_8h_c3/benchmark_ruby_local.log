@@ -1,0 +1,3865 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>false, :app_profile_id=>"nosidecar", :threads=>50, :qps=>500, :duration=>28800, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+/home/justinuang_google_com/ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 499.5
+  Average Latency:      8.7612 ms
+  p50 Latency:          6 ms
+  p90 Latency:          14 ms
+  p99 Latency:          52 ms
+  p99.9 Latency:        93 ms
+----------------------------------------
+Minute 2 (Sec 60-120):
+  Throughput (ops/sec): 498.88
+  Average Latency:      7.3592 ms
+  p50 Latency:          4 ms
+  p90 Latency:          10 ms
+  p99 Latency:          73 ms
+  p99.9 Latency:        133 ms
+----------------------------------------
+Minute 3 (Sec 120-180):
+  Throughput (ops/sec): 499.52
+  Average Latency:      5.2239 ms
+  p50 Latency:          4 ms
+  p90 Latency:          6 ms
+  p99 Latency:          27 ms
+  p99.9 Latency:        46 ms
+----------------------------------------
+Minute 4 (Sec 180-240):
+  Throughput (ops/sec): 498.9
+  Average Latency:      6.3248 ms
+  p50 Latency:          4 ms
+  p90 Latency:          8 ms
+  p99 Latency:          69 ms
+  p99.9 Latency:        144 ms
+----------------------------------------
+Minute 5 (Sec 240-300):
+  Throughput (ops/sec): 499.5
+  Average Latency:      6.1143 ms
+  p50 Latency:          4 ms
+  p90 Latency:          8 ms
+  p99 Latency:          33 ms
+  p99.9 Latency:        105 ms
+----------------------------------------
+Minute 6 (Sec 300-360):
+  Throughput (ops/sec): 499.65
+  Average Latency:      5.5634 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          27 ms
+  p99.9 Latency:        60 ms
+----------------------------------------
+Minute 7 (Sec 360-420):
+  Throughput (ops/sec): 499.52
+  Average Latency:      5.6984 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          31 ms
+  p99.9 Latency:        77 ms
+----------------------------------------
+Minute 8 (Sec 420-480):
+  Throughput (ops/sec): 499.62
+  Average Latency:      5.5332 ms
+  p50 Latency:          4 ms
+  p90 Latency:          6 ms
+  p99 Latency:          45 ms
+  p99.9 Latency:        69 ms
+----------------------------------------
+Minute 9 (Sec 480-540):
+  Throughput (ops/sec): 498.72
+  Average Latency:      6.9077 ms
+  p50 Latency:          4 ms
+  p90 Latency:          9 ms
+  p99 Latency:          69 ms
+  p99.9 Latency:        151 ms
+----------------------------------------
+Minute 10 (Sec 540-600):
+  Throughput (ops/sec): 499.53
+  Average Latency:      6.0014 ms
+  p50 Latency:          4 ms
+  p90 Latency:          9 ms
+  p99 Latency:          29 ms
+  p99.9 Latency:        72 ms
+----------------------------------------
+Minute 11 (Sec 600-660):
+  Throughput (ops/sec): 499.6
+  Average Latency:      5.4946 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          25 ms
+  p99.9 Latency:        96 ms
+----------------------------------------
+Minute 12 (Sec 660-720):
+  Throughput (ops/sec): 499.55
+  Average Latency:      4.8943 ms
+  p50 Latency:          4 ms
+  p90 Latency:          6 ms
+  p99 Latency:          18 ms
+  p99.9 Latency:        28 ms
+----------------------------------------
+Minute 13 (Sec 720-780):
+  Throughput (ops/sec): 499.53
+  Average Latency:      5.1873 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          24 ms
+  p99.9 Latency:        47 ms
+----------------------------------------
+Minute 14 (Sec 780-840):
+  Throughput (ops/sec): 499.6
+  Average Latency:      6.1216 ms
+  p50 Latency:          4 ms
+  p90 Latency:          8 ms
+  p99 Latency:          48 ms
+  p99.9 Latency:        82 ms
+----------------------------------------
+Minute 15 (Sec 840-900):
+  Throughput (ops/sec): 499.53
+  Average Latency:      6.5363 ms
+  p50 Latency:          4 ms
+  p90 Latency:          9 ms
+  p99 Latency:          58 ms
+  p99.9 Latency:        83 ms
+----------------------------------------
+Minute 16 (Sec 900-960):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5064 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        23 ms
+----------------------------------------
+Minute 17 (Sec 960-1020):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2299 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 18 (Sec 1020-1080):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.2637 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 19 (Sec 1080-1140):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2047 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 20 (Sec 1140-1200):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2611 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 21 (Sec 1200-1260):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2144 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 22 (Sec 1260-1320):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1595 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 23 (Sec 1320-1380):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1355 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 24 (Sec 1380-1440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0675 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 25 (Sec 1440-1500):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3691 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 26 (Sec 1500-1560):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2293 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 27 (Sec 1560-1620):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2532 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 28 (Sec 1620-1680):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3407 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 29 (Sec 1680-1740):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3739 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        23 ms
+----------------------------------------
+Minute 30 (Sec 1740-1800):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5436 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 31 (Sec 1800-1860):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.379 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 32 (Sec 1860-1920):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1862 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 33 (Sec 1920-1980):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0291 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 34 (Sec 1980-2040):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0921 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 35 (Sec 2040-2100):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0409 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 36 (Sec 2100-2160):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1393 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 37 (Sec 2160-2220):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2038 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 38 (Sec 2220-2280):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.088 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 39 (Sec 2280-2340):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.1519 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 40 (Sec 2340-2400):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.271 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 41 (Sec 2400-2460):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1534 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 42 (Sec 2460-2520):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0768 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 43 (Sec 2520-2580):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0811 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 44 (Sec 2580-2640):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0789 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 45 (Sec 2640-2700):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0896 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 46 (Sec 2700-2760):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2088 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 47 (Sec 2760-2820):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1808 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 48 (Sec 2820-2880):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2994 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 49 (Sec 2880-2940):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3531 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 50 (Sec 2940-3000):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 51 (Sec 3000-3060):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2277 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 52 (Sec 3060-3120):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2112 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 53 (Sec 3120-3180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4111 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 54 (Sec 3180-3240):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.027 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 55 (Sec 3240-3300):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.8621 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 56 (Sec 3300-3360):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.8451 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 57 (Sec 3360-3420):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.8132 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 58 (Sec 3420-3480):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.9008 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 59 (Sec 3480-3540):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.8119 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 60 (Sec 3540-3600):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.7991 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 61 (Sec 3600-3660):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.7949 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 62 (Sec 3660-3720):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.803 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 63 (Sec 3720-3780):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.7578 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 64 (Sec 3780-3840):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.8071 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 65 (Sec 3840-3900):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8911 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        18 ms
+----------------------------------------
+Minute 66 (Sec 3900-3960):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.9169 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 67 (Sec 3960-4020):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.7211 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 68 (Sec 4020-4080):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.8036 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 69 (Sec 4080-4140):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9326 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 70 (Sec 4140-4200):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0073 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 71 (Sec 4200-4260):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0665 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 72 (Sec 4260-4320):
+  Throughput (ops/sec): 499.07
+  Average Latency:      5.5212 ms
+  p50 Latency:          3 ms
+  p90 Latency:          11 ms
+  p99 Latency:          26 ms
+  p99.9 Latency:        121 ms
+----------------------------------------
+Minute 73 (Sec 4320-4380):
+  Throughput (ops/sec): 499.7
+  Average Latency:      5.8479 ms
+  p50 Latency:          4 ms
+  p90 Latency:          9 ms
+  p99 Latency:          17 ms
+  p99.9 Latency:        24 ms
+----------------------------------------
+Minute 74 (Sec 4380-4440):
+  Throughput (ops/sec): 499.47
+  Average Latency:      4.1457 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          10 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 75 (Sec 4440-4500):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8916 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 76 (Sec 4500-4560):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.6942 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 77 (Sec 4560-4620):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.735 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 78 (Sec 4620-4680):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.9164 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        12 ms
+----------------------------------------
+Minute 79 (Sec 4680-4740):
+  Throughput (ops/sec): 499.53
+  Average Latency:      3.47 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 80 (Sec 4740-4800):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.5159 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 81 (Sec 4800-4860):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3967 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 82 (Sec 4860-4920):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.6912 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 83 (Sec 4920-4980):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4817 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 84 (Sec 4980-5040):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6649 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 85 (Sec 5040-5100):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4862 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 86 (Sec 5100-5160):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8374 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        22 ms
+----------------------------------------
+Minute 87 (Sec 5160-5220):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.9052 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 88 (Sec 5220-5280):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7415 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 89 (Sec 5280-5340):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6303 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 90 (Sec 5340-5400):
+  Throughput (ops/sec): 496.43
+  Average Latency:      15.1296 ms
+  p50 Latency:          4 ms
+  p90 Latency:          57 ms
+  p99 Latency:          122 ms
+  p99.9 Latency:        161 ms
+----------------------------------------
+Minute 91 (Sec 5400-5460):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0897 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 92 (Sec 5460-5520):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1961 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 93 (Sec 5520-5580):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1724 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 94 (Sec 5580-5640):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4916 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 95 (Sec 5640-5700):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1915 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 96 (Sec 5700-5760):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.24 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 97 (Sec 5760-5820):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2513 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 98 (Sec 5820-5880):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.0728 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 99 (Sec 5880-5940):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0741 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 100 (Sec 5940-6000):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5399 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 101 (Sec 6000-6060):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1775 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 102 (Sec 6060-6120):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.336 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 103 (Sec 6120-6180):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.191 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 104 (Sec 6180-6240):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1715 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 105 (Sec 6240-6300):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1573 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 106 (Sec 6300-6360):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0669 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 107 (Sec 6360-6420):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0521 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 108 (Sec 6420-6480):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.3507 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 109 (Sec 6480-6540):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.5032 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 110 (Sec 6540-6600):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4371 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        60 ms
+----------------------------------------
+Minute 111 (Sec 6600-6660):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1894 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 112 (Sec 6660-6720):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4008 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 113 (Sec 6720-6780):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9865 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 114 (Sec 6780-6840):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9271 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 115 (Sec 6840-6900):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.8805 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 116 (Sec 6900-6960):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.9354 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 117 (Sec 6960-7020):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.803 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 118 (Sec 7020-7080):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.7452 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 119 (Sec 7080-7140):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.6594 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 120 (Sec 7140-7200):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0751 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 121 (Sec 7200-7260):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.103 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 122 (Sec 7260-7320):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.18 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 123 (Sec 7320-7380):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4602 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 124 (Sec 7380-7440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4768 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 125 (Sec 7440-7500):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5847 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 126 (Sec 7500-7560):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5569 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 127 (Sec 7560-7620):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.24 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 128 (Sec 7620-7680):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4141 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 129 (Sec 7680-7740):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.337 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 130 (Sec 7740-7800):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3727 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 131 (Sec 7800-7860):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3665 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 132 (Sec 7860-7920):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3216 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 133 (Sec 7920-7980):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1816 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 134 (Sec 7980-8040):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3855 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 135 (Sec 8040-8100):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1804 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 136 (Sec 8100-8160):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0383 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 137 (Sec 8160-8220):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1466 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 138 (Sec 8220-8280):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.9692 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 139 (Sec 8280-8340):
+  Throughput (ops/sec): 499.63
+  Average Latency:      2.8445 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 140 (Sec 8340-8400):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9938 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 141 (Sec 8400-8460):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2894 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 142 (Sec 8460-8520):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1099 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 143 (Sec 8520-8580):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0678 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 144 (Sec 8580-8640):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1684 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 145 (Sec 8640-8700):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2986 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 146 (Sec 8700-8760):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1934 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 147 (Sec 8760-8820):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.2888 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 148 (Sec 8820-8880):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3698 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 149 (Sec 8880-8940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.188 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 150 (Sec 8940-9000):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.014 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 151 (Sec 9000-9060):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.0338 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 152 (Sec 9060-9120):
+  Throughput (ops/sec): 499.63
+  Average Latency:      2.8663 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 153 (Sec 9120-9180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0888 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 154 (Sec 9180-9240):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0241 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 155 (Sec 9240-9300):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9474 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 156 (Sec 9300-9360):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9867 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 157 (Sec 9360-9420):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1506 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 158 (Sec 9420-9480):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4913 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 159 (Sec 9480-9540):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.4304 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 160 (Sec 9540-9600):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3833 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 161 (Sec 9600-9660):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0882 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 162 (Sec 9660-9720):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0997 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 163 (Sec 9720-9780):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0151 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 164 (Sec 9780-9840):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.8813 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 165 (Sec 9840-9900):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.7787 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 166 (Sec 9900-9960):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.2066 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 167 (Sec 9960-10020):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.4054 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 168 (Sec 10020-10080):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.1782 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 169 (Sec 10080-10140):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.4525 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 170 (Sec 10140-10200):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3273 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 171 (Sec 10200-10260):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2066 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 172 (Sec 10260-10320):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2209 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 173 (Sec 10320-10380):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.189 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 174 (Sec 10380-10440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.383 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 175 (Sec 10440-10500):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1507 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 176 (Sec 10500-10560):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.435 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 177 (Sec 10560-10620):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5405 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        28 ms
+----------------------------------------
+Minute 178 (Sec 10620-10680):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4795 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 179 (Sec 10680-10740):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.28 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        26 ms
+----------------------------------------
+Minute 180 (Sec 10740-10800):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6126 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        27 ms
+----------------------------------------
+Minute 181 (Sec 10800-10860):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.404 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 182 (Sec 10860-10920):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2991 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 183 (Sec 10920-10980):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3548 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 184 (Sec 10980-11040):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5846 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 185 (Sec 11040-11100):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.3884 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 186 (Sec 11100-11160):
+  Throughput (ops/sec): 499.45
+  Average Latency:      3.6365 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 187 (Sec 11160-11220):
+  Throughput (ops/sec): 499.72
+  Average Latency:      3.5023 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 188 (Sec 11220-11280):
+  Throughput (ops/sec): 499.47
+  Average Latency:      3.7127 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 189 (Sec 11280-11340):
+  Throughput (ops/sec): 499.68
+  Average Latency:      3.7474 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 190 (Sec 11340-11400):
+  Throughput (ops/sec): 499.53
+  Average Latency:      3.629 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 191 (Sec 11400-11460):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.895 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 192 (Sec 11460-11520):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7163 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 193 (Sec 11520-11580):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.4493 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 194 (Sec 11580-11640):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4818 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 195 (Sec 11640-11700):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5112 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 196 (Sec 11700-11760):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.7343 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 197 (Sec 11760-11820):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5505 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 198 (Sec 11820-11880):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6022 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 199 (Sec 11880-11940):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4484 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 200 (Sec 11940-12000):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3848 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 201 (Sec 12000-12060):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3844 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 202 (Sec 12060-12120):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5109 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 203 (Sec 12120-12180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3607 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 204 (Sec 12180-12240):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4423 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 205 (Sec 12240-12300):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3694 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 206 (Sec 12300-12360):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4096 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 207 (Sec 12360-12420):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.3153 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 208 (Sec 12420-12480):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.173 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 209 (Sec 12480-12540):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1364 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 210 (Sec 12540-12600):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1546 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 211 (Sec 12600-12660):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1964 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 212 (Sec 12660-12720):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1659 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 213 (Sec 12720-12780):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0832 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 214 (Sec 12780-12840):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.0831 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 215 (Sec 12840-12900):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1198 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 216 (Sec 12900-12960):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1701 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 217 (Sec 12960-13020):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1452 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 218 (Sec 13020-13080):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1954 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 219 (Sec 13080-13140):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1568 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 220 (Sec 13140-13200):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2123 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 221 (Sec 13200-13260):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2575 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 222 (Sec 13260-13320):
+  Throughput (ops/sec): 499.23
+  Average Latency:      5.643 ms
+  p50 Latency:          3 ms
+  p90 Latency:          9 ms
+  p99 Latency:          21 ms
+  p99.9 Latency:        118 ms
+----------------------------------------
+Minute 223 (Sec 13320-13380):
+  Throughput (ops/sec): 499.38
+  Average Latency:      4.4436 ms
+  p50 Latency:          3 ms
+  p90 Latency:          6 ms
+  p99 Latency:          11 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 224 (Sec 13380-13440):
+  Throughput (ops/sec): 499.72
+  Average Latency:      3.816 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 225 (Sec 13440-13500):
+  Throughput (ops/sec): 499.47
+  Average Latency:      3.7819 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 226 (Sec 13500-13560):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.6181 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 227 (Sec 13560-13620):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5132 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 228 (Sec 13620-13680):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4982 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 229 (Sec 13680-13740):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7006 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 230 (Sec 13740-13800):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.9426 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        17 ms
+----------------------------------------
+Minute 231 (Sec 13800-13860):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.9227 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          10 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 232 (Sec 13860-13920):
+  Throughput (ops/sec): 499.6
+  Average Latency:      4.0556 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 233 (Sec 13920-13980):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.563 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 234 (Sec 13980-14040):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.5662 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 235 (Sec 14040-14100):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3493 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 236 (Sec 14100-14160):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2356 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 237 (Sec 14160-14220):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2559 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 238 (Sec 14220-14280):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2291 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 239 (Sec 14280-14340):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5168 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 240 (Sec 14340-14400):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.5651 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 241 (Sec 14400-14460):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4946 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 242 (Sec 14460-14520):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.3939 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 243 (Sec 14520-14580):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4691 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 244 (Sec 14580-14640):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5701 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 245 (Sec 14640-14700):
+  Throughput (ops/sec): 499.55
+  Average Latency:      4.0889 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 246 (Sec 14700-14760):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8698 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 247 (Sec 14760-14820):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.655 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 248 (Sec 14820-14880):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6747 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 249 (Sec 14880-14940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.086 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 250 (Sec 14940-15000):
+  Throughput (ops/sec): 499.53
+  Average Latency:      3.2887 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 251 (Sec 15000-15060):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.4117 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 252 (Sec 15060-15120):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.1305 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 253 (Sec 15120-15180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.372 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        12 ms
+----------------------------------------
+Minute 254 (Sec 15180-15240):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0322 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 255 (Sec 15240-15300):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4678 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 256 (Sec 15300-15360):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7193 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 257 (Sec 15360-15420):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8384 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 258 (Sec 15420-15480):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7387 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 259 (Sec 15480-15540):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.7024 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 260 (Sec 15540-15600):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8312 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 261 (Sec 15600-15660):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.6385 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 262 (Sec 15660-15720):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.6767 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 263 (Sec 15720-15780):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.5613 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 264 (Sec 15780-15840):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.4656 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 265 (Sec 15840-15900):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.5158 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 266 (Sec 15900-15960):
+  Throughput (ops/sec): 499.12
+  Average Latency:      4.8559 ms
+  p50 Latency:          4 ms
+  p90 Latency:          6 ms
+  p99 Latency:          13 ms
+  p99.9 Latency:        130 ms
+----------------------------------------
+Minute 267 (Sec 15960-16020):
+  Throughput (ops/sec): 499.5
+  Average Latency:      3.7043 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 268 (Sec 16020-16080):
+  Throughput (ops/sec): 499.48
+  Average Latency:      3.5098 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        12 ms
+----------------------------------------
+Minute 269 (Sec 16080-16140):
+  Throughput (ops/sec): 499.68
+  Average Latency:      3.8858 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 270 (Sec 16140-16200):
+  Throughput (ops/sec): 499.47
+  Average Latency:      3.5431 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 271 (Sec 16200-16260):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.4632 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 272 (Sec 16260-16320):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.466 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 273 (Sec 16320-16380):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3202 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 274 (Sec 16380-16440):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.4404 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 275 (Sec 16440-16500):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.2533 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 276 (Sec 16500-16560):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5392 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 277 (Sec 16560-16620):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4613 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 278 (Sec 16620-16680):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5312 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 279 (Sec 16680-16740):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5449 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 280 (Sec 16740-16800):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.551 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 281 (Sec 16800-16860):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.6502 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 282 (Sec 16860-16920):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3949 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 283 (Sec 16920-16980):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.3981 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 284 (Sec 16980-17040):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3087 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 285 (Sec 17040-17100):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4997 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 286 (Sec 17100-17160):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.489 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 287 (Sec 17160-17220):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2425 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 288 (Sec 17220-17280):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3765 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 289 (Sec 17280-17340):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1057 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 290 (Sec 17340-17400):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4076 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 291 (Sec 17400-17460):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4166 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 292 (Sec 17460-17520):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3458 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 293 (Sec 17520-17580):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1196 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 294 (Sec 17580-17640):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1568 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 295 (Sec 17640-17700):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.0662 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 296 (Sec 17700-17760):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1669 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 297 (Sec 17760-17820):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2094 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 298 (Sec 17820-17880):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1314 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 299 (Sec 17880-17940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0789 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 300 (Sec 17940-18000):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0667 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 301 (Sec 18000-18060):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.9485 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 302 (Sec 18060-18120):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.8848 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 303 (Sec 18120-18180):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.0264 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 304 (Sec 18180-18240):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3496 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        22 ms
+----------------------------------------
+Minute 305 (Sec 18240-18300):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.9819 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 306 (Sec 18300-18360):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.146 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 307 (Sec 18360-18420):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0334 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 308 (Sec 18420-18480):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0642 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 309 (Sec 18480-18540):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0308 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 310 (Sec 18540-18600):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.0434 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 311 (Sec 18600-18660):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9227 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 312 (Sec 18660-18720):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9617 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 313 (Sec 18720-18780):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9911 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 314 (Sec 18780-18840):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.9269 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 315 (Sec 18840-18900):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.8896 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 316 (Sec 18900-18960):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8709 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 317 (Sec 18960-19020):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.7997 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 318 (Sec 19020-19080):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.7759 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 319 (Sec 19080-19140):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.017 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 320 (Sec 19140-19200):
+  Throughput (ops/sec): 499.6
+  Average Latency:      4.38 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          15 ms
+  p99.9 Latency:        37 ms
+----------------------------------------
+Minute 321 (Sec 19200-19260):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7817 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 322 (Sec 19260-19320):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7957 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        17 ms
+----------------------------------------
+Minute 323 (Sec 19320-19380):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4101 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 324 (Sec 19380-19440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6194 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 325 (Sec 19440-19500):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7061 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 326 (Sec 19500-19560):
+  Throughput (ops/sec): 499.6
+  Average Latency:      4.0873 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          11 ms
+  p99.9 Latency:        39 ms
+----------------------------------------
+Minute 327 (Sec 19560-19620):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8669 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 328 (Sec 19620-19680):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.7804 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 329 (Sec 19680-19740):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4989 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 330 (Sec 19740-19800):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5986 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 331 (Sec 19800-19860):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.6912 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 332 (Sec 19860-19920):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5831 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 333 (Sec 19920-19980):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4566 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 334 (Sec 19980-20040):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3437 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 335 (Sec 20040-20100):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.2801 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 336 (Sec 20100-20160):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.3035 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 337 (Sec 20160-20220):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2589 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 338 (Sec 20220-20280):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3116 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 339 (Sec 20280-20340):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.428 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 340 (Sec 20340-20400):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3198 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 341 (Sec 20400-20460):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.39 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 342 (Sec 20460-20520):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.499 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 343 (Sec 20520-20580):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6201 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 344 (Sec 20580-20640):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7405 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 345 (Sec 20640-20700):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.7172 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 346 (Sec 20700-20760):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6705 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 347 (Sec 20760-20820):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6901 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 348 (Sec 20820-20880):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6931 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 349 (Sec 20880-20940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6342 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 350 (Sec 20940-21000):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6629 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 351 (Sec 21000-21060):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.9391 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 352 (Sec 21060-21120):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.9849 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 353 (Sec 21120-21180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8302 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 354 (Sec 21180-21240):
+  Throughput (ops/sec): 499.2
+  Average Latency:      4.0349 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        155 ms
+----------------------------------------
+Minute 355 (Sec 21240-21300):
+  Throughput (ops/sec): 499.28
+  Average Latency:      5.078 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          13 ms
+  p99.9 Latency:        20 ms
+----------------------------------------
+Minute 356 (Sec 21300-21360):
+  Throughput (ops/sec): 499.65
+  Average Latency:      3.6721 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 357 (Sec 21360-21420):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4838 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 358 (Sec 21420-21480):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.6303 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 359 (Sec 21480-21540):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.5634 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 360 (Sec 21540-21600):
+  Throughput (ops/sec): 499.02
+  Average Latency:      4.789 ms
+  p50 Latency:          3 ms
+  p90 Latency:          6 ms
+  p99 Latency:          15 ms
+  p99.9 Latency:        156 ms
+----------------------------------------
+Minute 361 (Sec 21600-21660):
+  Throughput (ops/sec): 499.47
+  Average Latency:      3.4781 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 362 (Sec 21660-21720):
+  Throughput (ops/sec): 499.7
+  Average Latency:      3.4246 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 363 (Sec 21720-21780):
+  Throughput (ops/sec): 499.45
+  Average Latency:      3.3624 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 364 (Sec 21780-21840):
+  Throughput (ops/sec): 499.67
+  Average Latency:      3.6099 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 365 (Sec 21840-21900):
+  Throughput (ops/sec): 499.52
+  Average Latency:      3.4846 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 366 (Sec 21900-21960):
+  Throughput (ops/sec): 499.63
+  Average Latency:      3.4267 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 367 (Sec 21960-22020):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3321 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 368 (Sec 22020-22080):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.178 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 369 (Sec 22080-22140):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9814 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 370 (Sec 22140-22200):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8969 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 371 (Sec 22200-22260):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.8826 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        5 ms
+----------------------------------------
+Minute 372 (Sec 22260-22320):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8317 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 373 (Sec 22320-22380):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9664 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 374 (Sec 22380-22440):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.8207 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 375 (Sec 22440-22500):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.8518 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 376 (Sec 22500-22560):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8357 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 377 (Sec 22560-22620):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.8093 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 378 (Sec 22620-22680):
+  Throughput (ops/sec): 499.6
+  Average Latency:      2.9386 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 379 (Sec 22680-22740):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.1448 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 380 (Sec 22740-22800):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.2105 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 381 (Sec 22800-22860):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.0458 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 382 (Sec 22860-22920):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0768 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 383 (Sec 22920-22980):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9851 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 384 (Sec 22980-23040):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1285 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 385 (Sec 23040-23100):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.0296 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 386 (Sec 23100-23160):
+  Throughput (ops/sec): 499.58
+  Average Latency:      2.9853 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 387 (Sec 23160-23220):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0384 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 388 (Sec 23220-23280):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.0299 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 389 (Sec 23280-23340):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1576 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 390 (Sec 23340-23400):
+  Throughput (ops/sec): 499.57
+  Average Latency:      2.9621 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 391 (Sec 23400-23460):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2749 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 392 (Sec 23460-23520):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.0058 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 393 (Sec 23520-23580):
+  Throughput (ops/sec): 499.62
+  Average Latency:      2.9779 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 394 (Sec 23580-23640):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2718 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 395 (Sec 23640-23700):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.1195 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 396 (Sec 23700-23760):
+  Throughput (ops/sec): 499.55
+  Average Latency:      3.1616 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 397 (Sec 23760-23820):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3535 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 398 (Sec 23820-23880):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1733 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 399 (Sec 23880-23940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1661 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        12 ms
+----------------------------------------
+Minute 400 (Sec 23940-24000):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4065 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 401 (Sec 24000-24060):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2789 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 402 (Sec 24060-24120):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2547 ms
+  p50 Latency:          2 ms
+  p90 Latency:          4 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 403 (Sec 24120-24180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.9763 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          16 ms
+  p99.9 Latency:        33 ms
+----------------------------------------
+Minute 404 (Sec 24180-24240):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.2498 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          21 ms
+  p99.9 Latency:        57 ms
+----------------------------------------
+Minute 405 (Sec 24240-24300):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.6172 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          10 ms
+  p99.9 Latency:        21 ms
+----------------------------------------
+Minute 406 (Sec 24300-24360):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7466 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          11 ms
+  p99.9 Latency:        29 ms
+----------------------------------------
+Minute 407 (Sec 24360-24420):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.3664 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          17 ms
+  p99.9 Latency:        30 ms
+----------------------------------------
+Minute 408 (Sec 24420-24480):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.9624 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          13 ms
+  p99.9 Latency:        29 ms
+----------------------------------------
+Minute 409 (Sec 24480-24540):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.5528 ms
+  p50 Latency:          3 ms
+  p90 Latency:          6 ms
+  p99 Latency:          17 ms
+  p99.9 Latency:        30 ms
+----------------------------------------
+Minute 410 (Sec 24540-24600):
+  Throughput (ops/sec): 499.6
+  Average Latency:      4.6744 ms
+  p50 Latency:          3 ms
+  p90 Latency:          6 ms
+  p99 Latency:          24 ms
+  p99.9 Latency:        50 ms
+----------------------------------------
+Minute 411 (Sec 24600-24660):
+  Throughput (ops/sec): 499.55
+  Average Latency:      4.1415 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          15 ms
+  p99.9 Latency:        25 ms
+----------------------------------------
+Minute 412 (Sec 24660-24720):
+  Throughput (ops/sec): 499.6
+  Average Latency:      5.2106 ms
+  p50 Latency:          3 ms
+  p90 Latency:          6 ms
+  p99 Latency:          41 ms
+  p99.9 Latency:        63 ms
+----------------------------------------
+Minute 413 (Sec 24720-24780):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.0902 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          4 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 414 (Sec 24780-24840):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1733 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 415 (Sec 24840-24900):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2975 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 416 (Sec 24900-24960):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.2955 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 417 (Sec 24960-25020):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.2236 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 418 (Sec 25020-25080):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.206 ms
+  p50 Latency:          3 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 419 (Sec 25080-25140):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.8518 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 420 (Sec 25140-25200):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8442 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 421 (Sec 25200-25260):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8967 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        12 ms
+----------------------------------------
+Minute 422 (Sec 25260-25320):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.8882 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 423 (Sec 25320-25380):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.9468 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 424 (Sec 25380-25440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6348 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 425 (Sec 25440-25500):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.5421 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 426 (Sec 25500-25560):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.5571 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 427 (Sec 25560-25620):
+  Throughput (ops/sec): 499.55
+  Average Latency:      4.0538 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 428 (Sec 25620-25680):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.0457 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 429 (Sec 25680-25740):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.7603 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 430 (Sec 25740-25800):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6108 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 431 (Sec 25800-25860):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3259 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        18 ms
+----------------------------------------
+Minute 432 (Sec 25860-25920):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2674 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 433 (Sec 25920-25980):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1731 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 434 (Sec 25980-26040):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.183 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 435 (Sec 26040-26100):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.3779 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 436 (Sec 26100-26160):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4465 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 437 (Sec 26160-26220):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4123 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 438 (Sec 26220-26280):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.343 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 439 (Sec 26280-26340):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4279 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 440 (Sec 26340-26400):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5238 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        11 ms
+----------------------------------------
+Minute 441 (Sec 26400-26460):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4207 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 442 (Sec 26460-26520):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4153 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 443 (Sec 26520-26580):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3551 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 444 (Sec 26580-26640):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.6127 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 445 (Sec 26640-26700):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.5103 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 446 (Sec 26700-26760):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4641 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        13 ms
+----------------------------------------
+Minute 447 (Sec 26760-26820):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3924 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 448 (Sec 26820-26880):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4339 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 449 (Sec 26880-26940):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4558 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 450 (Sec 26940-27000):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.4034 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 451 (Sec 27000-27060):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3142 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 452 (Sec 27060-27120):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3785 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 453 (Sec 27120-27180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3551 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 454 (Sec 27180-27240):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3931 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 455 (Sec 27240-27300):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.6053 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 456 (Sec 27300-27360):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.3568 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 457 (Sec 27360-27420):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.3859 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 458 (Sec 27420-27480):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.2681 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 459 (Sec 27480-27540):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.4869 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 460 (Sec 27540-27600):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.627 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 461 (Sec 27600-27660):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.8106 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        15 ms
+----------------------------------------
+Minute 462 (Sec 27660-27720):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.7314 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        10 ms
+----------------------------------------
+Minute 463 (Sec 27720-27780):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.426 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        9 ms
+----------------------------------------
+Minute 464 (Sec 27780-27840):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.391 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 465 (Sec 27840-27900):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.2809 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 466 (Sec 27900-27960):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.4495 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          6 ms
+  p99.9 Latency:        8 ms
+----------------------------------------
+Minute 467 (Sec 27960-28020):
+  Throughput (ops/sec): 499.58
+  Average Latency:      3.1791 ms
+  p50 Latency:          3 ms
+  p90 Latency:          4 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        6 ms
+----------------------------------------
+Minute 468 (Sec 28020-28080):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.1523 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 469 (Sec 28080-28140):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.1472 ms
+  p50 Latency:          2 ms
+  p90 Latency:          3 ms
+  p99 Latency:          5 ms
+  p99.9 Latency:        7 ms
+----------------------------------------
+Minute 470 (Sec 28140-28200):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.8081 ms
+  p50 Latency:          3 ms
+  p90 Latency:          7 ms
+  p99 Latency:          19 ms
+  p99.9 Latency:        58 ms
+----------------------------------------
+Minute 471 (Sec 28200-28260):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.1827 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        16 ms
+----------------------------------------
+Minute 472 (Sec 28260-28320):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8978 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          7 ms
+  p99.9 Latency:        17 ms
+----------------------------------------
+Minute 473 (Sec 28320-28380):
+  Throughput (ops/sec): 499.57
+  Average Latency:      3.8173 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        14 ms
+----------------------------------------
+Minute 474 (Sec 28380-28440):
+  Throughput (ops/sec): 499.6
+  Average Latency:      3.8819 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          8 ms
+  p99.9 Latency:        30 ms
+----------------------------------------
+Minute 475 (Sec 28440-28500):
+  Throughput (ops/sec): 499.55
+  Average Latency:      4.9006 ms
+  p50 Latency:          4 ms
+  p90 Latency:          7 ms
+  p99 Latency:          16 ms
+  p99.9 Latency:        33 ms
+----------------------------------------
+Minute 476 (Sec 28500-28560):
+  Throughput (ops/sec): 499.6
+  Average Latency:      4.0613 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        22 ms
+----------------------------------------
+Minute 477 (Sec 28560-28620):
+  Throughput (ops/sec): 499.57
+  Average Latency:      5.4504 ms
+  p50 Latency:          4 ms
+  p90 Latency:          8 ms
+  p99 Latency:          23 ms
+  p99.9 Latency:        32 ms
+----------------------------------------
+Minute 478 (Sec 28620-28680):
+  Throughput (ops/sec): 499.58
+  Average Latency:      4.5436 ms
+  p50 Latency:          4 ms
+  p90 Latency:          6 ms
+  p99 Latency:          11 ms
+  p99.9 Latency:        25 ms
+----------------------------------------
+Minute 479 (Sec 28680-28740):
+  Throughput (ops/sec): 499.57
+  Average Latency:      4.2412 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        19 ms
+----------------------------------------
+Minute 480 (Sec 28740-28800):
+  Throughput (ops/sec): 249.82
+  Average Latency:      4.1535 ms
+  p50 Latency:          3 ms
+  p90 Latency:          5 ms
+  p99 Latency:          9 ms
+  p99.9 Latency:        18 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 14372572
+Throughput (ops/sec): 499.5680222453945
+Average Latency: 3.510988880220556 ms
+p50 Latency:     3 ms
+p90 Latency:     4 ms
+p99 Latency:     8 ms
+p99.9 Latency:   27 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 90 at 122 ms
+========================================
