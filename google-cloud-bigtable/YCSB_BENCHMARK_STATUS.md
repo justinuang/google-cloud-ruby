@@ -278,18 +278,14 @@ To definitively prove that the Java Sidecar architecture mitigates underlying me
 
 The output metrics were extracted into a permanent repository artifact located at `benchmark_results/phase_12_8h_c3/`. This generated over 14.3 Million network operations per test axis.
 
-### p99 Latency Minute-by-Minute Breakdown (Sampled every 30 mins)
+### Latency Minute-by-Minute Breakdown (All Percentiles)
 
-```mermaid
-xychart-beta
-    title "p99 Tail Latencies Over 8-Hours (Sampled every 30 mins) - 500 QPS"
-    x-axis ["M1", "M30", "M60", "M90", "M120", "M150", "M180", "M210", "M240", "M270", "M300", "M330", "M360", "M390", "M420", "M450", "M480"]
-    y-axis "Latency (ms)" 2 --> 130
-    line [6.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 4.0, 5.0, 4.0, 4.0, 4.0, 4.0, 4.0]
-    line [5.0, 5.0, 5.0, 4.0, 6.0, 4.0, 5.0, 5.0, 5.0, 4.0, 4.0, 5.0, 5.0, 4.0, 5.0, 5.0, 5.0]
-    line [52.0, 7.0, 4.0, 122.0, 5.0, 5.0, 7.0, 5.0, 6.0, 7.0, 5.0, 6.0, 15.0, 4.0, 6.0, 6.0, 9.0]
-```
-*(Legend: 🔵 Java Sidecar DirectPath | 🟢 Java Sidecar Cloudpath | 🔴 Native Ruby)*
+To provide an exact, non-sampled visualization of the Garbage Collection spikes spanning the 480-minute test cycle, we generated absolute time-series graphs spanning every single minute measured across all core percentiles.
+
+![P50 Latency](benchmark_results/phase_12_8h_c3/p50_latency_8h.png)
+![P90 Latency](benchmark_results/phase_12_8h_c3/p90_latency_8h.png)
+![P99 Latency](benchmark_results/phase_12_8h_c3/p99_latency_8h.png)
+![P99.9 Latency](benchmark_results/phase_12_8h_c3/p99_9_latency_8h.png)
 
 ### Absolute vs Worst-Minute Metrics (8-Hour Run, 500 QPS)
 
