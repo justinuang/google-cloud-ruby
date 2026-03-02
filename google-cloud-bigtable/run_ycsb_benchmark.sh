@@ -22,7 +22,7 @@ scp $SSH_OPTS $GEM_FILE ycsb_benchmark.rb $SSH_USER@$SSH_HOST:~/
 echo "Uninstalling old gem and installing new gem on VM..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install ~/$GEM_FILE"
 
-echo "--- Step 2: Running Benchmarks ---"
+echo "--- Step 2: Running Benchmarks on VM ---"
 echo "Starting 3-way benchmarks in the background and waiting..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
   rm -f ~/benchmark_sidecar.log ~/benchmark_sidecar_cloudpath.log ~/benchmark_ruby.log
@@ -63,15 +63,15 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar_cloudpath.log" > tmp/
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
 
 echo "Sidecar Results (DirectPath):"
-cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 20
+cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 35
 
 echo ""
 echo "Sidecar Results (CloudPath):"
-cat tmp/benchmark/benchmark_sidecar_cloudpath_local.log | tail -n 20
+cat tmp/benchmark/benchmark_sidecar_cloudpath_local.log | tail -n 35
 
 echo ""
 echo "Native Ruby Results:"
-cat tmp/benchmark/benchmark_ruby_local.log | tail -n 20
+cat tmp/benchmark/benchmark_ruby_local.log | tail -n 35
 
 # echo "--- Step 4: Routing Verification ---"
 # echo "Waiting 120s for metrics to propagate to Monarch..."

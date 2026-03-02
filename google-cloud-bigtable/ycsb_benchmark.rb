@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'google/cloud/bigtable'
+require "securerandom"
+require "json"
+require "HDRHistogram"
 require 'optparse'
 require 'logger'
 require 'digest'
@@ -116,7 +119,8 @@ puts "Generator Ready."
 qps_per_thread = options[:qps].to_f / options[:threads]
 sleep_time_per_query = 1.0 / qps_per_thread
 
-latencies_by_minute = Hash.new { |h, k| h[k] = [] }
+latencies_by_minute = Hash.new { |h, k| h[k] = { count: 0, sum: 0.0, histogram: HDRHistogram.new(1, 120_000, 3) } }
+overall_stats = { count: 0, sum: 0.0, histogram: HDRHistogram.new(1, 120_000, 3) }
 latencies_mutex = Mutex.new
 
 start_time = Time.now
@@ -166,7 +170,16 @@ threads = options[:threads].times.map do |i|
       # Only record latency if we are past the warmup phase
       if now > warmup_end
         minute_bucket = ((now - warmup_end) / 60.0).floor
-        latencies_mutex.synchronize { latencies_by_minute[minute_bucket] << latency_ms }
+        latencies_mutex.synchronize do
+          bucket = latencies_by_minute[minute_bucket]
+          bucket[:count] += 1
+          bucket[:sum] += latency_ms
+          bucket[:histogram].record([latency_ms.to_i, 1].max)
+          
+          overall_stats[:count] += 1
+          overall_stats[:sum] += latency_ms
+          overall_stats[:histogram].record([latency_ms.to_i, 1].max)
+        end
       end
       
       # Rate limit
@@ -182,9 +195,7 @@ threads.each(&:join)
 puts "========================================"
 puts "Benchmark Finished!"
 
-overall_latencies = latencies_by_minute.values.flatten
-
-if overall_latencies.empty?
+if overall_stats[:count] == 0
   puts "No latencies recorded. Was the run duration too short?"
 else
   # 1. Print Per-Minute Metrics
@@ -196,17 +207,16 @@ else
   
   latencies_by_minute.keys.sort.each do |minute|
     bucket = latencies_by_minute[minute]
-    next if bucket.empty?
+    next if bucket[:count] == 0
     
-    sorted_bucket = bucket.sort
     actual_duration = [60, options[:duration] - (minute * 60)].min
-    throughput = bucket.size.to_f / actual_duration
+    throughput = bucket[:count].to_f / actual_duration
     
-    avg = sorted_bucket.sum / sorted_bucket.size
-    p50 = sorted_bucket[(sorted_bucket.size * 0.50).to_i]
-    p90 = sorted_bucket[(sorted_bucket.size * 0.90).to_i]
-    p99 = sorted_bucket[(sorted_bucket.size * 0.99).to_i]
-    p999 = sorted_bucket[(sorted_bucket.size * 0.999).to_i]
+    avg = bucket[:sum] / bucket[:count]
+    p50 = bucket[:histogram].percentile(50.0)
+    p90 = bucket[:histogram].percentile(90.0)
+    p99 = bucket[:histogram].percentile(99.0)
+    p999 = bucket[:histogram].percentile(99.9)
     
     if p99 > max_p99
       max_p99 = p99
@@ -227,15 +237,14 @@ else
   puts "========================================"
   puts "Overall Aggregate Metrics:"
   puts "========================================"
-  puts "Total operations recorded (post-warmup): #{overall_latencies.size}"
+  puts "Total operations recorded (post-warmup): #{overall_stats[:count]}"
   
-  sorted_overall = overall_latencies.sort
-  puts "Throughput (ops/sec): #{overall_latencies.size.to_f / (options[:duration] - options[:warmup])}"
-  puts "Average Latency: #{sorted_overall.sum / sorted_overall.size} ms"
-  puts "p50 Latency:     #{sorted_overall[(sorted_overall.size * 0.50).to_i]} ms"
-  puts "p90 Latency:     #{sorted_overall[(sorted_overall.size * 0.90).to_i]} ms"
-  puts "p99 Latency:     #{sorted_overall[(sorted_overall.size * 0.99).to_i]} ms"
-  puts "p99.9 Latency:   #{sorted_overall[(sorted_overall.size * 0.999).to_i]} ms"
+  puts "Throughput (ops/sec): #{overall_stats[:count].to_f / (options[:duration] - options[:warmup])}"
+  puts "Average Latency: #{overall_stats[:sum] / overall_stats[:count]} ms"
+  puts "p50 Latency:     #{overall_stats[:histogram].percentile(50.0) || 0} ms"
+  puts "p90 Latency:     #{overall_stats[:histogram].percentile(90.0) || 0} ms"
+  puts "p99 Latency:     #{overall_stats[:histogram].percentile(99.0) || 0} ms"
+  puts "p99.9 Latency:   #{overall_stats[:histogram].percentile(99.9) || 0} ms"
   
   # 3. Print Worst-Minute Callout
   puts "========================================"
