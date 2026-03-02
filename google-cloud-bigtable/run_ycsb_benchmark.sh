@@ -26,13 +26,13 @@ echo "--- Step 2: Running Benchmarks on VM ---"
 echo "Starting 3-way benchmarks in the background and waiting..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
   rm -f ~/benchmark_sidecar.log ~/benchmark_sidecar_cloudpath.log ~/benchmark_ruby.log
-  ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar > ~/benchmark_sidecar.log 2>&1 &
+  ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=28800 > ~/benchmark_sidecar.log 2>&1 &
   PID1=$!
   
-  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath > ~/benchmark_sidecar_cloudpath.log 2>&1 &
+  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath --duration=28800 > ~/benchmark_sidecar_cloudpath.log 2>&1 &
   PID2=$!
   
-  ruby ~/ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar > ~/benchmark_ruby.log 2>&1 &
+  ruby ~/ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=28800 > ~/benchmark_ruby.log 2>&1 &
   PID3=$!
   
   wait -n $PID1 $PID2 $PID3
