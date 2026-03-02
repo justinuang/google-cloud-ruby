@@ -119,8 +119,8 @@ puts "Generator Ready."
 qps_per_thread = options[:qps].to_f / options[:threads]
 sleep_time_per_query = 1.0 / qps_per_thread
 
-latencies_by_minute = Hash.new { |h, k| h[k] = { count: 0, sum: 0.0, histogram: HDRHistogram.new(1, 120_000, 3) } }
-overall_stats = { count: 0, sum: 0.0, histogram: HDRHistogram.new(1, 120_000, 3) }
+latencies_by_minute = Hash.new { |h, k| h[k] = { count: 0, sum_us: 0.0, histogram: HDRHistogram.new(1, 120_000_000, 3) } }
+overall_stats = { count: 0, sum_us: 0.0, histogram: HDRHistogram.new(1, 120_000_000, 3) }
 latencies_mutex = Mutex.new
 
 start_time = Time.now
@@ -165,7 +165,7 @@ threads = options[:threads].times.map do |i|
       end
       
       req_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      latency_ms = (req_end - req_start) * 1000.0
+      latency_us = (req_end - req_start) * 1_000_000.0
       
       # Only record latency if we are past the warmup phase
       if now > warmup_end
@@ -173,12 +173,12 @@ threads = options[:threads].times.map do |i|
         latencies_mutex.synchronize do
           bucket = latencies_by_minute[minute_bucket]
           bucket[:count] += 1
-          bucket[:sum] += latency_ms
-          bucket[:histogram].record([latency_ms.to_i, 1].max)
+          bucket[:sum_us] += latency_us
+          bucket[:histogram].record([latency_us.to_i, 1].max)
           
           overall_stats[:count] += 1
-          overall_stats[:sum] += latency_ms
-          overall_stats[:histogram].record([latency_ms.to_i, 1].max)
+          overall_stats[:sum_us] += latency_us
+          overall_stats[:histogram].record([latency_us.to_i, 1].max)
         end
       end
       
@@ -212,11 +212,11 @@ else
     actual_duration = [60, options[:duration] - (minute * 60)].min
     throughput = bucket[:count].to_f / actual_duration
     
-    avg = bucket[:sum] / bucket[:count]
-    p50 = bucket[:histogram].percentile(50.0)
-    p90 = bucket[:histogram].percentile(90.0)
-    p99 = bucket[:histogram].percentile(99.0)
-    p999 = bucket[:histogram].percentile(99.9)
+    avg = (bucket[:sum_us] / bucket[:count]) / 1000.0
+    p50 = bucket[:histogram].percentile(50.0) / 1000.0
+    p90 = bucket[:histogram].percentile(90.0) / 1000.0
+    p99 = bucket[:histogram].percentile(99.0) / 1000.0
+    p999 = bucket[:histogram].percentile(99.9) / 1000.0
     
     if p99 > max_p99
       max_p99 = p99
@@ -240,11 +240,11 @@ else
   puts "Total operations recorded (post-warmup): #{overall_stats[:count]}"
   
   puts "Throughput (ops/sec): #{overall_stats[:count].to_f / (options[:duration] - options[:warmup])}"
-  puts "Average Latency: #{overall_stats[:sum] / overall_stats[:count]} ms"
-  puts "p50 Latency:     #{overall_stats[:histogram].percentile(50.0) || 0} ms"
-  puts "p90 Latency:     #{overall_stats[:histogram].percentile(90.0) || 0} ms"
-  puts "p99 Latency:     #{overall_stats[:histogram].percentile(99.0) || 0} ms"
-  puts "p99.9 Latency:   #{overall_stats[:histogram].percentile(99.9) || 0} ms"
+  puts "Average Latency: #{(overall_stats[:sum_us] / overall_stats[:count]) / 1000.0} ms"
+  puts "p50 Latency:     #{overall_stats[:histogram].percentile(50.0) / 1000.0} ms"
+  puts "p90 Latency:     #{overall_stats[:histogram].percentile(90.0) / 1000.0} ms"
+  puts "p99 Latency:     #{overall_stats[:histogram].percentile(99.0) / 1000.0} ms"
+  puts "p99.9 Latency:   #{overall_stats[:histogram].percentile(99.9) / 1000.0} ms"
   
   # 3. Print Worst-Minute Callout
   puts "========================================"
