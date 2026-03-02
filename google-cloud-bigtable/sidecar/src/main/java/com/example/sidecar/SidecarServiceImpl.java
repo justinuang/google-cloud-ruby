@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Arrays;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
+import com.codahale.metrics.Snapshot;
 
 public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBase {
     private static final Logger logger = Logger.getLogger(SidecarServiceImpl.class.getName());
@@ -32,7 +33,10 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     private final String defaultProject;
     private final String defaultInstance;
     private final AtomicLong readRowsCount = new AtomicLong(0);
-    private final ConcurrentLinkedQueue<Long> readRowsLatencies = new ConcurrentLinkedQueue<>();
+    private final AtomicLong readRowsSumNs = new AtomicLong(0);
+    
+    // Dropwizard histogram for safely bounded latency tracking
+    private Histogram readRowsHistogram = new Histogram(new ExponentiallyDecayingReservoir());
 
     private static final Pattern TABLE_NAME_PATTERN = Pattern.compile("projects/([^/]+)/instances/([^/]+)/tables/([^/]+)");
 
@@ -97,33 +101,23 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     @Override
     public void clearStats(com.example.sidecar.ClearStatsRequest request, StreamObserver<com.example.sidecar.ClearStatsResponse> responseObserver) {
         readRowsCount.set(0);
-        readRowsLatencies.clear();
+        readRowsSumNs.set(0);
+        readRowsHistogram = new Histogram(new ExponentiallyDecayingReservoir());
         responseObserver.onNext(com.example.sidecar.ClearStatsResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
     public void getStats(StatsRequest request, StreamObserver<StatsResponse> responseObserver) {
-        int size = readRowsLatencies.size();
+        Snapshot snapshot = readRowsHistogram.getSnapshot();
         double p50 = 0.0, p90 = 0.0, p99 = 0.0, avg = 0.0;
         
-        if (size > 0) {
-            double[] latenciesMs = new double[size];
-            int i = 0;
-            for (Long latencyNanos : readRowsLatencies) {
-                if (i < size) {
-                    latenciesMs[i++] = latencyNanos / 1_000_000.0;
-                }
-            }
-            Arrays.sort(latenciesMs);
-            
-            double sumMs = 0;
-            for (double l : latenciesMs) sumMs += l;
-            
-            p50 = latenciesMs[(int) (size * 0.50)];
-            p90 = latenciesMs[(int) (size * 0.90)];
-            p99 = latenciesMs[(int) (size * 0.99)];
-            avg = sumMs / size;
+        long totalOps = readRowsCount.get();
+        if (totalOps > 0) {
+            p50 = snapshot.getMedian() / 1_000_000.0;
+            p90 = snapshot.getValue(0.90) / 1_000_000.0;
+            p99 = snapshot.get99thPercentile() / 1_000_000.0;
+            avg = (readRowsSumNs.get() / (double) totalOps) / 1_000_000.0;
         }
 
         StatsResponse response = StatsResponse.newBuilder()
@@ -142,7 +136,6 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
     public void readRows(com.example.sidecar.ReadRowsRequest request, StreamObserver<SidecarRow> responseObserver) {
         long startTime = System.nanoTime();
         try {
-            readRowsCount.incrementAndGet();
             logger.fine("Java Sidecar: Received readRows call. Request bytes size: " + request.getRequestBytes().size());
             
             // 1. Parse the serialized native ReadRowsRequest bytes
@@ -210,7 +203,10 @@ public class SidecarServiceImpl extends SidecarServiceGrpc.SidecarServiceImplBas
             logger.log(Level.SEVERE, "Java Sidecar ERROR: " + e.getMessage(), e);
             responseObserver.onError(e);
         } finally {
-            readRowsLatencies.add(System.nanoTime() - startTime);
+            long latencyNs = System.nanoTime() - startTime;
+            readRowsCount.incrementAndGet();
+            readRowsSumNs.addAndGet(latencyNs);
+            readRowsHistogram.update(latencyNs);
         }
     }
 
