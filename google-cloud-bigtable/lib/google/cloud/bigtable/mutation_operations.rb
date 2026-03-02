@@ -74,18 +74,7 @@ module Google
         #   table.mutate_row entry
         #
         def mutate_row entry
-          if service.use_sidecar
-            stub = service.sidecar_stub
-            native_req = Google::Cloud::Bigtable::V2::MutateRowRequest.new(
-              table_name: path,
-              app_profile_id: @app_profile_id || "",
-              row_key: entry.row_key,
-              mutations: entry.mutations
-            )
-            sidecar_req = Com::Example::Sidecar::MutateRowRequest.new(request_bytes: native_req.to_proto)
-            stub.mutate_row sidecar_req
-            return true
-          end
+
 
           service.mutate_row path, entry.row_key, entry.mutations, app_profile_id: @app_profile_id
           true

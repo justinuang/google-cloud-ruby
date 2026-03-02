@@ -78,6 +78,7 @@ module Google
           @universe_domain_override = universe_domain
           @use_sidecar = use_sidecar
           @bigtable_clients = ::Gapic::LruHash.new 10
+          @sidecar_clients = ::Gapic::LruHash.new 10
           @mutex = Mutex.new
 
           self.class.sidecar_stub(project_id) if @use_sidecar
@@ -123,6 +124,18 @@ module Google
           end
         end
         attr_accessor :mocked_client
+
+        def sidecar_client table_path, app_profile_id
+          return mocked_client if mocked_client
+          table_key = "#{table_path}_#{app_profile_id}"
+          @mutex.synchronize do
+            if @sidecar_clients.get(table_key).nil?
+              sidecar_client = create_sidecar_client table_path, app_profile_id
+              @sidecar_clients.put table_key, sidecar_client
+            end
+            @sidecar_clients.get table_key
+          end
+        end
 
         ##
         # Creates an instance within a project.
@@ -677,17 +690,8 @@ module Google
         end
 
         def read_rows instance_id, table_id, app_profile_id: nil, rows: nil, filter: nil, rows_limit: nil
-          if @use_sidecar
-            return self.class.sidecar_stub.read_rows(
-              instance_id: instance_id,
-              table_id: table_id,
-              app_profile_id: app_profile_id,
-              rows: rows,
-              filter: filter,
-              rows_limit: rows_limit
-            )
-          end
-          client(table_path(instance_id, table_id), app_profile_id).read_rows(
+          c = @use_sidecar ? sidecar_client(table_path(instance_id, table_id), app_profile_id) : client(table_path(instance_id, table_id), app_profile_id)
+          c.read_rows(
             table_name:     table_path(instance_id, table_id),
             rows:           rows,
             filter:         filter,
@@ -697,11 +701,13 @@ module Google
         end
 
         def sample_row_keys table_name, app_profile_id: nil
+          # Sample row keys is an admin/metadata operation, bypass sidecar
           client(table_name, app_profile_id).sample_row_keys table_name: table_name, app_profile_id: app_profile_id
         end
 
         def mutate_row table_name, row_key, mutations, app_profile_id: nil
-          client(table_name, app_profile_id).mutate_row(
+          c = @use_sidecar ? sidecar_client(table_name, app_profile_id) : client(table_name, app_profile_id)
+          c.mutate_row(
             **{
               table_name:     table_name,
               app_profile_id: app_profile_id,
@@ -717,7 +723,8 @@ module Google
             app_profile_id: app_profile_id,
             entries:        entries
           }.compact
-          client(table_name, app_profile_id).mutate_rows request, call_options
+          c = @use_sidecar ? sidecar_client(table_name, app_profile_id) : client(table_name, app_profile_id)
+          c.mutate_rows request, call_options
         end
 
         def check_and_mutate_row table_name,
@@ -1082,6 +1089,7 @@ module Google
             config.universe_domain = @universe_domain_override if @universe_domain_override
             config.timeout = timeout if timeout
             config.endpoint = host if host
+
             config.lib_name = "gccl"
             config.lib_version = Google::Cloud::Bigtable::VERSION
             config.metadata = { "google-cloud-resource-prefix": "projects/#{@project_id}" }
@@ -1091,6 +1099,21 @@ module Google
             config.channel_pool.on_channel_create = proc do |channel|
               channel.call_rpc :ping_and_warm, request, options: options
             end
+          end
+        end
+
+        def create_sidecar_client table_path, app_profile_id
+          V2::Bigtable::Client.new do |config|
+            config.timeout = timeout if timeout
+            sock_dir = self.class.instance_variable_get(:@sidecar_tmp_dir)
+            config.endpoint = "unix:#{sock_dir}/sidecar.sock"
+            config.credentials = :this_channel_is_insecure
+
+            config.lib_name = "gccl"
+            config.lib_version = Google::Cloud::Bigtable::VERSION
+            config.metadata = { "google-cloud-resource-prefix": "projects/#{@project_id}" }
+            config.channel_pool.channel_selection = @channel_selection
+            config.channel_pool.channel_count = @channel_count
           end
         end
       end

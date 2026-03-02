@@ -1,6 +1,7 @@
 package com.example;
 
 import com.example.sidecar.SidecarServiceImpl;
+import com.example.sidecar.BigtableProxyService;
 import io.grpc.Server;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import io.grpc.netty.shaded.io.netty.channel.EventLoopGroup;
@@ -55,7 +56,8 @@ public class BigtableSidecar {
                 .channelType(EpollServerDomainSocketChannel.class)
                 .workerEventLoopGroup(workerGroup)
                 .bossEventLoopGroup(bossGroup)
-                .addService(new SidecarServiceImpl(project, instance))
+                .addService(new SidecarServiceImpl())
+                .addService(new BigtableProxyService(project, instance))
                 .build();
 
         server.start();

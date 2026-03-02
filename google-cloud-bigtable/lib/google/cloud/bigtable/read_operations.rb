@@ -149,31 +149,7 @@ module Google
         def read_rows keys: nil, ranges: nil, filter: nil, limit: nil, &block
           return enum_for :read_rows, keys: keys, ranges: ranges, filter: filter, limit: limit unless block_given?
 
-          if service.use_sidecar
-            stub = service.sidecar_stub
-            
-            # Construct the full native request
-            row_set = build_row_set keys, ranges
-            native_req = Google::Cloud::Bigtable::V2::ReadRowsRequest.new(
-              table_name: path,
-              app_profile_id: app_profile_id || "",
-              rows: row_set,
-              filter: filter&.to_grpc,
-              rows_limit: limit || 0
-            )
 
-            # Send serialized bytes to sidecar
-            sidecar_req = Com::Example::Sidecar::ReadRowsRequest.new(request_bytes: native_req.to_proto)
-            
-            begin
-              stub.read_rows(sidecar_req).each do |sidecar_row|
-                yield map_sidecar_row(sidecar_row)
-              end
-              return
-            rescue GRPC::BadStatus => e
-              raise Google::Cloud::Error.from_error(e)
-            end
-          end
 
           row_set = build_row_set keys, ranges
           rows_limit = limit
@@ -356,18 +332,6 @@ module Google
           end
 
           Google::Cloud::Bigtable::V2::RowSet.new row_set
-        end
-
-        def map_sidecar_row sidecar_row
-          row = Row.new sidecar_row.key
-          sidecar_row.families.each do |f|
-            f.columns.each do |c|
-              c.cells.each do |cell|
-                row.cells[f.name] << Row::Cell.new(f.name, c.qualifier, cell.timestamp_micros, cell.value, cell.labels.to_a)
-              end
-            end
-          end
-          row
         end
       end
     end

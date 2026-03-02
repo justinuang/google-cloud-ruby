@@ -348,3 +348,17 @@ A new Ruby script that will:
   - `--app-profile-id=nosidecar` (outputs to `benchmark_ruby.log`)
 - Wait 5 minutes for completion.
 - Wait 120s and execute a `mash` query filtering by the instance ID and grouped by `app_profile_id` to confirm routing profiles worked as intended (Sidecar -> DirectPath, No-Sidecar -> CloudPath).
+
+### Phase 14: 5-Minute Performance Re-Evaluation (Batched Chunks & Dual Client)
+
+To prove that buffering chunks and separating the Dual-Client architecture improved throughput, we deployed the final `v2.12.3` Sidecar GEM to our high-performance `ju-ruby-sidecar-c3-vm` compute instance and executed a 3-way 5-minute benchmark at 500 QPS.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- |
+| **Throughput**        | 494 ops/sec               | 475 ops/sec              | 499 ops/sec             |
+| **Overall p99 Latency** | **5.80 ms**               | **8.86 ms**              | **29.34 ms**             |
+| **Worst-Min p99**     | 6.47 ms (Min 1)           | 9.36 ms (Min 3)          | 107.00 ms (Min 1)       |
+| **Overall p50 Latency** | 3.22 ms                   | 3.84 ms                  | 3.79 ms                 |
+
+**Conclusion:** 
+With chunk buffering natively implemented within the proxy, the Sidecar was able to smoothly handle the 500 QPS limit with zero errors, holding to a pristine `6.47ms` worst-minute spike. Meanwhile, the Native Ruby implementation suffered a `107ms` p99 worst-minute spike, firmly cementing the Proxy architecture as significantly superior for predictable tail latencies.

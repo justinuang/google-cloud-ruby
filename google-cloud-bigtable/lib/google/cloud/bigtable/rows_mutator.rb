@@ -60,9 +60,7 @@ module Google
         # @return [Array<Google::Cloud::Bigtable::V2::MutateRowsResponse::Entry>]
         #
         def apply_mutations
-          if @table.service.use_sidecar
-            return apply_mutations_via_sidecar
-          end
+
 
           @req_entries = @entries.map(&:to_grpc)
           statuses, delay, cookies = mutate_rows @req_entries
@@ -121,28 +119,6 @@ module Google
           [statuses, delay, cookies]
         end
 
-        ##
-        # Applies mutations via sidecar.
-        #
-        # @return [Array<Google::Cloud::Bigtable::V2::MutateRowsResponse::Entry>]
-        #
-        def apply_mutations_via_sidecar
-          stub = @table.service.sidecar_stub
-          native_req = Google::Cloud::Bigtable::V2::MutateRowsRequest.new(
-            table_name: @table.path,
-            app_profile_id: @table.app_profile_id || "",
-            entries: @entries.map(&:to_grpc)
-          )
-          sidecar_req = Com::Example::Sidecar::MutateRowsRequest.new(request_bytes: native_req.to_proto)
-          sidecar_res = stub.mutate_rows sidecar_req
-
-          sidecar_res.entries.map do |e|
-            Google::Cloud::Bigtable::V2::MutateRowsResponse::Entry.new(
-              index: e.index,
-              status: Google::Rpc::Status.new(code: e.status_code, message: e.status_message)
-            )
-          end
-        end
 
         ##
         # Collects failed entries, retries mutation, and updates status.
