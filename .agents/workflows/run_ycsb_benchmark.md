@@ -7,7 +7,10 @@ description: Run the YCSB benchmark to test Bigtable DirectPath Sidecar vs Nativ
 When you need to test the performance of the Java Sidecar vs Native Ruby, follow this workflow to run the `run_ycsb_benchmark.sh` script and persist the results. This benchmark performs 100% Read point lookups (YCSB Workload C) against a 100GB Bigtable dataset with a Zipfian distribution.
 
 ## Pre-requisites
-- **Testing VM**: Typically a compute-optimized VM like `ju-ruby-sidecar-c3-vm` in `us-east1-b`.
+- **Testing VM**: This workflow always targets the compute-optimized VM `ju-ruby-sidecar-c3-vm` in `us-east1-b`.
+
+## Parameters
+- `<PHASE_NAME>`: A descriptive name for this specific benchmark run (e.g., `baseline_c3_test`). Avoid generic numbered phases.
 
 // turbo-all
 ## Steps
@@ -17,10 +20,10 @@ When you need to test the performance of the Java Sidecar vs Native Ruby, follow
 cd google-cloud-bigtable
 ```
 
-2. Execute the `run_ycsb_benchmark.sh` script. Ensure you use the correct `VM_NAME`, `VM_ZONE`, `DURATION`, and `PHASE` variables based on your request.
+2. Execute the `run_ycsb_benchmark.sh` script. Always use `ju-ruby-sidecar-c3-vm` and `us-east1-b` for the VM and Zone parameters to ensure consistent testing. Supply the desired `DURATION` and `<PHASE_NAME>`. User descriptive phase names instead of numbers!
 ```bash
 # Example usage to be dynamically updated with actual parameters
-./run_ycsb_benchmark.sh ju-ruby-sidecar-c3-vm us-east1-b 300 phase_20
+./run_ycsb_benchmark.sh ju-ruby-sidecar-c3-vm us-east1-b 300 <PHASE_NAME>
 ```
 3. Interpret the output metrics to understand the performance differences:
    - **p50 (Median)**: General performance baseline.

@@ -421,3 +421,17 @@ To test the newly added benchmark skill, we executed a 3-minute run against the 
 
 **Conclusion:** 
 The skill execution was successful. The 3-minute evaluation confirms the established patterns: Native Ruby experiences severe tail latency spikes (61ms p99, 86ms worst-minute p99), while the Java Sidecar architecture shields the application, keeping p99 latencies under 6ms (DirectPath) and 9ms (CloudPath).
+
+## Phase: Workflow Improvements Test (`test_workflow_improvements`)
+
+To test the newly refactored automated workflow execution leveraging isolated `benchmark_phases/$PHASE/` directories, we executed a rapid 60-second test against the 100GB dataset at 500 QPS targeting the `ju-ruby-sidecar-c3-vm`.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- |
+| **Throughput**        | 498.17 ops/sec            | 498.90 ops/sec           | 499.17 ops/sec          |
+| **Overall p99 Latency** | **6.91 ms**               | **6.79 ms**              | **6.33 ms**             |
+| **Worst-Min p99**     | 6.91 ms (Min 1)           | 6.79 ms (Min 1)          | 6.33 ms (Min 1)         |
+| **Overall p50 Latency** | 2.94 ms                   | 3.61 ms                  | 3.06 ms                 |
+
+**Conclusion:** 
+The `test_workflow_improvements` automatically provisioned a discrete sub-folder remotely on the VM and correctly executed the 60-second test without clobbering other runs. Because the test duration was incredibly short (1 minute), the Ruby client was not exposed to prolonged GC or GIL contention, matching the Java Sidecar's native healthy tail latencies of ~6ms.

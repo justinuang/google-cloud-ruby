@@ -1,0 +1,65 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>true, :app_profile_id=>"sidecar", :threads=>50, :qps=>500, :duration=>60, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+>>> JAVA SIDECAR: Located jlink launcher in gem at /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime/bin/sidecar-launcher
+>>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS...
+ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+>>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)...
+   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260303-114934-e63y9q/sidecar.sock
+   [SIDECAR] Java Sidecar JRE Home: /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime
+   [SIDECAR] Java Sidecar JRE Version: 17.0.18
+   [SIDECAR] Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: true
+   [SIDECAR] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+   [SIDECAR] SLF4J: Defaulting to no-operation (NOP) logger implementation
+   [SIDECAR] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260303-114934-e63y9q/sidecar.sock
+>>> RUBY CLIENT: Sidecar signaled readiness via FIFO.
+   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260303-114934-e63y9q/ready.fifo
+   [SIDECAR] Mar 03, 2026 7:30:45 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0xda8633c9, L:/tmp/bigtable-sidecar20260303-114934-e63y9q/sidecar.sock - R:]'
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+   [SIDECAR] Mar 03, 2026 7:30:54 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0xef591278, L:/tmp/bigtable-sidecar20260303-114934-e63y9q/sidecar.sock - R:]'
+   [SIDECAR] Mar 03, 2026 7:30:54 PM com.example.sidecar.BigtableProxyService lambda$getClient$0
+   [SIDECAR] INFO: Java Proxy: Initializing new client for autonomous-mote-782/ju-ruby-sidecar/sidecar
+Sidecar stats cleared after warmup.
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 249.08
+  Average Latency:      3.9596 ms
+  p50 Latency:          2.937 ms
+  p90 Latency:          3.827 ms
+  p99 Latency:          6.907 ms
+  p99.9 Latency:        192.255 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 14945
+Throughput (ops/sec): 498.1666666666667
+Average Latency: 3.959632221011976 ms
+p50 Latency:     2.937 ms
+p90 Latency:     3.827 ms
+p99 Latency:     6.907 ms
+p99.9 Latency:   192.255 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 1 at 6.907 ms
+========================================
+
+========================================
+Java Sidecar Base Performance Metrics:
+========================================
+Sidecar Processed Ops: 14945
+Average Latency:       3.2852 ms
+p50 Latency:           2.3039 ms
+p90 Latency:           3.1161 ms
+p99 Latency:           90.8471 ms
+========================================
+>>> RUBY CLIENT: Shutting down sidecar...
