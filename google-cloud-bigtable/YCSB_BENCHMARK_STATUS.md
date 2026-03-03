@@ -407,3 +407,17 @@ We simultaneously extracted internal Dropwizard metrics from the Java Sidecar to
 Over the punishing 8-hour lifecycle, the native Ruby architecture suffered extreme latency degradation due to GIL network blocking and GC thrashing. Its overall p99 swelled to **17.74 ms**, and it suffered a massive tail-latency spike during Minute 313 reaching **196.22 ms**. 
 
 Conversely, the Java Sidecar architecture flawlessly maintained its connection streams. Even when routing through CloudPath, the java proxy held a **5.67 ms** overall p99. Across the full 8-hour endurance test, the Java Sidecar traversing DirectPath never breached a **9.47 ms** worst-minute spike, proving the massive architectural superiority of offloading the connection multiplexing to a separate JVM daemon. The IPC communication tax remained consistently under **0.7 ms** for all measured percentiles.
+
+## Phase 18: 3-Minute Skill Test Benchmark
+
+To test the newly added benchmark skill, we executed a 3-minute run against the 100GB dataset at 500 QPS targeting the `ju-ruby-sidecar-c3-vm` compute instance.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- |
+| **Throughput**        | 498.84 ops/sec            | 499.55 ops/sec           | 499.47 ops/sec          |
+| **Overall p99 Latency** | **5.68 ms**               | **8.79 ms**              | **61.34 ms**            |
+| **Worst-Min p99**     | 6.01 ms (Min 2)           | 9.83 ms (Min 3)          | 86.72 ms (Min 3)        |
+| **Overall p50 Latency** | 2.76 ms                   | 3.69 ms                  | 5.14 ms                 |
+
+**Conclusion:** 
+The skill execution was successful. The 3-minute evaluation confirms the established patterns: Native Ruby experiences severe tail latency spikes (61ms p99, 86ms worst-minute p99), while the Java Sidecar architecture shields the application, keeping p99 latencies under 6ms (DirectPath) and 9ms (CloudPath).

@@ -1,0 +1,117 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>true, :app_profile_id=>"sidecar", :threads=>50, :qps=>500, :duration=>180, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+>>> JAVA SIDECAR: Located jlink launcher in gem at /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime/bin/sidecar-launcher
+>>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS...
+/home/justinuang_google_com/ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+>>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)...
+   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260303-108507-8yov4d/sidecar.sock
+   [SIDECAR] Java Sidecar JRE Home: /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime
+   [SIDECAR] Java Sidecar JRE Version: 17.0.18
+   [SIDECAR] Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: true
+   [SIDECAR] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+   [SIDECAR] SLF4J: Defaulting to no-operation (NOP) logger implementation
+   [SIDECAR] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260303-108507-8yov4d/sidecar.sock
+>>> RUBY CLIENT: Sidecar signaled readiness via FIFO.
+   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260303-108507-8yov4d/ready.fifo
+   [SIDECAR] Mar 03, 2026 4:44:18 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0xef936f31, L:/tmp/bigtable-sidecar20260303-108507-8yov4d/sidecar.sock - R:]'
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+   [SIDECAR] Mar 03, 2026 4:44:27 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0x537fc3d1, L:/tmp/bigtable-sidecar20260303-108507-8yov4d/sidecar.sock - R:]'
+   [SIDECAR] Mar 03, 2026 4:44:27 PM com.example.sidecar.BigtableProxyService lambda$getClient$0
+   [SIDECAR] INFO: Java Proxy: Initializing new client for autonomous-mote-782/ju-ruby-sidecar/sidecar
+Sidecar stats cleared after warmup.
+   [SIDECAR] Mar 03, 2026 4:46:27 PM com.google.cloud.bigtable.data.v2.stub.metrics.BigtableCloudMonitoringExporter$1 onFailure
+   [SIDECAR] WARNING: createServiceTimeSeries request failed for application metrics.
+   [SIDECAR] com.google.api.gax.rpc.InvalidArgumentException: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: One or more TimeSeries could not be written: timeSeries[15] (metric.type="bigtable.googleapis.com/internal/client/connection_pool/outstanding_rpcs", metric.labels={"project_id": "autonomous-mote-782", "instance": "ju-ruby-sidecar", "app_profile": "sidecar", "client_name": "bigtable-java/2.73.0"}, resource.type="bigtable_client", resource.labels={"app_profile": "sidecar", "project_id": "autonomous-mote-782", "host_id": "8080148837761103711", "client_project": "autonomous-mote-782", "uuid": "java-06dc24b4-45e2-46ff-b869-49dd6446277c108621@ju-ruby-sidecar-c3-vm.us-east1-b.c.autonomous-mote-782.internal-0", "host_name": "ju-ruby-sidecar-c3-vm.us-east1-b.c.autonomous-mote-782.internal", "instance": "ju-ruby-sidecar", "region": "us-east1", "cloud_platform": "gcp_compute_engine", "client_name": "java-bigtable/2.73.0"}): unrecognized metric labels [project_id, instance, app_profile, client_name]
+   [SIDECAR] 	at com.google.api.gax.rpc.ApiExceptionFactory.createException(ApiExceptionFactory.java:92)
+   [SIDECAR] 	at com.google.api.gax.grpc.GrpcApiExceptionFactory.create(GrpcApiExceptionFactory.java:98)
+   [SIDECAR] 	at com.google.api.gax.grpc.GrpcApiExceptionFactory.create(GrpcApiExceptionFactory.java:66)
+   [SIDECAR] 	at com.google.api.gax.grpc.GrpcExceptionCallable$ExceptionTransformingFuture.onFailure(GrpcExceptionCallable.java:97)
+   [SIDECAR] 	at com.google.api.core.ApiFutures$1.onFailure(ApiFutures.java:84)
+   [SIDECAR] 	at com.google.common.util.concurrent.Futures$CallbackListener.run(Futures.java:1125)
+   [SIDECAR] 	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:30)
+   [SIDECAR] 	at com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1004)
+   [SIDECAR] 	at com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:767)
+   [SIDECAR] 	at com.google.common.util.concurrent.AbstractFuture.setException(AbstractFuture.java:516)
+   [SIDECAR] 	at io.grpc.stub.ClientCalls$GrpcFuture.setException(ClientCalls.java:668)
+   [SIDECAR] 	at io.grpc.stub.ClientCalls$UnaryStreamToFuture.onClose(ClientCalls.java:638)
+   [SIDECAR] 	at io.grpc.PartialForwardingClientCallListener.onClose(PartialForwardingClientCallListener.java:39)
+   [SIDECAR] 	at io.grpc.ForwardingClientCallListener.onClose(ForwardingClientCallListener.java:23)
+   [SIDECAR] 	at io.grpc.ForwardingClientCallListener$SimpleForwardingClientCallListener.onClose(ForwardingClientCallListener.java:40)
+   [SIDECAR] 	at com.google.api.gax.grpc.ChannelPool$ReleasingClientCall$1.onClose(ChannelPool.java:602)
+   [SIDECAR] 	at io.grpc.PartialForwardingClientCallListener.onClose(PartialForwardingClientCallListener.java:39)
+   [SIDECAR] 	at io.grpc.ForwardingClientCallListener.onClose(ForwardingClientCallListener.java:23)
+   [SIDECAR] 	at io.grpc.ForwardingClientCallListener$SimpleForwardingClientCallListener.onClose(ForwardingClientCallListener.java:40)
+   [SIDECAR] 	at com.google.api.gax.grpc.GrpcLoggingInterceptor$1$1.onClose(GrpcLoggingInterceptor.java:98)
+   [SIDECAR] 	at io.grpc.internal.ClientCallImpl.closeObserver(ClientCallImpl.java:565)
+   [SIDECAR] 	at io.grpc.internal.ClientCallImpl.access$100(ClientCallImpl.java:72)
+   [SIDECAR] 	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1StreamClosed.runInternal(ClientCallImpl.java:733)
+   [SIDECAR] 	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1StreamClosed.runInContext(ClientCallImpl.java:714)
+   [SIDECAR] 	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37)
+   [SIDECAR] 	at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:133)
+   [SIDECAR] 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+   [SIDECAR] 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+   [SIDECAR] 	at java.base/java.lang.Thread.run(Thread.java:840)
+   [SIDECAR] Caused by: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: One or more TimeSeries could not be written: timeSeries[15] (metric.type="bigtable.googleapis.com/internal/client/connection_pool/outstanding_rpcs", metric.labels={"project_id": "autonomous-mote-782", "instance": "ju-ruby-sidecar", "app_profile": "sidecar", "client_name": "bigtable-java/2.73.0"}, resource.type="bigtable_client", resource.labels={"app_profile": "sidecar", "project_id": "autonomous-mote-782", "host_id": "8080148837761103711", "client_project": "autonomous-mote-782", "uuid": "java-06dc24b4-45e2-46ff-b869-49dd6446277c108621@ju-ruby-sidecar-c3-vm.us-east1-b.c.autonomous-mote-782.internal-0", "host_name": "ju-ruby-sidecar-c3-vm.us-east1-b.c.autonomous-mote-782.internal", "instance": "ju-ruby-sidecar", "region": "us-east1", "cloud_platform": "gcp_compute_engine", "client_name": "java-bigtable/2.73.0"}): unrecognized metric labels [project_id, instance, app_profile, client_name]
+   [SIDECAR] 	at io.grpc.Status.asRuntimeException(Status.java:532)
+   [SIDECAR] 	... 18 more
+   [SIDECAR] 
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 499.47
+  Average Latency:      3.0086 ms
+  p50 Latency:          2.705 ms
+  p90 Latency:          3.439 ms
+  p99 Latency:          5.443 ms
+  p99.9 Latency:        87.423 ms
+----------------------------------------
+Minute 2 (Sec 60-120):
+  Throughput (ops/sec): 497.93
+  Average Latency:      3.5231 ms
+  p50 Latency:          2.735 ms
+  p90 Latency:          3.595 ms
+  p99 Latency:          6.011 ms
+  p99.9 Latency:        224.511 ms
+----------------------------------------
+Minute 3 (Sec 120-180):
+  Throughput (ops/sec): 249.7
+  Average Latency:      3.1376 ms
+  p50 Latency:          2.935 ms
+  p90 Latency:          3.739 ms
+  p99 Latency:          5.607 ms
+  p99.9 Latency:        52.287 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 74826
+Throughput (ops/sec): 498.84
+Average Latency: 3.239854923333759 ms
+p50 Latency:     2.763 ms
+p90 Latency:     3.569 ms
+p99 Latency:     5.683 ms
+p99.9 Latency:   151.807 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 2 at 6.011 ms
+========================================
+
+========================================
+Java Sidecar Base Performance Metrics:
+========================================
+Sidecar Processed Ops: 74827
+Average Latency:       2.6069 ms
+p50 Latency:           2.2602 ms
+p90 Latency:           3.0572 ms
+p99 Latency:           4.5075 ms
+========================================
+>>> RUBY CLIENT: Shutting down sidecar...
