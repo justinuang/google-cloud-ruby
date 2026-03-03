@@ -449,3 +449,17 @@ To verify the successful upgrade of the Java Sidecar's embedded `jlink` runtime 
 
 **Conclusion:** 
 The embedded `jlink` runtime was successfully updated to Java 21 and deployed to the VM. The performance of the proxy architecture remains extremely strong and stable with p99 tail latencies under 6ms, further validating that the Java 21 upgrade introduced no regressions in the Sidecar's high-performance throughput compared to Java 11/17.
+
+## Phase: Parallel Gem Installation (`support_parallel_bigtable_gem`)
+
+To verify the isolation of benchmark gem installations in their respective `benchmark_phases/$PHASE/vendor` directories, we executed a 60-second test against the 100GB dataset at 500 QPS targeting the `ju-ruby-sidecar-c3-vm`.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- |
+| **Throughput**        | 499.27 ops/sec            | 499.57 ops/sec           | 499.20 ops/sec          |
+| **Overall p99 Latency** | **6.47 ms**               | **6.50 ms**              | **31.28 ms**            |
+| **Worst-Min p99**     | 6.47 ms (Min 1)           | 6.50 ms (Min 1)          | 31.28 ms (Min 1)        |
+| **Overall p50 Latency** | 3.15 ms                   | 3.60 ms                  | 5.03 ms                 |
+
+**Conclusion:** 
+The benchmark successfully verified the parallel execution workflow by installing the gem locally without overwriting the global VM state. The test confirms that the Custom Java Sidecar achieves a 4x reduction in p99 tail latencies for short bursts (6.47ms vs 31.28ms) by avoiding the Ruby GIL blockages even over a simple 60-second window.

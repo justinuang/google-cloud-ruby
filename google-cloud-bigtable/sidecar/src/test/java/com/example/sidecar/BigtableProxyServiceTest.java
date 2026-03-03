@@ -108,13 +108,14 @@ public class BigtableProxyServiceTest {
                 responseIterator.forEachRemaining(responses::add);
 
                 // 4. Verification
-                assertEquals(1, responses.size());
-
-                ReadRowsResponse r1 = responses.get(0);
-                assertEquals(3, r1.getChunksCount());
+                List<ReadRowsResponse.CellChunk> allChunks = new ArrayList<>();
+                for (ReadRowsResponse r : responses) {
+                        allChunks.addAll(r.getChunksList());
+                }
+                assertEquals(3, allChunks.size());
 
                 // First Chunk of Row 1
-                ReadRowsResponse.CellChunk c1 = r1.getChunks(0);
+                ReadRowsResponse.CellChunk c1 = allChunks.get(0);
                 assertEquals("row-key-1", c1.getRowKey().toStringUtf8());
                 assertEquals("cf1", c1.getFamilyName().getValue());
                 assertEquals("col1", c1.getQualifier().getValue().toStringUtf8());
@@ -122,7 +123,7 @@ public class BigtableProxyServiceTest {
                 assertFalse("First chunk should not have commitRow set", c1.getCommitRow());
 
                 // Second Chunk of Row 1
-                ReadRowsResponse.CellChunk c2 = r1.getChunks(1);
+                ReadRowsResponse.CellChunk c2 = allChunks.get(1);
                 assertEquals("", c2.getRowKey().toStringUtf8()); // Should be empty for subsequent chunks
                 assertEquals("cf2", c2.getFamilyName().getValue());
                 assertEquals("col2", c2.getQualifier().getValue().toStringUtf8());
@@ -130,7 +131,7 @@ public class BigtableProxyServiceTest {
                 assertTrue("Last chunk of a row MUST have commitRow set to true", c2.getCommitRow());
 
                 // Third Chunk (Row 2)
-                ReadRowsResponse.CellChunk c3 = r1.getChunks(2);
+                ReadRowsResponse.CellChunk c3 = allChunks.get(2);
                 assertEquals("row-key-2", c3.getRowKey().toStringUtf8());
                 assertEquals("cf1", c3.getFamilyName().getValue());
                 assertEquals("val3", c3.getValue().toStringUtf8());

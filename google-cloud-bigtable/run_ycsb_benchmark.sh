@@ -24,13 +24,15 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "mkdir -p ~/benchmark_phases/$PHASE"
 echo "Copying scripts to VM..."
 scp $SSH_OPTS $GEM_FILE ycsb_benchmark.rb $SSH_USER@$SSH_HOST:~/benchmark_phases/$PHASE/
 
-echo "Uninstalling old gem and installing new gem on VM..."
-ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install ~/benchmark_phases/$PHASE/$GEM_FILE"
+echo "Installing new gem locally on VM..."
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "gem install --no-document --install-dir ~/benchmark_phases/$PHASE/vendor ~/benchmark_phases/$PHASE/$GEM_FILE"
 
 echo "--- Step 2: Running Benchmarks on VM ---"
 echo "Starting 3-way benchmarks in the background (Duration: ${DURATION}s) and waiting..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
   cd ~/benchmark_phases/$PHASE
+  export GEM_HOME=~/benchmark_phases/$PHASE/vendor
+  export GEM_PATH=~/benchmark_phases/$PHASE/vendor:\$(gem env gempath)
   rm -f benchmark_sidecar.log benchmark_sidecar_cloudpath.log benchmark_ruby.log
   ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=${DURATION} > benchmark_sidecar.log 2>&1 &
   PID1=\$!

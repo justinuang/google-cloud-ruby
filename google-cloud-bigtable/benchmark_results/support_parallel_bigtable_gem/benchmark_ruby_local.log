@@ -1,0 +1,33 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>false, :app_profile_id=>"nosidecar", :threads=>50, :qps=>500, :duration=>60, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 249.6
+  Average Latency:      6.2454 ms
+  p50 Latency:          5.027 ms
+  p90 Latency:          9.111 ms
+  p99 Latency:          31.279 ms
+  p99.9 Latency:        60.511 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 14976
+Throughput (ops/sec): 499.2
+Average Latency: 6.245439771259729 ms
+p50 Latency:     5.027 ms
+p90 Latency:     9.111 ms
+p99 Latency:     31.279 ms
+p99.9 Latency:   60.511 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 1 at 31.279 ms
+========================================
