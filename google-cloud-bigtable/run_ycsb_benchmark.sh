@@ -12,12 +12,10 @@ for arg in "$@"; do
   fi
 done
 
-PHASE="phase_18"
-for arg in "$@"; do
-  if [[ "$arg" == phase_* ]]; then
-    PHASE="$arg"
-  fi
-done
+PHASE=${4:-baseline}
+if [ "$PHASE" == "--enable-debug-logging" ]; then
+  PHASE="baseline"
+fi
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
@@ -50,7 +48,10 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
   
   DEBUG_ENV=""
   if [ "$ENABLE_DEBUG_LOGGING" == "true" ]; then
-    DEBUG_ENV="export GRPC_TRACE=all GRPC_VERBOSITY=DEBUG;"
+    # We used to set GRPC_TRACE=all GRPC_VERBOSITY=DEBUG here, but it
+    # logged far too much C++/gRPC stuff between Ruby and Java.
+    # The only debug logs we care about are the custom ones we added for Jetstream.
+    DEBUG_ENV=""
   fi
 
   eval "\$DEBUG_ENV ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=${DURATION} > benchmark_sidecar.log 2>&1 &"

@@ -1,0 +1,65 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>false, :app_profile_id=>"nosidecar", :threads=>50, :qps=>500, :duration=>300, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+ycsb_benchmark.rb:128: warning: undefining the allocator of T_DATA class HDRHistogram
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 499.4
+  Average Latency:      3.7198 ms
+  p50 Latency:          3.329 ms
+  p90 Latency:          4.799 ms
+  p99 Latency:          10.511 ms
+  p99.9 Latency:        18.767 ms
+----------------------------------------
+Minute 2 (Sec 60-120):
+  Throughput (ops/sec): 499.68
+  Average Latency:      3.5155 ms
+  p50 Latency:          3.259 ms
+  p90 Latency:          4.363 ms
+  p99 Latency:          8.231 ms
+  p99.9 Latency:        12.943 ms
+----------------------------------------
+Minute 3 (Sec 120-180):
+  Throughput (ops/sec): 499.45
+  Average Latency:      3.7292 ms
+  p50 Latency:          3.395 ms
+  p90 Latency:          4.807 ms
+  p99 Latency:          9.463 ms
+  p99.9 Latency:        13.159 ms
+----------------------------------------
+Minute 4 (Sec 180-240):
+  Throughput (ops/sec): 499.62
+  Average Latency:      3.699 ms
+  p50 Latency:          3.417 ms
+  p90 Latency:          4.691 ms
+  p99 Latency:          8.503 ms
+  p99.9 Latency:        12.231 ms
+----------------------------------------
+Minute 5 (Sec 240-300):
+  Throughput (ops/sec): 249.75
+  Average Latency:      3.6732 ms
+  p50 Latency:          3.377 ms
+  p90 Latency:          4.603 ms
+  p99 Latency:          9.023 ms
+  p99.9 Latency:        16.335 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 134874
+Throughput (ops/sec): 499.53333333333336
+Average Latency: 3.6666710076091444 ms
+p50 Latency:     3.351 ms
+p90 Latency:     4.655 ms
+p99 Latency:     9.191 ms
+p99.9 Latency:   14.519 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 1 at 10.511 ms
+========================================

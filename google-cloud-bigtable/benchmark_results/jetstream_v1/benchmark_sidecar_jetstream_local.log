@@ -1,0 +1,225 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>true, :app_profile_id=>"sidecarjetstream", :threads=>50, :qps=>500, :duration=>300, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian", :use_jetstream=>true}
+>>> JAVA SIDECAR: Located jlink launcher in gem at /home/justinuang_google_com/benchmark_phases/jetstream_v1/vendor/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime/bin/sidecar-launcher
+>>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS...
+ycsb_benchmark.rb:128: warning: undefining the allocator of T_DATA class HDRHistogram
+>>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)...
+   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260303-141534-9a5bzj/sidecar.sock
+   [SIDECAR] Java Sidecar JRE Home: /home/justinuang_google_com/benchmark_phases/jetstream_v1/vendor/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime
+   [SIDECAR] Java Sidecar JRE Version: 21.0.10
+   [SIDECAR] Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: true
+   [SIDECAR] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+   [SIDECAR] SLF4J: Defaulting to no-operation (NOP) logger implementation
+   [SIDECAR] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260303-141534-9a5bzj/sidecar.sock
+>>> RUBY CLIENT: Sidecar signaled readiness via FIFO.
+   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260303-141534-9a5bzj/ready.fifo
+   [SIDECAR] Mar 03, 2026 9:29:51 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0xe4027f88, L:/tmp/bigtable-sidecar20260303-141534-9a5bzj/sidecar.sock - R:]'
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+   [SIDECAR] Mar 03, 2026 9:30:00 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0x6e786374, L:/tmp/bigtable-sidecar20260303-141534-9a5bzj/sidecar.sock - R:]'
+   [SIDECAR] Mar 03, 2026 9:30:00 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:30:00 PM com.example.sidecar.BigtableProxyService lambda$getJetstreamTableAsync$0
+   [SIDECAR] INFO: Java Proxy: Initializing new Jetstream client for autonomous-mote-782/ju-ruby-sidecar/ycsb-100gb/sidecarjetstream
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 1, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-6 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-8 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-2 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-0 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-4 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 2, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 0, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-9 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-1 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-5 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-3 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-7 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 3, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-22 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-21 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-23 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-20 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-24 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 5, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-30 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-35 session closed unexpectedly in state STARTING. Status: Status{code=CANCELLED, description=io.grpc.Context was cancelled without error, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 4, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-27 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-26 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-28 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-25 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-29 session closed unexpectedly in state STARTING. Status: Status{code=FAILED_PRECONDITION, description=Session requests cannot have a user-set deadline, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-36 session closed unexpectedly in state STARTING. Status: Status{code=CANCELLED, description=io.grpc.Context was cancelled without error, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 6, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/173.194.215.95:443
+   [SIDECAR] Mar 03, 2026 9:30:02 PM com.google.cloud.bigtable.data.v2.internal.session.SessionImpl dispatchStreamClosed
+   [SIDECAR] WARNING: Session error: table(ycsb-100gb)-52 session closed unexpectedly in state STARTING. Status: Status{code=CANCELLED, description=io.grpc.Context was cancelled without error, cause=null}
+   [SIDECAR] Mar 03, 2026 9:30:10 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:30:20 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+Sidecar stats cleared after warmup.
+   [SIDECAR] Mar 03, 2026 9:30:30 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:30:40 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:30:50 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:00 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:10 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:20 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:30 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:40 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:31:50 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:00 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:10 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:20 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:30 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:40 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:32:50 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:00 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:10 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:20 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:30 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:40 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:33:50 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:00 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:02 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 11, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/108.177.11.95:443
+   [SIDECAR] Mar 03, 2026 9:34:10 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:15 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 10, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/108.177.11.95:443
+   [SIDECAR] Mar 03, 2026 9:34:16 PM com.google.cloud.bigtable.data.v2.internal.channels.DirectPathIpInterceptor$1$1 onHeaders
+   [SIDECAR] WARNING: Channel 9, Unexpected DirectPath status: false, expected: true. ip: sessionbigtable.googleapis.com/108.177.11.95:443
+   [SIDECAR] Mar 03, 2026 9:34:20 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:30 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:40 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+   [SIDECAR] Mar 03, 2026 9:34:50 PM com.example.sidecar.BigtableProxyService logJetstreamUsage
+   [SIDECAR] INFO: Using Jetstream!
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 499.62
+  Average Latency:      23.5905 ms
+  p50 Latency:          23.455 ms
+  p90 Latency:          24.063 ms
+  p99 Latency:          25.711 ms
+  p99.9 Latency:        29.407 ms
+----------------------------------------
+Minute 2 (Sec 60-120):
+  Throughput (ops/sec): 499.48
+  Average Latency:      23.5499 ms
+  p50 Latency:          23.439 ms
+  p90 Latency:          23.999 ms
+  p99 Latency:          25.455 ms
+  p99.9 Latency:        29.903 ms
+----------------------------------------
+Minute 3 (Sec 120-180):
+  Throughput (ops/sec): 499.58
+  Average Latency:      23.5683 ms
+  p50 Latency:          23.439 ms
+  p90 Latency:          24.015 ms
+  p99 Latency:          25.743 ms
+  p99.9 Latency:        29.903 ms
+----------------------------------------
+Minute 4 (Sec 180-240):
+  Throughput (ops/sec): 499.55
+  Average Latency:      23.5935 ms
+  p50 Latency:          23.455 ms
+  p90 Latency:          24.047 ms
+  p99 Latency:          26.031 ms
+  p99.9 Latency:        31.167 ms
+----------------------------------------
+Minute 5 (Sec 240-300):
+  Throughput (ops/sec): 249.83
+  Average Latency:      23.6232 ms
+  p50 Latency:          23.487 ms
+  p90 Latency:          24.111 ms
+  p99 Latency:          26.047 ms
+  p99.9 Latency:        30.223 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 134884
+Throughput (ops/sec): 499.57037037037037
+Average Latency: 23.580865063543534 ms
+p50 Latency:     23.455 ms
+p90 Latency:     24.047 ms
+p99 Latency:     25.759 ms
+p99.9 Latency:   30.159 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 5 at 26.047 ms
+========================================
+
+========================================
+Java Sidecar Base Performance Metrics:
+========================================
+Sidecar Processed Ops: 134892
+Average Latency:       22.9477 ms
+p50 Latency:           22.8523 ms
+p90 Latency:           23.3474 ms
+p99 Latency:           27.1036 ms
+========================================
+>>> RUBY CLIENT: Shutting down sidecar...

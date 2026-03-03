@@ -67,7 +67,7 @@ module Google
         #
         def initialize project_id, credentials, host: nil, host_admin: nil, timeout: nil,
                        channel_selection: nil, channel_count: nil, universe_domain: nil,
-                       use_sidecar: nil
+                       use_sidecar: nil, use_jetstream: nil
           @project_id = project_id
           @credentials = credentials
           @host = host
@@ -77,6 +77,7 @@ module Google
           @channel_count = channel_count
           @universe_domain_override = universe_domain
           @use_sidecar = use_sidecar
+          @use_jetstream = use_jetstream
           @bigtable_clients = ::Gapic::LruHash.new 10
           @sidecar_clients = ::Gapic::LruHash.new 10
           @mutex = Mutex.new

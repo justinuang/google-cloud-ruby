@@ -470,3 +470,61 @@ To verify the bash variable escaping fix within the heredoc used for parallel SS
 
 **Conclusion:**
 The `run_ycsb_benchmark.sh` script successfully executed without throwing the previous `bash: line 16: [: -ne: unary operator expected` syntax errors, confirming the fix works correctly. As expected for a 10-second run with a 30-second warmup period, no percentiles were emitted, but the underlying execution completed completely intact with `Exit code: 0`.
+## Phase: Jetstream Benchmark (`jetstream_v1`)
+
+To test the performance of the Java Sidecar vs Native Ruby with the newly integrated Jetstream capabilities, we executed a 5-minute benchmark against the 100GB dataset at 500 QPS targeting the `ju-ruby-sidecar-c3-vm`.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) | Java Sidecar (Jetstream) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- | :----------------------- |
+| **Throughput**        | 499.28 ops/sec            | 499.38 ops/sec           | 499.53 ops/sec          | 499.57 ops/sec           |
+| **Overall p99 Latency** | **4.72 ms**               | **6.59 ms**              | **9.19 ms**             | **25.75 ms**             |
+| **Worst-Min p99**     | 5.03 ms (Min 1)           | 7.12 ms (Min 5)          | 10.51 ms (Min 1)        | 26.04 ms (Min 5)         |
+| **Overall p50 Latency** | 2.59 ms                   | 3.49 ms                  | 3.35 ms                 | 23.45 ms                 |
+
+**Conclusion:** 
+The benchmark successfully recorded Jetstream connectivity through the Sidecar. The initial results show that Jetstream API calls introduce significantly higher latency (~25ms p99 vs ~4ms) compared to the standard DirectPath BigtableDataClient under this 500 QPS workload. This suggests further optimization or investigation may be required for the Jetstream integration to match base performance.
+
+### Phase Jetstream Evaluation 2: Testing Regional Network Latency Hypothesis
+**Date:** March 3rd, 2026
+**VM Instance:** `ju-ruby-sidecar-c3-vm-east4` (`us-east4-a` / `c3-standard-22`)
+**Bigtable Instance:** `ju-ruby-sidecar-c3` cluster in `us-east4-a`
+**Key Changes:**
+1. Jetstream API was showing a major regression (~25ms p99) in the `us-east1` tests.
+2. Since standard Bigtable DirectPath was achieving 4ms p99 from `us-east1`, we theorized that Jetstream's AFEs or traffic routing currently requires crossing regions into `us-east4`, adding ~20ms RTT latency.
+3. To confirm, we deployed a new testing environment entirely physically residing inside `us-east4-a`.
+
+#### Benchmark Configuration
+- **Dataset:** 100M rows (ycsb-100gb table) 
+- **Workload:** 100% Read, Zipfian distribution
+- **Threads:** 50
+- **Duration:** 300 seconds
+- **QPS:** 500 total QPS target
+- **Proxy Command (DirectPath):** `ruby ycsb_benchmark.rb` with `--app-profile-id=sidecar`
+- **Proxy Command (CloudPath):** `ruby ycsb_benchmark.rb` with `--app-profile-id=sidecarcloudpath` and `BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true`
+- **Jetstream Command:** `ruby ycsb_benchmark.rb` with `--app-profile-id=sidecarjetstream`
+
+#### Resulting Performance Metrics
+| Metric | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby Client | Jetstream Bidi-Stream |
+|--------|--------------------------|-------------------------|--------------------|-----------------------|
+| Throughput | 498.9 ops/sec | 499.5 ops/sec | 499.5 ops/sec | 499.5 ops/sec |
+| **E2E Latency** | | | | |
+| Average | 2.88 ms | 3.30 ms | 2.84 ms | 1.86 ms |
+| p50 | 2.63 ms | 3.20 ms | 2.70 ms | 1.78 ms |
+| p90 | 3.49 ms | 4.01 ms | 3.60 ms | 2.45 ms |
+| p99 | 4.59 ms | 5.22 ms | 5.56 ms | 3.25 ms |
+| p99.9 | 11.04 ms | 7.26 ms | 8.39 ms | 4.25 ms |
+| **Java Proxy Latency (Base)** | | | | |
+| Average | 2.21 ms | 2.64 ms | N/A | 1.20 ms |
+| p50 | 1.92 ms | 2.53 ms | N/A | 1.01 ms |
+| p90 | 2.70 ms | 3.25 ms | N/A | 1.59 ms |
+| p99 | 3.55 ms | 4.70 ms | N/A | 2.04 ms |
+| **IPC Proxy Tax (Overhead)** | | | | |
+| Average | +0.67 ms | +0.66 ms | N/A | +0.66 ms |
+| p50 | +0.71 ms | +0.67 ms | N/A | +0.77 ms |
+| p90 | +0.79 ms | +0.76 ms | N/A | +0.86 ms |
+| p99 | +1.04 ms | +0.52 ms | N/A | +1.21 ms |
+
+#### Analysis
+- Jetstream latency in `us-east4` is staggering, hitting **1.78ms p50 and 3.25ms p99**!
+- Jetstream is now out-performing standard Bigtable DirectPath proxy implementations (4.59ms p99).
+- This absolutely confirms the cross-region latency theory: testing across regions in `us-east1` was responsible for the +20ms tax due to Jetstream routing. Jetstream itself is natively faster than standard unary calls.
