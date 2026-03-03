@@ -4,13 +4,14 @@ set -ex
 VM_NAME=${1:-ju-ruby-sidecar-vm}
 VM_ZONE=${2:-us-east1-b}
 DURATION=${3:-300}
+PHASE=${4:-phase_18}
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
 SSH_OPTS="-i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no"
 
 echo "--- Step 1: Building and Deploying Gem ---"
-cd /usr/local/google/home/justinuang/ruby-prototype/google-cloud-ruby/google-cloud-bigtable
+cd /usr/local/google/home/justinuang/ruby-sidecar/google-cloud-ruby/google-cloud-bigtable
 
 echo "Building gem..."
 bundle exec rake sidecar:build
@@ -58,27 +59,27 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "--- Step 3: Fetching Results ---"
-mkdir -p tmp/benchmark
-ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar.log" > tmp/benchmark/benchmark_sidecar_local.log
-ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar_cloudpath.log" > tmp/benchmark/benchmark_sidecar_cloudpath_local.log
-ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_ruby.log" > tmp/benchmark/benchmark_ruby_local.log
+mkdir -p tmp/$PHASE
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar.log" > tmp/$PHASE/benchmark_sidecar_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_sidecar_cloudpath.log" > tmp/$PHASE/benchmark_sidecar_cloudpath_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_ruby.log" > tmp/$PHASE/benchmark_ruby_local.log
 
 echo "Sidecar Results (DirectPath):"
-cat tmp/benchmark/benchmark_sidecar_local.log | tail -n 35
+cat tmp/$PHASE/benchmark_sidecar_local.log | tail -n 35
 
 echo ""
 echo "Sidecar Results (CloudPath):"
-cat tmp/benchmark/benchmark_sidecar_cloudpath_local.log | tail -n 35
+cat tmp/$PHASE/benchmark_sidecar_cloudpath_local.log | tail -n 35
 
 echo ""
 echo "Native Ruby Results:"
-cat tmp/benchmark/benchmark_ruby_local.log | tail -n 35
+cat tmp/$PHASE/benchmark_ruby_local.log | tail -n 35
 
 # echo "--- Step 4: Routing Verification ---"
 # echo "Waiting 120s for metrics to propagate to Monarch..."
 # sleep 120
 
-# mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > tmp/benchmark/mash_routing_results.txt
+# mash --namespace=cloud_prod --deadline=600 "Query(Fetch(Raw('cloud.BigtableDataRequest', 'bigtable.googleapis.com/frontend_server/handler_latencies'), {'instance': 'ju-ruby-sidecar', 'metric:method': RegexpMatch('(google.bigtable.v2.)?Bigtable(\\\\.|\\\\/).*'), 'project': '450300683590'}) | Point(DistributionCount()) | Window(Rate('5m')) | GroupBy(['app_profile', 'metric:originator'], Sum()))" > tmp/$PHASE/mash_routing_results.txt
 
 # echo "Routing Results:"
-# cat tmp/benchmark/mash_routing_results.txt
+# cat tmp/$PHASE/mash_routing_results.txt
