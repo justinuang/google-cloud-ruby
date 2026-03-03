@@ -35,7 +35,9 @@ namespace :sidecar do
 
     puts "Building Java sidecar JAR..."
     Dir.chdir(java_dir) do
-      sh "mvn clean package"
+      mvn_cmd = "mvn clean package"
+      mvn_cmd += " -DskipTests" if ENV["SKIP_SIDECAR_TESTS"]
+      sh mvn_cmd
       
       if Dir.exist? "jlink-runtime"
         puts "jlink-runtime already exists, skipping jlink creation."

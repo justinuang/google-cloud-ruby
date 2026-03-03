@@ -8,13 +8,13 @@ PHASE=${4:-phase_18}
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
-SSH_OPTS="-i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no"
+SSH_OPTS="-i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no -o ServerAliveInterval=60"
 
 echo "--- Step 1: Building and Deploying Gem ---"
 cd "$(dirname "$0")"
 
 echo "Building gem..."
-bundle exec rake sidecar:build
+SKIP_SIDECAR_TESTS=true bundle exec rake sidecar:build
 gem build google-cloud-bigtable.gemspec
 GEM_FILE=$(ls -t google-cloud-bigtable-*.gem | head -n1)
 
