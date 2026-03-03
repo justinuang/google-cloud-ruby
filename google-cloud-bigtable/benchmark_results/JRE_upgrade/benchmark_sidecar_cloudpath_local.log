@@ -1,0 +1,74 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>true, :app_profile_id=>"sidecarcloudpath", :threads=>50, :qps=>500, :duration=>120, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+>>> JAVA SIDECAR: Located jlink launcher in gem at /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime/bin/sidecar-launcher
+>>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS...
+>>> JAVA SIDECAR: DirectPath expressly disabled by BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true. Using CloudPath.
+ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+>>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)...
+   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260303-125417-tkmkrh/sidecar.sock
+   [SIDECAR] Java Sidecar JRE Home: /var/lib/gems/3.2.0/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime
+   [SIDECAR] Java Sidecar JRE Version: 21.0.10
+   [SIDECAR] Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: null
+   [SIDECAR] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+   [SIDECAR] SLF4J: Defaulting to no-operation (NOP) logger implementation
+   [SIDECAR] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260303-125417-tkmkrh/sidecar.sock
+>>> RUBY CLIENT: Sidecar signaled readiness via FIFO.
+   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260303-125417-tkmkrh/ready.fifo
+   [SIDECAR] Mar 03, 2026 8:17:27 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0xeda5a127, L:/tmp/bigtable-sidecar20260303-125417-tkmkrh/sidecar.sock - R:]'
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+   [SIDECAR] Mar 03, 2026 8:17:37 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0x4976aed5, L:/tmp/bigtable-sidecar20260303-125417-tkmkrh/sidecar.sock - R:]'
+   [SIDECAR] Mar 03, 2026 8:17:37 PM com.example.sidecar.BigtableProxyService lambda$getClient$0
+   [SIDECAR] INFO: Java Proxy: Initializing new client for autonomous-mote-782/ju-ruby-sidecar/sidecarcloudpath
+Sidecar stats cleared after warmup.
+========================================
+Benchmark Finished!
+========================================
+Per-Minute Breakdown:
+========================================
+Minute 1 (Sec 0-60):
+  Throughput (ops/sec): 499.25
+  Average Latency:      3.8577 ms
+  p50 Latency:          3.701 ms
+  p90 Latency:          4.631 ms
+  p99 Latency:          6.219 ms
+  p99.9 Latency:        9.911 ms
+----------------------------------------
+Minute 2 (Sec 60-120):
+  Throughput (ops/sec): 249.85
+  Average Latency:      3.8029 ms
+  p50 Latency:          3.665 ms
+  p90 Latency:          4.531 ms
+  p99 Latency:          6.167 ms
+  p99.9 Latency:        9.103 ms
+----------------------------------------
+========================================
+Overall Aggregate Metrics:
+========================================
+Total operations recorded (post-warmup): 44946
+Throughput (ops/sec): 499.4
+Average Latency: 3.839458085941681 ms
+p50 Latency:     3.689 ms
+p90 Latency:     4.599 ms
+p99 Latency:     6.211 ms
+p99.9 Latency:   9.743 ms
+========================================
+Worst-Minute Analysis:
+========================================
+Worst p99 occurred in Minute 1 at 6.219 ms
+========================================
+
+========================================
+Java Sidecar Base Performance Metrics:
+========================================
+Sidecar Processed Ops: 44946
+Average Latency:       3.0728 ms
+p50 Latency:           2.9906 ms
+p90 Latency:           3.7186 ms
+p99 Latency:           5.1359 ms
+========================================
+>>> RUBY CLIENT: Shutting down sidecar...

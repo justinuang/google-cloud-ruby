@@ -41,8 +41,8 @@ namespace :sidecar do
         puts "jlink-runtime already exists, skipping jlink creation."
       else
         puts "Creating jlink runtime (JRE only)..."
-        jlink_bin = "/usr/lib/jvm/java-17-openjdk-amd64/bin/jlink"
-        jmods_path = "/usr/lib/jvm/java-17-openjdk-amd64/jmods"
+        jlink_bin = "/usr/lib/jvm/java-21-openjdk-amd64/bin/jlink"
+        jmods_path = "/usr/lib/jvm/java-21-openjdk-amd64/jmods"
         
         # Modules identified by jdeps + some extras for safety
         modules = [
