@@ -136,4 +136,77 @@ public class BigtableProxyServiceTest {
                 assertEquals("val3", c3.getValue().toStringUtf8());
                 assertTrue("Single chunk row MUST have commitRow set to true", c3.getCommitRow());
         }
+
+        @Test
+        public void testReadRowsEmptyRow() {
+                // Setup Mock Row Data with no cells
+                Row mockEmptyRow = Row.create(ByteString.copyFromUtf8("empty-row"), Arrays.asList());
+
+                @SuppressWarnings("unchecked")
+                com.google.api.gax.rpc.ServerStream<Row> mockStream = mock(com.google.api.gax.rpc.ServerStream.class);
+                when(mockStream.iterator()).thenReturn(Arrays.asList(mockEmptyRow).iterator());
+                when(mockDataClient.readRows(any(Query.class))).thenReturn(mockStream);
+
+                ReadRowsRequest request = ReadRowsRequest.newBuilder()
+                                .setTableName("projects/test-project/instances/test-instance/tables/test-table")
+                                .build();
+
+                Iterator<ReadRowsResponse> responseIterator = blockingStub.readRows(request);
+
+                List<ReadRowsResponse> responses = new ArrayList<>();
+                responseIterator.forEachRemaining(responses::add);
+
+                assertEquals(1, responses.size());
+                ReadRowsResponse r1 = responses.get(0);
+                assertEquals(1, r1.getChunksCount());
+
+                ReadRowsResponse.CellChunk c1 = r1.getChunks(0);
+                assertEquals("empty-row", c1.getRowKey().toStringUtf8());
+                assertTrue("Empty row chunk MUST have commitRow set to true", c1.getCommitRow());
+                assertFalse("Empty row chunk should not have family name", c1.hasFamilyName());
+                assertFalse("Empty row chunk should not have qualifier", c1.hasQualifier());
+                // ByteString.EMPTY has size 0
+                assertEquals(0, c1.getValue().size());
+        }
+
+        @Test
+        public void testReadRowsNoChunkSplittingForLargeRows() {
+                // We will create a row with 1005 cells. The proxy flushes every 1000 chunks.
+                List<RowCell> cells = new ArrayList<>();
+                for (int i = 0; i < 1005; i++) {
+                        cells.add(RowCell.create(
+                                        "cf1",
+                                        ByteString.copyFromUtf8("col" + i),
+                                        1000L + i,
+                                        Arrays.asList(),
+                                        ByteString.copyFromUtf8("val" + i)));
+                }
+
+                Row mockHugeRow = Row.create(ByteString.copyFromUtf8("huge-row"), cells);
+
+                @SuppressWarnings("unchecked")
+                com.google.api.gax.rpc.ServerStream<Row> mockStream = mock(com.google.api.gax.rpc.ServerStream.class);
+                when(mockStream.iterator()).thenReturn(Arrays.asList(mockHugeRow).iterator());
+                when(mockDataClient.readRows(any(Query.class))).thenReturn(mockStream);
+
+                ReadRowsRequest request = ReadRowsRequest.newBuilder()
+                                .setTableName("projects/test-project/instances/test-instance/tables/test-table")
+                                .build();
+
+                Iterator<ReadRowsResponse> responseIterator = blockingStub.readRows(request);
+
+                List<ReadRowsResponse> responses = new ArrayList<>();
+                responseIterator.forEachRemaining(responses::add);
+
+                // Because we no longer split rows, everything should be batched into a single
+                // response
+                assertEquals(1, responses.size());
+
+                ReadRowsResponse r1 = responses.get(0);
+                assertEquals("Whole row should be in one response", 1005, r1.getChunksCount());
+
+                // Assert Commit Marker is only on the very last chunk of the row
+                assertFalse("Intermediate chunk should not have commit", r1.getChunks(999).getCommitRow());
+                assertTrue("Last chunk must have commit", r1.getChunks(1004).getCommitRow());
+        }
 }

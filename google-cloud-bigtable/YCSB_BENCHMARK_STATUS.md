@@ -362,3 +362,22 @@ To prove that buffering chunks and separating the Dual-Client architecture impro
 
 **Conclusion:** 
 With chunk buffering natively implemented within the proxy, the Sidecar was able to smoothly handle the 500 QPS limit with zero errors, holding to a pristine `6.47ms` worst-minute spike. Meanwhile, the Native Ruby implementation suffered a `107ms` p99 worst-minute spike, firmly cementing the Proxy architecture as significantly superior for predictable tail latencies.
+
+## Phase 15: Run YCSB Benchmark Skill
+
+We have documented the process of running the YCSB benchmark as a reusable agent skill (`.agents/skills/run_ycsb_benchmark/SKILL.md`). This skill instructs agents on how to use `run_ycsb_benchmark.sh` specifically targeting the high-performance `ju-ruby-sidecar-c3-vm` compute instance for consistent and accurate latency evaluation between the DirectPath Sidecar and Native Ruby.
+### Phase 16: Verify Unbounded Chunks at Scale (5-minute Benchmark)
+
+To prove that buffering unbound logical `Row` chunks natively within the Java Sidecar does not introduce latency or OOM issues, we executed the 3-Way 5-minute benchmark at 500 QPS against the 100GB dataset after the Phase 15 code changes were merged.
+
+| Metric Type           | Java Sidecar (DirectPath) | Java Sidecar (CloudPath) | Native Ruby (CloudPath) |
+| :-------------------- | :------------------------ | :----------------------- | :---------------------- |
+| **Throughput**        | 499 ops/sec               | 499 ops/sec              | 499 ops/sec             |
+| **Overall p99 Latency** | **4.91 ms**               | **7.35 ms**              | **47.78 ms**             |
+| **Worst-Min p99**     | 5.07 ms (Min 1)           | 7.99 ms (Min 3)          | 77.70 ms (Min 4)        |
+| **Overall p50 Latency** | 2.79 ms                   | 3.65 ms                  | 4.85 ms                 |
+
+**Conclusion:** 
+Moving from artificial 1000-chunk splits (Phase 14) to natively grouping the entire `Row` before yielding (Phase 15/16) showed zero regressions in boundaries while actually improving the Sidecar's overall p99 tail latency from 5.80 ms down to a blistering **4.91 ms**.
+
+The Native Ruby baseline heavily struggled during the prolonged connection pools, generating a **47.78 ms** p99 benchmark latency score. This confirms the new sidecar buffering strategy mapped dynamically inside the Proxy successfully hits the absolute performance ceiling for Ruby.

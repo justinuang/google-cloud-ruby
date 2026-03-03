@@ -96,8 +96,9 @@ public class BigtableProxyService extends BigtableGrpc.BigtableImplBase {
             int currentBytes = 0;
             // 2MB soft limit for chunking
             final int MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
-            // Max chunks per response to avoid extreme array allocation
-            final int MAX_CHUNKS = 1000;
+            // 10ms max flush delay to prevent artificial latency for sparse rows
+            final long MAX_FLUSH_DELAY_NANOS = 10_000_000L;
+            long lastFlushTime = System.nanoTime();
 
             for (Row row : dataClient.readRows(query)) {
                 java.util.List<RowCell> cells = row.getCells();
@@ -135,21 +136,18 @@ public class BigtableProxyService extends BigtableGrpc.BigtableImplBase {
 
                         responseBuilder.addChunks(chunkBuilder.build());
                         currentBytes += cellSize;
-
-                        // If we are hitting limits, flush the response
-                        if (currentBytes >= MAX_RESPONSE_BYTES || responseBuilder.getChunksCount() >= MAX_CHUNKS) {
-                            responseObserver.onNext(responseBuilder.build());
-                            responseBuilder.clear();
-                            currentBytes = 0;
-                        }
                     }
                 }
 
-                // Also check limits after outer row, in case an empty row pushed it over
-                if (currentBytes >= MAX_RESPONSE_BYTES || responseBuilder.getChunksCount() >= MAX_CHUNKS) {
-                    responseObserver.onNext(responseBuilder.build());
-                    responseBuilder.clear();
-                    currentBytes = 0;
+                // Evaluate batch limits AFTER the full row is completely buffered
+                long timeSinceLastFlush = System.nanoTime() - lastFlushTime;
+                if (currentBytes >= MAX_RESPONSE_BYTES || timeSinceLastFlush >= MAX_FLUSH_DELAY_NANOS) {
+                    if (responseBuilder.getChunksCount() > 0) {
+                        responseObserver.onNext(responseBuilder.build());
+                        responseBuilder.clear();
+                        currentBytes = 0;
+                        lastFlushTime = System.nanoTime();
+                    }
                 }
             }
 
