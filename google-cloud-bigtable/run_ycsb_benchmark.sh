@@ -43,11 +43,11 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
   ruby ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=${DURATION} > benchmark_ruby.log 2>&1 &
   PID3=\$!
   
-  wait -n $PID1 $PID2 $PID3
-  STATUS=$?
-  if [ $STATUS -ne 0 ]; then
-    echo "A benchmark process failed with status $STATUS!"
-    kill $PID1 $PID2 $PID3 2>/dev/null || true
+  wait -n \$PID1 \$PID2 \$PID3
+  STATUS=\$?
+  if [ \$STATUS -ne 0 ]; then
+    echo "A benchmark process failed with status \$STATUS!"
+    kill \$PID1 \$PID2 \$PID3 2>/dev/null || true
     echo "--- Sidecar Logs ---"
     cat benchmark_sidecar.log
     echo "--- Sidecar CloudPath Logs ---"
@@ -56,7 +56,7 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
     cat benchmark_ruby.log
     exit 1
   fi
-  wait $PID1 $PID2 $PID3
+  wait \$PID1 \$PID2 \$PID3
 EOF
 
 if [ $? -ne 0 ]; then

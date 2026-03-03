@@ -463,3 +463,10 @@ To verify the isolation of benchmark gem installations in their respective `benc
 
 **Conclusion:** 
 The benchmark successfully verified the parallel execution workflow by installing the gem locally without overwriting the global VM state. The test confirms that the Custom Java Sidecar achieves a 4x reduction in p99 tail latencies for short bursts (6.47ms vs 31.28ms) by avoiding the Ruby GIL blockages even over a simple 60-second window.
+
+## Phase: Bash Script Fix Test (`test_bash_fix`)
+
+To verify the bash variable escaping fix within the heredoc used for parallel SSH execution, a 10-second duration run was executed against the `ju-ruby-sidecar-c3-vm`.
+
+**Conclusion:**
+The `run_ycsb_benchmark.sh` script successfully executed without throwing the previous `bash: line 16: [: -ne: unary operator expected` syntax errors, confirming the fix works correctly. As expected for a 10-second run with a 30-second warmup period, no percentiles were emitted, but the underlying execution completed completely intact with `Exit code: 0`.

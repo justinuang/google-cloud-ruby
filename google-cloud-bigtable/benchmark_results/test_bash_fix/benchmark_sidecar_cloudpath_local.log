@@ -1,0 +1,30 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>true, :app_profile_id=>"sidecarcloudpath", :threads=>50, :qps=>500, :duration=>10, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+>>> JAVA SIDECAR: Located jlink launcher in gem at /home/justinuang_google_com/benchmark_phases/test_bash_fix/vendor/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime/bin/sidecar-launcher
+>>> RUBY CLIENT: Starting Java sidecar with gRPC/UDS...
+>>> JAVA SIDECAR: DirectPath expressly disabled by BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true. Using CloudPath.
+ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+>>> RUBY CLIENT: Waiting for sidecar readiness signal via FIFO (timeout: 30s)...
+   [SIDECAR] Java Sidecar: Starting gRPC server on /tmp/bigtable-sidecar20260303-134442-dnzfwc/sidecar.sock
+   [SIDECAR] Java Sidecar JRE Home: /home/justinuang_google_com/benchmark_phases/test_bash_fix/vendor/gems/google-cloud-bigtable-2.12.3/lib/google/cloud/bigtable/runtime
+   [SIDECAR] Java Sidecar JRE Version: 21.0.10
+   [SIDECAR] Java Sidecar ENV [CBT_ENABLE_DIRECTPATH]: null
+   [SIDECAR] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+   [SIDECAR] SLF4J: Defaulting to no-operation (NOP) logger implementation
+   [SIDECAR] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+   [SIDECAR] Java Sidecar: Server started, listening on /tmp/bigtable-sidecar20260303-134442-dnzfwc/sidecar.sock
+>>> RUBY CLIENT: Sidecar signaled readiness via FIFO.
+   [SIDECAR] Java Sidecar: Signaled readiness to FIFO: /tmp/bigtable-sidecar20260303-134442-dnzfwc/ready.fifo
+   [SIDECAR] Mar 03, 2026 9:11:13 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0x8d740f87, L:/tmp/bigtable-sidecar20260303-134442-dnzfwc/sidecar.sock - R:]'
+>>> RUBY CLIENT: Sidecar ready and verified via gRPC.
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+   [SIDECAR] Mar 03, 2026 9:11:22 PM io.grpc.netty.shaded.io.netty.bootstrap.AbstractBootstrap setChannelOption
+   [SIDECAR] WARNING: Unknown channel option 'SO_KEEPALIVE' for channel '[id: 0x8730a356, L:/tmp/bigtable-sidecar20260303-134442-dnzfwc/sidecar.sock - R:]'
+   [SIDECAR] Mar 03, 2026 9:11:22 PM com.example.sidecar.BigtableProxyService lambda$getClient$0
+   [SIDECAR] INFO: Java Proxy: Initializing new client for autonomous-mote-782/ju-ruby-sidecar/sidecarcloudpath
+========================================
+Benchmark Finished!
+No latencies recorded. Was the run duration too short?
+>>> RUBY CLIENT: Shutting down sidecar...

@@ -1,0 +1,8 @@
+Starting YCSB Read-Only Benchmark with:
+{:use_sidecar=>false, :app_profile_id=>"nosidecar", :threads=>50, :qps=>500, :duration=>10, :warmup=>30, :project_id=>"autonomous-mote-782", :instance_id=>"ju-ruby-sidecar", :table_id=>"ycsb-100gb", :recordcount=>100000000, :distribution=>"zipfian"}
+ycsb_benchmark.rb:123: warning: undefining the allocator of T_DATA class HDRHistogram
+Initializing Zipfian generator for 100000000 items...
+Generator Ready.
+========================================
+Benchmark Finished!
+No latencies recorded. Was the run duration too short?
