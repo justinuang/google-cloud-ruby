@@ -11,7 +11,7 @@ SSH_USER="justinuang_google_com"
 SSH_OPTS="-i ~/.ssh/google_compute_engine -o StrictHostKeyChecking=no"
 
 echo "--- Step 1: Building and Deploying Gem ---"
-cd /usr/local/google/home/justinuang/ruby-sidecar/google-cloud-ruby/google-cloud-bigtable
+cd "$(dirname "$0")"
 
 echo "Building gem..."
 bundle exec rake sidecar:build
