@@ -191,7 +191,7 @@ public class BigtableProxyService extends BigtableGrpc.BigtableImplBase {
                 }
 
                 Client jetstreamClient = new Client(settingsBuilder.build());
-                return jetstreamClient.openTableAsync(finalTableId, OpenTableRequest.Permission.PERMISSION_READ_WRITE);
+                return jetstreamClient.openTableAsync(finalTableId, OpenTableRequest.Permission.PERMISSION_READ);
             } catch (IOException e) {
                 throw new RuntimeException("Java Proxy: Failed to create JetstreamClient", e);
             }
@@ -364,6 +364,7 @@ public class BigtableProxyService extends BigtableGrpc.BigtableImplBase {
             String tableName = request.getTableName();
             String appProfileId = request.getAppProfileId();
 
+            /*
             if (Boolean.TRUE.equals(USE_JETSTREAM_KEY.get())) {
                 JETSTREAM_USED_KEY.get().set(true);
                 logJetstreamUsage();
@@ -381,6 +382,7 @@ public class BigtableProxyService extends BigtableGrpc.BigtableImplBase {
                 responseObserver.onCompleted();
                 return;
             }
+            */
 
             BigtableDataClient dataClient = getClient(tableName, appProfileId);
 

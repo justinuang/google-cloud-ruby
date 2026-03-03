@@ -87,7 +87,8 @@ module Google
                    timeout: nil,
                    channel_selection: nil,
                    channel_count: nil,
-                   use_sidecar: nil
+                   use_sidecar: nil,
+                   use_jetstream: nil
         project_id ||= default_project_id
         universe_domain ||= configure.universe_domain
         scope ||= configure.scope
@@ -111,7 +112,8 @@ module Google
                                         timeout: timeout,
                                         channel_selection: channel_selection,
                                         channel_count: channel_count,
-                                        use_sidecar: use_sidecar
+                                        use_sidecar: use_sidecar,
+                                        use_jetstream: use_jetstream
         Bigtable::Project.new service
       end
       # rubocop:enable Metrics/CyclomaticComplexity
