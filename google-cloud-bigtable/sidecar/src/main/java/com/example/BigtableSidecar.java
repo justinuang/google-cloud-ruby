@@ -11,6 +11,8 @@ import io.grpc.netty.shaded.io.netty.channel.unix.DomainSocketAddress;
 
 import java.io.IOException;
 
+import io.grpc.ServerInterceptors;
+
 public class BigtableSidecar {
     public static void main(String[] args) throws IOException, InterruptedException {
         String socketPath = null;
@@ -57,7 +59,8 @@ public class BigtableSidecar {
                 .workerEventLoopGroup(workerGroup)
                 .bossEventLoopGroup(bossGroup)
                 .addService(new SidecarServiceImpl())
-                .addService(new BigtableProxyService(project, instance))
+                .addService(ServerInterceptors.intercept(new BigtableProxyService(project, instance),
+                        BigtableProxyService.JETSTREAM_INTERCEPTOR))
                 .build();
 
         server.start();

@@ -21,11 +21,17 @@ cd google-cloud-bigtable
 ```
 
 2. Execute the `run_ycsb_benchmark.sh` script. Always use `ju-ruby-sidecar-c3-vm` and `us-east1-b` for the VM and Zone parameters to ensure consistent testing. Supply the desired `DURATION` and `<PHASE_NAME>`. User descriptive phase names instead of numbers!
+You can optionally add the `--enable-debug-logging` flag anywhere in the arguments to activate Java gRPC tracing and Verbosity logging for diagnosing connection/routing issues visually in the logs.
 ```bash
 # Example usage to be dynamically updated with actual parameters
-./run_ycsb_benchmark.sh ju-ruby-sidecar-c3-vm us-east1-b 300 <PHASE_NAME>
+./run_ycsb_benchmark.sh ju-ruby-sidecar-c3-vm us-east1-b 300 <PHASE_NAME> --enable-debug-logging
 ```
-3. Interpret the output metrics to understand the performance differences:
+3. Interpret the output metrics to understand the performance differences across the 4 axes:
+   - **Sidecar (DirectPath)**: Uses the Java sidecar with DirectPath enabled.
+   - **Sidecar (CloudPath)**: Uses the Java sidecar with DirectPath disabled.
+   - **Native Ruby**: Uses the standard Ruby client (CloudPath).
+   - **Sidecar (Jetstream)**: Uses Jetstream bidi streaming APIs inside the sidecar.
+
    - **p50 (Median)**: General performance baseline.
    - **p99 / p99.9 (Tail)**: Crucial for understanding the impact of GC pauses and network jitter.
 

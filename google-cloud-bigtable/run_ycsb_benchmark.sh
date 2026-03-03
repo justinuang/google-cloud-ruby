@@ -4,7 +4,20 @@ set -ex
 VM_NAME=${1:-ju-ruby-sidecar-c3-vm}
 VM_ZONE=${2:-us-east1-b}
 DURATION=${3:-300}
-PHASE=${4:-phase_18}
+
+ENABLE_DEBUG_LOGGING=false
+for arg in "$@"; do
+  if [ "$arg" == "--enable-debug-logging" ]; then
+    ENABLE_DEBUG_LOGGING=true
+  fi
+done
+
+PHASE="phase_18"
+for arg in "$@"; do
+  if [[ "$arg" == phase_* ]]; then
+    PHASE="$arg"
+  fi
+done
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
@@ -33,30 +46,41 @@ ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
   cd ~/benchmark_phases/$PHASE
   export GEM_HOME=~/benchmark_phases/$PHASE/vendor
   export GEM_PATH=~/benchmark_phases/$PHASE/vendor:\$(gem env gempath)
-  rm -f benchmark_sidecar.log benchmark_sidecar_cloudpath.log benchmark_ruby.log
-  ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=${DURATION} > benchmark_sidecar.log 2>&1 &
+  rm -f benchmark_sidecar.log benchmark_sidecar_cloudpath.log benchmark_ruby.log benchmark_sidecar_jetstream.log
+  
+  DEBUG_ENV=""
+  if [ "$ENABLE_DEBUG_LOGGING" == "true" ]; then
+    DEBUG_ENV="export GRPC_TRACE=all GRPC_VERBOSITY=DEBUG;"
+  fi
+
+  eval "\$DEBUG_ENV ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=${DURATION} > benchmark_sidecar.log 2>&1 &"
   PID1=\$!
   
-  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath --duration=${DURATION} > benchmark_sidecar_cloudpath.log 2>&1 &
+  eval "\$DEBUG_ENV BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath --duration=${DURATION} > benchmark_sidecar_cloudpath.log 2>&1 &"
   PID2=\$!
   
-  ruby ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=${DURATION} > benchmark_ruby.log 2>&1 &
+  eval "\$DEBUG_ENV ruby ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=${DURATION} > benchmark_ruby.log 2>&1 &"
   PID3=\$!
   
-  wait -n \$PID1 \$PID2 \$PID3
+  eval "\$DEBUG_ENV ruby ycsb_benchmark.rb --qps=500 --use-sidecar --use-jetstream --app-profile-id=sidecarjetstream --duration=${DURATION} > benchmark_sidecar_jetstream.log 2>&1 &"
+  PID4=\$!
+  
+  wait -n \$PID1 \$PID2 \$PID3 \$PID4
   STATUS=\$?
   if [ \$STATUS -ne 0 ]; then
     echo "A benchmark process failed with status \$STATUS!"
-    kill \$PID1 \$PID2 \$PID3 2>/dev/null || true
+    kill \$PID1 \$PID2 \$PID3 \$PID4 2>/dev/null || true
     echo "--- Sidecar Logs ---"
     cat benchmark_sidecar.log
     echo "--- Sidecar CloudPath Logs ---"
     cat benchmark_sidecar_cloudpath.log
     echo "--- No-Sidecar Logs ---"
     cat benchmark_ruby.log
+    echo "--- Sidecar Jetstream Logs ---"
+    cat benchmark_sidecar_jetstream.log
     exit 1
   fi
-  wait \$PID1 \$PID2 \$PID3
+  wait \$PID1 \$PID2 \$PID3 \$PID4
 EOF
 
 if [ $? -ne 0 ]; then
@@ -69,6 +93,7 @@ mkdir -p tmp/$PHASE
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_phases/$PHASE/benchmark_sidecar.log" > tmp/$PHASE/benchmark_sidecar_local.log
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_phases/$PHASE/benchmark_sidecar_cloudpath.log" > tmp/$PHASE/benchmark_sidecar_cloudpath_local.log
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_phases/$PHASE/benchmark_ruby.log" > tmp/$PHASE/benchmark_ruby_local.log
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "cat ~/benchmark_phases/$PHASE/benchmark_sidecar_jetstream.log" > tmp/$PHASE/benchmark_sidecar_jetstream_local.log
 
 echo "Sidecar Results (DirectPath):"
 cat tmp/$PHASE/benchmark_sidecar_local.log | tail -n 35
@@ -80,6 +105,10 @@ cat tmp/$PHASE/benchmark_sidecar_cloudpath_local.log | tail -n 35
 echo ""
 echo "Native Ruby Results:"
 cat tmp/$PHASE/benchmark_ruby_local.log | tail -n 35
+
+echo ""
+echo "Sidecar Jetstream Results:"
+cat tmp/$PHASE/benchmark_sidecar_jetstream_local.log | tail -n 35
 
 # echo "--- Step 4: Routing Verification ---"
 # echo "Waiting 120s for metrics to propagate to Monarch..."

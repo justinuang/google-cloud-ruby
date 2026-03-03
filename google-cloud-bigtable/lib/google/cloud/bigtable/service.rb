@@ -691,13 +691,35 @@ module Google
 
         def read_rows instance_id, table_id, app_profile_id: nil, rows: nil, filter: nil, rows_limit: nil
           c = @use_sidecar ? sidecar_client(table_path(instance_id, table_id), app_profile_id) : client(table_path(instance_id, table_id), app_profile_id)
-          c.read_rows(
-            table_name:     table_path(instance_id, table_id),
-            rows:           rows,
-            filter:         filter,
-            rows_limit:     rows_limit,
-            app_profile_id: app_profile_id
-          )
+
+          if @use_jetstream
+            req = {
+              table_name:     table_path(instance_id, table_id),
+              rows:           rows,
+              filter:         filter,
+              rows_limit:     rows_limit,
+              app_profile_id: app_profile_id
+            }.compact
+            options = { metadata: { "x-use-jetstream" => "true" } }
+            op = nil
+            enum = c.read_rows(req, options) do |response, operation|
+              op = operation
+            end
+            return Enumerator.new do |y|
+              enum.each { |chunk| y << chunk }
+              unless op && op.trailing_metadata && op.trailing_metadata["x-jetstream-used"] == "true"
+                raise "Jetstream requested but not used for read_rows"
+              end
+            end
+          else
+            c.read_rows(
+              table_name:     table_path(instance_id, table_id),
+              rows:           rows,
+              filter:         filter,
+              rows_limit:     rows_limit,
+              app_profile_id: app_profile_id
+            )
+          end
         end
 
         def sample_row_keys table_name, app_profile_id: nil
@@ -707,14 +729,31 @@ module Google
 
         def mutate_row table_name, row_key, mutations, app_profile_id: nil
           c = @use_sidecar ? sidecar_client(table_name, app_profile_id) : client(table_name, app_profile_id)
-          c.mutate_row(
-            **{
+          
+          if @use_jetstream
+            req = {
               table_name:     table_name,
               app_profile_id: app_profile_id,
               row_key:        row_key,
               mutations:      mutations
             }.compact
-          )
+            options = { metadata: { "x-use-jetstream" => "true" } }
+            
+            c.mutate_row(req, options) do |response, operation|
+              unless operation && operation.trailing_metadata && operation.trailing_metadata["x-jetstream-used"] == "true"
+                raise "Jetstream requested but not used for mutate_row"
+              end
+            end
+          else
+            c.mutate_row(
+              **{
+                table_name:     table_name,
+                app_profile_id: app_profile_id,
+                row_key:        row_key,
+                mutations:      mutations
+              }.compact
+            )
+          end
         end
 
         def mutate_rows table_name, entries, app_profile_id: nil, call_options: nil

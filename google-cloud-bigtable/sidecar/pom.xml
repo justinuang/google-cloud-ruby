@@ -39,6 +39,20 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-bigtable</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-bigtable-jetstream</artifactId>
+            <version>2.62.1-session-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>proto-google-cloud-bigtable-v2</artifactId>
+            <version>2.62.1-session-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>grpc-google-cloud-bigtable-v2</artifactId>
             <version>2.62.1-session-SNAPSHOT</version>
         </dependency>
         <dependency>

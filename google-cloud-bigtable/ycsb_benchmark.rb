@@ -64,6 +64,10 @@ OptionParser.new do |opts|
     options[:use_sidecar] = true
   end
 
+  opts.on("--use-jetstream", "Use Jetstream bidi streams") do
+    options[:use_jetstream] = true
+  end
+
   opts.on("--app-profile-id ID", "App profile ID to use") do |id|
     options[:app_profile_id] = id
   end
@@ -103,7 +107,8 @@ puts options.inspect
 
 bigtable = Google::Cloud::Bigtable.new(
   project_id: options[:project_id],
-  use_sidecar: options[:use_sidecar]
+  use_sidecar: options[:use_sidecar],
+  use_jetstream: options[:use_jetstream]
 )
 table = bigtable.table(options[:instance_id], options[:table_id], app_profile_id: options[:app_profile_id])
 
