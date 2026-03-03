@@ -3,6 +3,7 @@ set -ex
 
 VM_NAME=${1:-ju-ruby-sidecar-vm}
 VM_ZONE=${2:-us-east1-b}
+DURATION=${3:-300}
 
 SSH_HOST="nic0.${VM_NAME}.${VM_ZONE}.c.autonomous-mote-782.internal.gcpnode.com"
 SSH_USER="justinuang_google_com"
@@ -23,17 +24,17 @@ echo "Uninstalling old gem and installing new gem on VM..."
 ssh $SSH_OPTS $SSH_USER@$SSH_HOST "sudo gem uninstall -aIx google-cloud-bigtable || true; sudo gem install ~/$GEM_FILE"
 
 echo "--- Step 2: Running Benchmarks on VM ---"
-echo "Starting 3-way benchmarks in the background and waiting..."
-ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
+echo "Starting 3-way benchmarks in the background (Duration: ${DURATION}s) and waiting..."
+ssh $SSH_OPTS $SSH_USER@$SSH_HOST "bash -s" << EOF
   rm -f ~/benchmark_sidecar.log ~/benchmark_sidecar_cloudpath.log ~/benchmark_ruby.log
-  ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=300 > ~/benchmark_sidecar.log 2>&1 &
-  PID1=$!
+  ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecar --duration=${DURATION} > ~/benchmark_sidecar.log 2>&1 &
+  PID1=\$!
   
-  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath --duration=300 > ~/benchmark_sidecar_cloudpath.log 2>&1 &
-  PID2=$!
+  BIGTABLE_SIDECAR_DISABLE_DIRECTPATH=true ruby ~/ycsb_benchmark.rb --qps=500 --use-sidecar --app-profile-id=sidecarcloudpath --duration=${DURATION} > ~/benchmark_sidecar_cloudpath.log 2>&1 &
+  PID2=\$!
   
-  ruby ~/ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=300 > ~/benchmark_ruby.log 2>&1 &
-  PID3=$!
+  ruby ~/ycsb_benchmark.rb --qps=500 --app-profile-id=nosidecar --duration=${DURATION} > ~/benchmark_ruby.log 2>&1 &
+  PID3=\$!
   
   wait -n $PID1 $PID2 $PID3
   STATUS=$?
